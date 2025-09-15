@@ -1,0 +1,38 @@
+:root{
+  --bg-dark-1: #031428;
+  --bg-dark-2: #062446;
+  --bg-bright: #0a67ff;
+  --card:#071a3a;
+  --muted:rgba(255,255,255,0.75);
+  --muted-2:rgba(255,255,255,0.6);
+  --danger:#ff5a6b;
+  --primary:#2f80ed;
+}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:linear-gradient(110deg,var(--bg-dark-1) 0%, var(--bg-dark-2) 50%, var(--bg-bright) 100%);
+  color:var(--muted);
+}
+.wrap{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:220px;background:linear-gradient(180deg, rgba(2,10,30,0.95), rgba(3,18,40,0.95));
+         border-right:1px solid rgba(255,255,255,0.03);padding:18px}
+.brand{font-weight:700;color:#dbefff;margin-bottom:12px}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav a{padding:8px 10px;border-radius:6px;color:rgba(255,255,255,0.85);text-decoration:none;font-weight:600}
+.nav a.active{background:rgba(255,255,255,0.03);color:#fff}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;
+        background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.topbar .title{font-weight:700;color:#eaf4ff}
+.menu-btn{font-size:20px;cursor:pointer;color:#fff;margin-right:12px}
+
+.container{padding:20px;max-width:1100px;margin:0 auto;width:100%}
+.card{background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.04);
+      box-shadow:0 10px 30px rgba(2,10,30,0.6)}

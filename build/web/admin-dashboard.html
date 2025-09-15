@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thống kê & Báo cáo</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: #e0e0e0; /* chữ mặc định sáng hơn */
+      background: linear-gradient(110deg,#031428 0%,#062446 40%,#083d9a 70%,#0a67ff 100%);
+
+    }
+
+    .container {
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:250px;
+      background: linear-gradient(180deg, rgba(3,18,40,0.98), rgba(6,24,44,0.98));
+      border-right:1px solid rgba(255,255,255,0.03);
+      padding:22px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      color: #e6f6ff;
+    }
+    .brand{
+      font-weight:700;
+      font-size:18px;
+      color:#e6f6ff;
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .nav{
+      margin-top:10px;
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .nav a{
+      display:block;
+      padding:10px 12px;
+      border-radius:6px;
+      color:rgba(255,255,255,0.85);
+      text-decoration:none;
+      font-weight:500;
+    }
+    .nav a.active, .nav a:hover{
+      background: rgba(255,255,255,0.03);
+      color: #ffffff;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #ffffff;
+      font-size: 28px;
+    }
+
+    /* Cards thống kê */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .card h2 {
+      margin: 0;
+      font-size: 28px;
+      color: #00e5ff; /* số nổi bật */
+    }
+    .card p {
+      margin: 5px 0 0;
+      font-size: 15px;
+      color: #f5f5f5; /* chữ sáng dễ đọc */
+    }
+
+    /* Biểu đồ */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .chart-box {
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar" role="navigation">
+      <div class="brand">
+        JOBs
+      </div>
+
+      <nav class="nav" aria-label="Main">
+        <a class="active">Bảng thống kê</a>
+        <a href="Job_posting_management.html">Tin tuyển dụng</a>
+        <a href="Admin-user.html">Quản lý tài khoản</a>
+        <a href="#">Quản lý danh mục</a>
+        <a href="#">Đơn xin việc</a>
+        <a href="#">Tin tuyển dụng</a>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main">
+      <h1>Thống kê & Báo cáo</h1>
+      <div class="stats">
+        <div class="card"><h2>1,250</h2><p>Người dùng</p></div>
+        <div class="card"><h2>3,450</h2><p>Tin tuyển dụng</p></div>
+        <div class="card"><h2>7,200</h2><p>Ứng tuyển</p></div>
+        <div class="card"><h2>$12,500</h2><p>Doanh thu</p></div>
+      </div>
+
+      <div class="charts">
+        <div class="chart-box"><canvas id="usersChart"></canvas></div>
+        <div class="chart-box"><canvas id="jobsChart"></canvas></div>
+        <div class="chart-box"><canvas id="statusChart"></canvas></div>
+        <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Line chart - Người dùng
+    new Chart(document.getElementById('usersChart'), {
+      type: 'line',
+      data: {
+        labels: ['T1','T2','T3','T4','T5','T6'],
+        datasets: [{
+          label: 'Người dùng',
+          data: [200, 350, 600, 800, 1000, 1250],
+          borderColor: '#4bc0c0',
+          fill: false,
+          tension: 0.3
+        }]
+      }
+    });
+
+    // Bar chart - Tin tuyển dụng
+    new Chart(document.getElementById('jobsChart'), {
+      type: 'bar',
+      data: {
+        labels: ['CNTT','Kinh tế','Giáo dục','Y tế','Khác'],
+        datasets: [{
+          label: 'Tin tuyển dụng',
+          data: [1100, 900, 600, 400, 300],
+          backgroundColor: '#36a2eb'
+        }]
+      }
+    });
+
+    // Doughnut chart - Trạng thái
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Chấp nhận','Từ chối','Đang xử lý'],
+        datasets: [{
+          data: [55, 25, 20],
+          backgroundColor: ['#4caf50','#f44336','#ff9800']
+        }]
+      }
+    });
+
+    // Bar chart - Doanh thu
+    new Chart(document.getElementById('revenueChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Q1','Q2','Q3','Q4'],
+        datasets: [{
+          label: 'Doanh thu ($)',
+          data: [2500, 3000, 3300, 3200],
+          backgroundColor: '#ba68c8'
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
