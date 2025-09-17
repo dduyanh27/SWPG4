@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tin đã đăng - Recruit Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Job Management Specific Styles */
+        .job-management-page {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .job-management-main {
+            background: white;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 20px;
+            background: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #6b7280;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+            background: #f8fafc;
+        }
+
+        .tab:hover {
+            color: #2563eb;
+            background: #f8fafc;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            color: #9ca3af;
+            z-index: 1;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: #2563eb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-excel {
+            background: white;
+            color: #059669;
+            border: 1px solid #059669;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-excel:hover {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-filter {
+            background: white;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Job List */
+        .job-list {
+            padding: 0;
+        }
+
+        /* Column Header */
+        .column-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .job-item {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: start;
+        }
+
+        .job-item:last-child {
+            border-bottom: none;
+        }
+
+        .job-item:hover {
+            background: #f8fafc;
+        }
+
+        /* Job Title Section */
+        .job-title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+
+        .job-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2563eb;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .job-id {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .category {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .posted-by {
+            color: #9ca3af;
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 0px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .action-btn:not(:last-child) {
+            margin-right: -60px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 1px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            width: 10px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .repost-btn {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 1px 3px;
+            border-radius: 2px;
+            font-size: 11px;
+            font-weight: 500;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: -60px;
+        }
+
+        .repost-btn:hover {
+            background: #e5e7eb;
+        }
+
+        /* Service Section */
+        .service-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .service-item {
+            font-size: 12px;
+            color: #6b7280;
+            padding: 4px 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .service-item.disabled {
+            color: #9ca3af;
+        }
+
+        .service-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .service-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+
+        .service-desc {
+            font-size: 10px;
+            color: #9ca3af;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .btn-upgrade {
+            background: white;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            align-self: flex-start;
+        }
+
+        .btn-upgrade:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-view-cv {
+            background: white;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            align-self: flex-start;
+            position: relative;
+        }
+
+        .btn-view-cv:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-view-cv::after {
+            content: '2';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Expiration Section */
+        .expiration-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .expiration-status {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .expiration-status.expired {
+            color: #ef4444;
+        }
+
+        .expiration-dates {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* Applications Section */
+        .applications-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .application-count {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* Refresh Section */
+        .refresh-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .last-refresh {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .refresh-date {
+            display: block;
+        }
+
+        .refresh-time {
+            display: block;
+            color: #9ca3af;
+        }
+
+        /* Bottom Right Buttons */
+        .bottom-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .three-dots-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .three-dots-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        .help-btn {
+            background: #1f2937;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(31, 41, 55, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .help-btn:hover {
+            background: #111827;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            
+            .job-item {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .job-title-section,
+            .service-section,
+            .expiration-section,
+            .applications-section,
+            .refresh-section {
+                border-bottom: 1px solid #e5e7eb;
+                padding-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 10px;
+            }
+            
+            .filter-tabs {
+                flex-wrap: wrap;
+                padding: 0 10px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body class="job-management-page">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-briefcase"></i>
+                    <span>RecruitPro</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="#">Việc Làm</a></li>
+                    <li class="dropdown">
+                        <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                        </div>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#">Onboarding <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Quy trình onboarding</a>
+                            <a href="#">Tài liệu hướng dẫn</a>
+                        </div>
+                    </li>
+                    <li><a href="#">Đơn hàng</a></li>
+                    <li><a href="#">Báo cáo</a></li>
+                    <li><a href="#" class="company-link">Công ty</a></li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="nav-buttons">
+                    <div class="dropdown">
+                        <button class="btn btn-orange active">
+                            ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="job-posting.html">Tạo tin tuyển dụng mới</a>
+                            <a href="job-management.html" class="active">Quản lý tin đã đăng</a>
+                        </div>
+                    </div>
+                    <button class="btn btn-blue" onclick="window.location.href='candidate-profile.html'">TÌM ỨNG VIÊN</button>
+                    <button class="btn btn-white">Mua</button>
+                </div>
+                <div class="nav-icons">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div class="dropdown user-dropdown">
+                        <div class="user-avatar">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGNUY3RkEiLz4KPHN2ZyB4PSIxMCIgeT0iMTAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSIjOUNBM0FGIi8+CjxwYXRoIGQ9Ik0xMiAxNEM5LjMzIDE0IDcgMTYuMzMgNyAxOVYyMUgxN1YxOUMxNyAxNi4zMyAxNC42NyAxNCAxMiAxNFoiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+Cjwvc3ZnPgo=" alt="User Avatar" class="avatar-img">
+                        </div>
+                        <div class="dropdown-content user-menu">
+                            <div class="user-header">
+                                <i class="fas fa-user-circle"></i>
+                                <div class="user-info">
+                                    <div class="user-name">Nguyen Phuoc</div>
+                                </div>
+                                <i class="fas fa-times close-menu"></i>
+                            </div>
+                            
+                            <div class="menu-section">
+                                <div class="section-title">Thành viên</div>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>Thành viên</span>
+                                </a>
+                            </div>
+                            
+                            <div class="menu-section">
+                                <div class="section-title">Thiết lập tài khoản</div>
+                                <a href="account-management.html" class="menu-item">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Quản lý tài khoản</span>
+                                </a>
+                                <a href="company-info.html" class="menu-item highlighted">
+                                    <i class="fas fa-building"></i>
+                                    <span>Thông tin công ty</span>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>Quản lý quyền truy cập</span>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>Quản lý yêu cầu</span>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-history"></i>
+                                    <span>Lịch sử hoạt động</span>
+                                </a>
+                            </div>
+                            
+                            <div class="menu-section">
+                                <div class="section-title">Liên hệ mua</div>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>Liên hệ mua</span>
+                                </a>
+                            </div>
+                            
+                            <div class="menu-section">
+                                <div class="section-title">Hỏi đáp</div>
+                                <a href="#" class="menu-item">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span>Hỏi đáp</span>
+                                </a>
+                            </div>
+                            
+                            <div class="menu-footer">
+                                <a href="#" class="logout-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Thoát</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="job-management-main">
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <div class="tab active">
+                    <span>Đang Hiển Thị (1)</span>
+                </div>
+                <div class="tab">
+                    <span>Đang Ẩn (3)</span>
+                </div>
+                <div class="tab">
+                    <span>Sắp Hết Hạn Trong 7 Ngày (1)</span>
+                </div>
+                <div class="tab">
+                    <span>Đã Hết Hạn</span>
+                </div>
+                <div class="tab">
+                    <span>Nháp (26)</span>
+                </div>
+                <div class="tab">
+                    <span>Việc Làm Ảo (19)</span>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Tìm kiếm...">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-excel">
+                        <i class="fas fa-file-excel"></i>
+                        Xuất ra Excel
+                    </button>
+                    <button class="btn btn-filter">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job List -->
+            <div class="job-list">
+                <div class="job-item">
+                    <div class="job-title-section">
+                        <div class="column-header">Chức danh</div>
+                        <h3 class="job-title">Embedded Linux Engineer (Junior/ Senior)</h3>
+                        <div class="job-meta">
+                            <span class="views">
+                                <i class="fas fa-eye"></i>
+                                3857
+                            </span>
+                            <span class="category">Hồ Chí Minh</span>
+                            <span class="posted-by">Đăng bởi: [Tên người đăng]</span>
+                        </div>
+                        <div class="job-actions">
+                            <button class="action-btn" title="Chỉnh sửa">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn" title="Sao chép">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="action-btn" title="Xem">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn" title="Thêm">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <button class="action-btn repost-btn" title="Đăng lại">
+                                Đăng lại
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="service-section">
+                        <div class="column-header">Dịch vụ</div>
+                        <div class="service-items-container">
+                            <div class="service-item">
+                                <span class="service-name">Đăng Tuyển Dụng</span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-name">Làm Mới Tin Tuyển Dụng</span>
+                            </div>
+                            <div class="service-item">
+                                <span class="service-name">Việc Cần Tuyển Gấp</span>
+                            </div>
+                        </div>
+                        <div class="service-buttons">
+                            <button class="btn-upgrade">Nâng cấp dịch vụ</button>
+                            <button class="btn-view-cv">Xem những CV phù hợp</button>
+                        </div>
+                    </div>
+
+                    <div class="expiration-section">
+                        <div class="column-header">Hết hạn</div>
+                        <div class="expiration-status expired">
+                            <span>Hết hạn trong 5 ngày</span>
+                        </div>
+                        <div class="expiration-dates">
+                            <span>19/09/24 - 19/10/24</span>
+                        </div>
+                    </div>
+
+                    <div class="applications-section">
+                        <div class="column-header">Hồ sơ ứng tuyển</div>
+                        <div class="application-count">
+                            <span>0/8</span>
+                        </div>
+                    </div>
+
+                    <div class="refresh-section">
+                        <div class="column-header">Làm mới lại</div>
+                        <div class="last-refresh">
+                            <span class="refresh-date">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Right Buttons -->
+    <div class="bottom-buttons">
+        <button class="three-dots-btn">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+        <button class="help-btn">
+            <i class="fas fa-question"></i>
+            Trợ giúp
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

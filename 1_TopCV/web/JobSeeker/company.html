@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopFinder - Hồ sơ công ty</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .company-container { max-width: 1200px; margin: 0 auto; padding: 0 1rem 2rem; }
+        .company-hero { display: none; }
+        .company-card { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+        .company-logo { width: 96px; height: 96px; background: #fff; border: 1px solid #eef1f5; border-radius: 12px; display: grid; place-items: center; font-weight: 800; color: #0b5bd3; }
+        .company-title { display: flex; align-items: center; gap: 0.75rem; }
+        .follow-btn { background: #ff6b35; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 0.75rem; cursor: pointer; }
+        .company-tabs { display: flex; gap: 1.25rem; border-bottom: 1px solid #eef1f5; margin-top: 1rem; }
+        .company-tab { padding: 0.75rem 0; cursor: pointer; color: #4b5563; position: relative; }
+        .company-tab.active { color: #0b5bd3; }
+        .company-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: #0b5bd3; border-radius: 2px; }
+        .section { margin-top: 1.25rem; }
+        .benefits { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+        .benefit-card { background: #f4f7ff; border: 1px solid #e6ecff; border-radius: 12px; padding: 1.25rem; text-align: center; color: #1f2937; }
+        .benefit-card .icon { font-size: 28px; color: #0b5bd3; }
+        .job-list { margin-top: 1rem; }
+        .job-item { background: #fff; border: 1px solid #e9ecef; border-radius: 12px; padding: 0.75rem; display: grid; grid-template-columns: 64px 1fr auto; gap: 0.75rem; align-items: center; }
+        .job-item .logo { width: 64px; height: 64px; border-radius: 8px; background: #f3f3f3; display: grid; place-items: center; font-weight: 700; color:#666; }
+        .job-item .meta { display: flex; gap: 0.75rem; color:#555; font-size: 0.9rem; margin-top: 0.25rem; }
+        .job-item .btn { background:#0066cc; color:#fff; border:none; border-radius:8px; padding:0.45rem 0.6rem; cursor:pointer; }
+        .select-menu { position: relative; }
+        .select-menu .menu { position: absolute; right: 0; top: calc(100% + 6px); background:#fff; border:1px solid #e5e7eb; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,0.06); display:none; min-width: 180px; z-index:20; }
+        .select-menu .menu.show { display:block; }
+        .select-menu .option { padding:0.55rem 0.75rem; cursor:pointer; }
+        .select-menu .option:hover { background:#f8fafc; }
+        @media (max-width: 900px) { .benefits { grid-template-columns: 1fr; } }
+    </style>
+    
+</head>
+<body>
+    <!-- Header (reused from job-detail.html) -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">
+                    <h1>Top</h1>
+                    <span class="tagline">Empower growth</span>
+                </div>
+            </div>
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="Tìm kiếm việc làm, công ty, kỹ năng">
+                    <div class="location-selector">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Tất cả địa điểm</span>
+                    </div>
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                    <span>Tất cả danh mục</span>
+                </div>
+                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <div class="user-actions">
+                    <div class="profile-icon">
+                        <i class="fas fa-user"></i>
+                        <span>Vi</span>
+                    </div>
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="message-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="company-container">
+        <div class="company-hero"></div>
+        <div class="company-card">
+            <div class="company-logo">SGO</div>
+            <div style="flex:1">
+                <div class="company-title">
+                    <h2 style="margin:0; color:#111827;">CÔNG TY CỔ PHẦN DU LỊCH SGOTOURS</h2>
+                </div>
+                <div style="color:#6b7280; margin-top:2px;">1 lượt theo dõi</div>
+            </div>
+            <button class="follow-btn">Theo dõi</button>
+        </div>
+
+        <div class="company-tabs">
+            <div class="company-tab active">Về chúng tôi</div>
+            <div class="company-tab">Vị trí đang tuyển dụng</div>
+        </div>
+
+        <div class="section">
+            <h3 style="margin:0 0 0.5rem; color:#111827;">Về chúng tôi</h3>
+            <div style="color:#374151; line-height:1.6;">
+                Công ty du lịch chuyên tổ chức các chương trình tour trong nước và tour nước ngoài với giá tốt, uy tín, chất lượng.
+                Website: https://sgotours.vn/
+            </div>
+        </div>
+
+        <div class="section">
+            <h3 style="margin:0 0 0.5rem; color:#111827;">Video</h3>
+            <div style="background:#f5f7fb; border:1px solid #eef1f5; border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; color:#6b7280;">
+                <div style="text-align:center;">
+                    <div style="width:56px; height:56px; border-radius:50%; background:#e6ecff; display:inline-grid; place-items:center; color:#3157d6; margin-bottom:8px;">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div>Công ty chưa cập nhật video giới thiệu.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3 style="margin:0 0 0.5rem; color:#111827;">Phúc lợi</h3>
+            <div class="benefits">
+                <div class="benefit-card">
+                    <div class="icon"><i class="fas fa-coins"></i></div>
+                    <h4>Thưởng</h4>
+                    <div>Thu nhập hấp dẫn; Thưởng KPI; thưởng nóng theo dự án</div>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon"><i class="fas fa-user-nurse"></i></div>
+                    <h4>Khám sức khỏe</h4>
+                    <div>Chế độ BHXH, BHYT, BHTN đầy đủ theo quy định</div>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon"><i class="fas fa-swimmer"></i></div>
+                    <h4>Hoạt động nhóm</h4>
+                    <div>Du lịch, teambuilding, nghỉ mát hàng năm cùng công ty</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <h3 style="margin:0; color:#111827;">Vị trí đang tuyển dụng <span style="color:#6b7280; font-weight:400;">(1 việc làm)</span></h3>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center; margin-top:0.75rem;">
+                <div style="flex:1; display:flex; align-items:center; border:1px solid #e5e7eb; border-radius:10px; padding:0.5rem 0.75rem; color:#6b7280; background:#fff;">
+                    <i class="fas fa-search" style="margin-right:8px;"></i>
+                    <input type="text" placeholder="Nhập chức danh" style="border:none; outline:none; width:100%; font-size:0.95rem; color:#111827; background:transparent;">
+                </div>
+                <button class="btn-outline" style="padding:0.55rem 0.75rem; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                    Tất cả địa điểm <i class="fas fa-chevron-down" style="color:#6b7280;"></i>
+                </button>
+                <button class="btn-outline" style="padding:0.55rem 0.75rem; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                    Công việc mới trang... <i class="fas fa-chevron-down" style="color:#6b7280;"></i>
+                </button>
+            </div>
+            <div class="job-list" id="jobList">
+                <div class="job-item">
+                    <div class="logo">SGO</div>
+                    <div>
+                        <h4 style="margin:0; color:#111827;">Trưởng Phòng Sales Tour (Thu Nhập 35-50 Triệu/ Tháng)</h4>
+                        <div style="color:#6b7280; margin-top:2px;">CÔNG TY CỔ PHẦN DU LỊCH SGOTOURS</div>
+                        <div class="meta">
+                            <span>35tr-50tr đ/tháng</span>
+                            <span>Hà Nội</span>
+                        </div>
+                        <div style="display:flex; gap:0.4rem; margin-top:0.4rem; flex-wrap:wrap;">
+                            <span class="chip">Quản Lý Đội Nhóm</span>
+                            <span class="chip">Bán hàng</span>
+                            <span class="chip">Kinh Doanh</span>
+                            <span class="chip">+2</span>
+                        </div>
+                        <div style="color:#6b7280; margin-top:0.4rem; font-size:0.85rem;">Cập nhật: 06/09/2025</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <a class="btn" href="job-detail.html">Xem chi tiết</a>
+                        <button class="btn-outline" style="width:36px; height:36px; border-radius:10px; display:grid; place-items:center;">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem; color:#6b7280;">
+                    <span id="prevPage" style="cursor:pointer;">‹</span>
+                    <span id="paginationInfo">1 / 1</span>
+                    <span id="nextPage" style="cursor:pointer;">›</span>
+                </div>
+                <div class="select-menu" id="jobsPerPageMenu">
+                    <button id="jobsPerPageBtn" class="btn-outline" style="padding:0.5rem 0.75rem; border-radius:10px; display:flex; align-items:center; gap:6px;">Công việc mỗi trang: 20 <i class="fas fa-chevron-down" style="color:#6b7280;"></i></button>
+                    <div class="menu">
+                        <div class="option" data-value="5">5</div>
+                        <div class="option" data-value="10">10</div>
+                        <div class="option" data-value="20">20</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
