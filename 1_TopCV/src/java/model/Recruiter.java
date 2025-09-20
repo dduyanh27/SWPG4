@@ -43,106 +43,40 @@ public class Recruiter {
         this.status = status;
     }
 
-    public int getRecruiterId() {
-        return recruiterId;
-    }
+    // Getter & Setter
+    public int getRecruiterId() { return recruiterId; }
+    public void setRecruiterId(int recruiterId) { this.recruiterId = recruiterId; }
 
-    public void setRecruiterId(int recruiterId) {
-        this.recruiterId = recruiterId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getCompanyDescription() { return companyDescription; }
+    public void setCompanyDescription(String companyDescription) { this.companyDescription = companyDescription; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public String getCompanyLogoURL() { return companyLogoURL; }
+    public void setCompanyLogoURL(String companyLogoURL) { this.companyLogoURL = companyLogoURL; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getWebsite() { return website; }
+    public void setWebsite(String website) { this.website = website; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+    public String getImg() { return img; }
+    public void setImg(String img) { this.img = img; }
 
-    public String getCompanyName() {
-        return companyName;
-    }
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getCompanyDescription() {
-        return companyDescription;
-    }
-
-    public void setCompanyDescription(String companyDescription) {
-        this.companyDescription = companyDescription;
-    }
-
-    public String getCompanyLogoURL() {
-        return companyLogoURL;
-    }
-
-    public void setCompanyLogoURL(String companyLogoURL) {
-        this.companyLogoURL = companyLogoURL;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "Recruiter{" + "recruiterId=" + recruiterId + ", email=" + email + ", password=" + password + ", phone=" + phone + ", gender=" + gender + ", companyName=" + companyName + ", companyDescription=" + companyDescription + ", companyLogoURL=" + companyLogoURL + ", website=" + website + ", img=" + img + ", categoryId=" + categoryId + ", status=" + status + '}';
-    }
-
-    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

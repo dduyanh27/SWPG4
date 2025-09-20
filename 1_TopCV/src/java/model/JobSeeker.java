@@ -45,114 +45,43 @@ public class JobSeeker {
         this.status = status;
     }
 
-    public int getJobSeekerId() {
-        return jobSeekerId;
-    }
+    // Getter & Setter
+    public int getJobSeekerId() { return jobSeekerId; }
+    public void setJobSeekerId(int jobSeekerId) { this.jobSeekerId = jobSeekerId; }
 
-    public void setJobSeekerId(int jobSeekerId) {
-        this.jobSeekerId = jobSeekerId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getFullName() {
-        return fullName;
-    }
+    public String getHeadline() { return headline; }
+    public void setHeadline(String headline) { this.headline = headline; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getContactInfo() { return contactInfo; }
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public Integer getLocationId() { return locationId; }
+    public void setLocationId(Integer locationId) { this.locationId = locationId; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getImg() { return img; }
+    public void setImg(String img) { this.img = img; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+    public Integer getCurrentLevelId() { return currentLevelId; }
+    public void setCurrentLevelId(Integer currentLevelId) { this.currentLevelId = currentLevelId; }
 
-    public String getHeadline() {
-        return headline;
-    }
-
-    public void setHeadline(String headline) {
-        this.headline = headline;
-    }
-
-    public String getContactInfo() {
-        return contactInfo;
-    }
-
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Integer getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(Integer locationId) {
-        this.locationId = locationId;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public Integer getCurrentLevelId() {
-        return currentLevelId;
-    }
-
-    public void setCurrentLevelId(Integer currentLevelId) {
-        this.currentLevelId = currentLevelId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "JobSeeker{" + "jobSeekerId=" + jobSeekerId + ", email=" + email + ", password=" + password + ", fullName=" + fullName + ", phone=" + phone + ", gender=" + gender + ", headline=" + headline + ", contactInfo=" + contactInfo + ", address=" + address + ", locationId=" + locationId + ", img=" + img + ", currentLevelId=" + currentLevelId + ", status=" + status + '}';
-    }
-
-    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
