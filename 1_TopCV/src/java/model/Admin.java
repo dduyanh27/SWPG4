@@ -1,29 +1,68 @@
 package model;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+
 public class Admin {
-    private int adminID;
+    private int adminId;
     private String email;
     private String password;
     private String fullName;
+    private String avatarURL;
+    private String phone;
+    private String gender;
+    private String address;
+    private Date dateOfBirth;
+    private String bio;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
     private String status;
 
-    public Admin() {
+    public Admin() {}
+
+    public Admin(String email, String password, String fullName, String phone) {
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.phone = phone;
+    }
+    
+    
+
+    public Admin(int adminId, String email, String password, String fullName,
+                 String avatarURL, String phone, String gender, String address,
+                 Date dateOfBirth, String bio, Timestamp createdAt,
+                 Timestamp updatedAt, String status) {
+        this.adminId = adminId;
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.avatarURL = avatarURL;
+        this.phone = phone;
+        this.gender = gender;
+        this.address = address;
+        this.dateOfBirth = dateOfBirth;
+        this.bio = bio;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.status = status;
     }
 
-    public Admin(int adminID, String email, String password, String fullName, String status) {
-        this.adminID = adminID;
+
+    public Admin(int adminId, String email, String password, String fullName, String status) {
+        this.adminId = adminId;
         this.email = email;
         this.password = password;
         this.fullName = fullName;
         this.status = status;
     }
 
-    public int getAdminID() {
-        return adminID;
+    public int getAdminId() {
+        return adminId;
     }
 
-    public void setAdminID(int adminID) {
-        this.adminID = adminID;
+    public void setAdminId(int adminId) {
+        this.adminId = adminId;
     }
 
     public String getEmail() {
@@ -50,6 +89,70 @@ public class Admin {
         this.fullName = fullName;
     }
 
+    public String getAvatarURL() {
+        return avatarURL;
+    }
+
+    public void setAvatarURL(String avatarURL) {
+        this.avatarURL = avatarURL;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -58,12 +161,16 @@ public class Admin {
         this.status = status;
     }
 
+    
+
     @Override
     public String toString() {
         return "Admin{" +
-                "adminID=" + adminID +
+                "adminId=" + adminId +
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender='" + gender + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }
