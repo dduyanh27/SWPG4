@@ -12,9 +12,9 @@ public class Admin {
     private String phone;
     private String gender;
     private String address;
-    private Date dateOfBirth;
+    private Date dateOfBirth;           // tương ứng với DATE trong DB
     private String bio;
-    private Timestamp createdAt;
+    private Timestamp createdAt;       // tương ứng với DATETIME trong DB
     private Timestamp updatedAt;
     private String status;
 
@@ -29,6 +29,7 @@ public class Admin {
     
     
 
+    // Constructor đầy đủ (phù hợp với AdminDAO)
     public Admin(int adminId, String email, String password, String fullName,
                  String avatarURL, String phone, String gender, String address,
                  Date dateOfBirth, String bio, Timestamp createdAt,
@@ -48,7 +49,7 @@ public class Admin {
         this.status = status;
     }
 
-
+    // Optional: constructor rút gọn dùng cho login/list
     public Admin(int adminId, String email, String password, String fullName, String status) {
         this.adminId = adminId;
         this.email = email;
@@ -57,111 +58,48 @@ public class Admin {
         this.status = status;
     }
 
-    public int getAdminId() {
-        return adminId;
-    }
+    // Getters & setters
+    public int getAdminId() { return adminId; }
+    public void setAdminId(int adminId) { this.adminId = adminId; }
 
-    public void setAdminId(int adminId) {
-        this.adminId = adminId;
-    }
+    // helper duplicate getter to be safe in JSPs using 'id'
+    public int getId() { return adminId; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getAvatarURL() { return avatarURL; }
+    public void setAvatarURL(String avatarURL) { this.avatarURL = avatarURL; }
 
-    public String getFullName() {
-        return fullName;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getAvatarURL() {
-        return avatarURL;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setAvatarURL(String avatarURL) {
-        this.avatarURL = avatarURL;
-    }
+    public Date getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(Date dateOfBirth) { this.dateOfBirth = dateOfBirth; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
-    public String getGender() {
-        return gender;
-    }
+    public Timestamp getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
