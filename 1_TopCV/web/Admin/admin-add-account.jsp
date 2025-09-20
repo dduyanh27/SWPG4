@@ -293,25 +293,55 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="roleId">👤 ID Vai trò</label>
-                        <input type="number" 
-                               id="roleId"
-                               name="roleId" 
+                        <label class="form-label" for="fullName">👤 Họ và tên / Tên công ty</label>
+                        <input type="text" 
+                               id="fullName"
+                               name="fullName" 
                                class="form-input" 
-                               value="${param.roleId}" 
+                               value="${param.fullName}" 
                                required 
-                               placeholder="Nhập ID vai trò (ví dụ: 1, 2, 3...)">
+                               placeholder="Nhập họ tên (JobSeeker/Admin) hoặc tên công ty (Recruiter)...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">📱 Số điện thoại</label>
+                        <input type="tel" 
+                               id="phone"
+                               name="phone" 
+                               class="form-input" 
+                               value="${param.phone}" 
+                               required 
+                               placeholder="Nhập số điện thoại...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="gender">⚥ Giới tính</label>
+                        <select id="gender" name="gender" class="form-input" required>
+                            <option value="" disabled selected>Chọn giới tính</option>
+                            <option value="Nam" ${param.gender == 'Nam' ? 'selected' : ''}>Nam</option>
+                            <option value="Nữ" ${param.gender == 'Nữ' ? 'selected' : ''}>Nữ</option>
+                            <option value="Khác" ${param.gender == 'Khác' ? 'selected' : ''}>Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="role">👤 Vai trò</label>
+                        <select id="role" name="role" class="form-input" required>
+                            <option value="" disabled selected>Chọn vai trò</option>
+                            <option value="admin" ${param.role == 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="jobseeker" ${param.role == 'jobseeker' ? 'selected' : ''}>JobSeeker</option>
+                            <option value="recruiter" ${param.role == 'recruiter' ? 'selected' : ''}>Recruiter</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="status">📊 Trạng thái</label>
-                        <input type="text" 
-                               id="status"
-                               name="status" 
-                               class="form-input" 
-                               value="${param.status}" 
-                               required 
-                               placeholder="Nhập trạng thái (active, inactive...)">
+                        <select id="status" name="status" class="form-input" required>
+                            <option value="" disabled selected>Chọn trạng thái</option>
+                            <option value="active" ${param.status == 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${param.status == 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="pending" ${param.status == 'pending' ? 'selected' : ''}>Pending</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -322,47 +352,9 @@
                 </form>
 
                 <div class="back-link">
-                    <a href="javascript:history.back()">← Quay lại trang trước</a>
+                    <a href="manage-accounts?role=admin">← Quay lại danh sách tài khoản</a>
                 </div>
             </div>
         </div>
-
-        <script>
-            // Thêm hiệu ứng focus cho form
-            document.querySelectorAll('.form-input').forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.parentElement.style.transform = 'scale(1.02)';
-                });
-
-                input.addEventListener('blur', function () {
-                    this.parentElement.style.transform = 'scale(1)';
-                });
-            });
-
-            // Validation cơ bản
-            document.querySelector('form').addEventListener('submit', function (e) {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const roleId = document.getElementById('roleId').value;
-
-                if (!email.includes('@')) {
-                    alert('Vui lòng nhập địa chỉ email hợp lệ!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (password.length < 6) {
-                    alert('Mật khẩu phải có ít nhất 6 ký tự!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (roleId < 1) {
-                    alert('ID vai trò phải là số dương!');
-                    e.preventDefault();
-                    return;
-                }
-            });
-        </script>
     </body>
 </html>
