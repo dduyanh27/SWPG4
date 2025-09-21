@@ -1,0 +1,56 @@
+/* Base styles from existing Recruiter/styles.css */
+@import url("../styles.css");
+
+/* Recruitment Process Page Styles */
+.recruitment-process-page { background: #f5f7fa; min-height: 100vh; }
+
+.progress-container { background: #fff; padding: 20px; }
+.progress-steps { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.progress-steps .step { text-align: center; }
+.step-number { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #6b7280; font-weight: 600; }
+.step.completed .step-number { background: #10b981; color: #fff; }
+.step.active .step-number { background: #2563eb; color: #fff; }
+.step-title { font-size: 14px; color: #6b7280; margin-top: 6px; }
+.step-line { flex: 1; height: 2px; background: #e5e7eb; }
+
+.main-content { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.content-container { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.main-content-area { padding: 20px; }
+
+.intro-text { background: #f8fafc; border: 1px solid #e5e7eb; padding: 12px 16px; border-radius: 8px; color: #374151; }
+.intro-text .learn-more { color: #2563eb; text-decoration: none; }
+
+.recruitment-steps { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.step-item { display: flex; align-items: center; justify-content: space-between; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; }
+.step-main { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+.step-info { display: flex; align-items: center; gap: 10px; }
+.step-label { font-weight: 600; color: #1f2937; }
+
+.email-btn { background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; color: #374151; cursor: pointer; }
+.email-btn i { margin: 0 4px; }
+
+.expandable .step-sub-items { display: none; padding: 12px 0 0 0; }
+.expandable.expanded .step-sub-items { display: block; }
+.sub-step-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; }
+.round-input { border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; }
+.add-round { margin-top: 8px; }
+.btn-add-round { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+.btn-add-round i { margin-right: 6px; }
+
+.form-actions { display: flex; justify-content: space-between; margin-top: 16px; }
+.btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+.btn-secondary { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+.btn-secondary:hover { background: #f3f4f6; }
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+
+.chat-widget { position: fixed; bottom: 24px; right: 24px; }
+.chat-button { background: #1f2937; color: #fff; border: none; padding: 10px 14px; border-radius: 24px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+@media (max-width: 768px) {
+  .main-content { padding: 12px; }
+  .step-title { font-size: 12px; }
+  .form-actions { flex-direction: column; gap: 10px; }
+}
+
+

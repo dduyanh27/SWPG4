@@ -10,10 +10,19 @@ public class DBContext {
 
     public DBContext() {
         try {
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=topcv4;encrypt=true;trustServerCertificate=true"; //database name phai sua
+            String url = "jdbc:sqlserver://localhost;databaseName=topcv4;TrustServerCertificate=true;";
             String username = "sa";
             String pass = "123";
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            // Thử driver cũ nếu driver mới không có
+            try {
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            } catch (ClassNotFoundException e1) {
+                try {
+                    Class.forName("com.microsoft.jdbc.sqlserver.SQLServerDriver");
+                } catch (ClassNotFoundException e2) {
+                    throw new Exception("SQL Server JDBC Driver not found. Please add mssql-jdbc JAR to WEB-INF/lib");
+                }
+            }
             c = DriverManager.getConnection(url, username, pass);
         } catch (Exception e) {
             e.printStackTrace();

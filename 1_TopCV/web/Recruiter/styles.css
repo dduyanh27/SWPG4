@@ -539,7 +539,7 @@ body {
 /* Main Content */
 .main-content {
     max-width: 1400px;
-    margin: -110px auto 0;
+    margin: 0px auto 0;
     padding: 30px 20px;
     display: flex;
     align-items: center;
@@ -6591,7 +6591,7 @@ html body .dropdown .dropdown-content {
 /* Job Management - Full width at bottom */
 .job-management {
     max-width: 1400px;
-    margin: -130px auto 0;
+    margin: -10px auto 40px;
     padding: 30px 20px;
     background: white;
     border-radius: 15px;
