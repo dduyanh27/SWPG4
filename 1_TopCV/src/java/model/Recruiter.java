@@ -1,7 +1,7 @@
 package model;
 
 public class Recruiter {
-    private int recruiterId;
+    private int recruiterID;
     private String email;
     private String password;
     private String phone;
@@ -11,25 +11,16 @@ public class Recruiter {
     private String companyLogoURL;
     private String website;
     private String img;
-    private int categoryId;
+    private int categoryID;
     private String status;
 
-    // Constructor
-    public Recruiter() {}
-
-    public Recruiter(String email, String password, String phone, String companyName) {
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.companyName = companyName;
+    public Recruiter() {
     }
-    
-    
 
-    public Recruiter(int recruiterId, String email, String password, String phone, String gender,
-                     String companyName, String companyDescription, String companyLogoURL,
-                     String website, String img, int categoryId, String status) {
-        this.recruiterId = recruiterId;
+    public Recruiter(int recruiterID, String email, String password, String phone, 
+                     String gender, String companyName, String companyDescription, 
+                     String companyLogoURL, String website, String img, int categoryID, String status) {
+        this.recruiterID = recruiterID;
         this.email = email;
         this.password = password;
         this.phone = phone;
@@ -39,44 +30,120 @@ public class Recruiter {
         this.companyLogoURL = companyLogoURL;
         this.website = website;
         this.img = img;
-        this.categoryId = categoryId;
+        this.categoryID = categoryID;
         this.status = status;
     }
 
-    // Getter & Setter
-    public int getRecruiterId() { return recruiterId; }
-    public void setRecruiterId(int recruiterId) { this.recruiterId = recruiterId; }
+    public int getRecruiterID() {
+        return recruiterID;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setRecruiterID(int recruiterID) {
+        this.recruiterID = recruiterID;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getEmail() {
+        return email;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
+    public String getPassword() {
+        return password;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getCompanyDescription() { return companyDescription; }
-    public void setCompanyDescription(String companyDescription) { this.companyDescription = companyDescription; }
+    public String getStatus() {
+        return status;
+    }
 
-    public String getCompanyLogoURL() { return companyLogoURL; }
-    public void setCompanyLogoURL(String companyLogoURL) { this.companyLogoURL = companyLogoURL; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-    public String getWebsite() { return website; }
-    public void setWebsite(String website) { this.website = website; }
+    public String getPhone() {
+        return phone;
+    }
 
-    public String getImg() { return img; }
-    public void setImg(String img) { this.img = img; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-    public int getCategoryId() { return categoryId; }
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public String getGender() {
+        return gender;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getCompanyDescription() {
+        return companyDescription;
+    }
+
+    public void setCompanyDescription(String companyDescription) {
+        this.companyDescription = companyDescription;
+    }
+
+    public String getCompanyLogoURL() {
+        return companyLogoURL;
+    }
+
+    public void setCompanyLogoURL(String companyLogoURL) {
+        this.companyLogoURL = companyLogoURL;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    public int getCategoryID() {
+        return categoryID;
+    }
+
+    public void setCategoryID(int categoryID) {
+        this.categoryID = categoryID;
+    }
+
+    @Override
+    public String toString() {
+        return "Recruiter{" +
+                "recruiterID=" + recruiterID +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", gender='" + gender + '\'' +
+                ", companyName='" + companyName + '\'' +
+                ", companyDescription='" + companyDescription + '\'' +
+                ", companyLogoURL='" + companyLogoURL + '\'' +
+                ", website='" + website + '\'' +
+                ", img='" + img + '\'' +
+                ", categoryID=" + categoryID +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

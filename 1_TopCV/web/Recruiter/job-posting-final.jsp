@@ -1,10 +1,11 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Tuyển Dụng - Recruit Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/css/job-posting-final.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="job-posting-final-page">
@@ -17,13 +18,13 @@
                     <span>RecruitPro</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                     <li><a href="#">Việc Làm</a></li>
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
                             <a href="#">Quản lý theo việc đăng tuyển</a>
-                            <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
                     <li class="dropdown">
@@ -45,11 +46,11 @@
                             ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="job-posting.html" class="active">Tạo tin tuyển dụng mới</a>
-                            <a href="job-management.html">Quản lý tin đã đăng</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp">Tạo tin tuyển dụng mới</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="window.location.href='candidate-profile.html'">TÌM ỨNG VIÊN</button>
+                    <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">TÌM ỨNG VIÊN</button>
                     <button class="btn btn-white">Mua</button>
                 </div>
                 <div class="nav-icons">
@@ -77,11 +78,11 @@
                             
                             <div class="menu-section">
                                 <div class="section-title">Thiết lập tài khoản</div>
-                                <a href="account-management.html" class="menu-item">
+                                <a href="${pageContext.request.contextPath}/Recruiter/account-management.html" class="menu-item">
                                     <i class="fas fa-cog"></i>
                                     <span>Quản lý tài khoản</span>
                                 </a>
-                                <a href="company-info.html" class="menu-item highlighted">
+                                <a href="${pageContext.request.contextPath}/Recruiter/company-info.html" class="menu-item highlighted">
                                     <i class="fas fa-building"></i>
                                     <span>Thông tin công ty</span>
                                 </a>
@@ -392,12 +393,12 @@
 
             <!-- Action Buttons -->
             <div class="form-actions">
-                <button class="btn btn-secondary" onclick="window.location.href='recruitment-process.html'">Quay lại</button>
+                <button class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/recruitment-process.jsp'">Quay lại</button>
                 <button class="btn btn-primary">Đăng tuyển dụng</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
 </body>
 </html>

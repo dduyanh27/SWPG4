@@ -87,8 +87,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Toggle dropdown on click
             trigger.addEventListener('click', function(event) {
-                event.preventDefault();
-                event.stopPropagation();
+                // Only prevent default for dropdown triggers, not for links inside dropdown content
+                if (event.target === trigger || trigger.contains(event.target)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
                 
                 // Close other dropdowns
                 dropdowns.forEach(otherDropdown => {
@@ -579,21 +582,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const dropdowns = document.querySelectorAll('.dropdown');
     
     dropdowns.forEach(dropdown => {
-        const dropdownLink = dropdown.querySelector('a');
+        const dropdownTrigger = dropdown.querySelector('a, button');
         
-        dropdownLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Close other dropdowns
-            dropdowns.forEach(otherDropdown => {
-                if (otherDropdown !== dropdown) {
-                    otherDropdown.classList.remove('active');
+        if (dropdownTrigger) {
+            dropdownTrigger.addEventListener('click', function(e) {
+                // Only prevent default for main dropdown triggers, not for links inside dropdown content
+                if (e.target === dropdownTrigger || dropdownTrigger.contains(e.target)) {
+                    e.preventDefault();
                 }
+                
+                // Close other dropdowns
+                dropdowns.forEach(otherDropdown => {
+                    if (otherDropdown !== dropdown) {
+                        otherDropdown.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current dropdown
+                dropdown.classList.toggle('active');
             });
-            
-            // Toggle current dropdown
-            dropdown.classList.toggle('active');
-        });
+        }
     });
     
     // Close dropdown when clicking outside
@@ -603,6 +611,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 dropdown.classList.remove('active');
             });
         }
+    });
+    
+    // Ensure dropdown links work properly
+    const dropdownLinks = document.querySelectorAll('.dropdown-content a');
+    dropdownLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Don't prevent default for dropdown content links
+            console.log('Dropdown link clicked:', this.href);
+            // Force navigation if href exists
+            if (this.href && this.href !== '#' && this.href !== window.location.href) {
+                window.location.href = this.href;
+            }
+        });
     });
 });
 
@@ -710,6 +731,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Remove benefit functionality
+    // Package item radio fallback for unsupported :has()
+    function updatePackageCheckedState() {
+        const items = document.querySelectorAll('.package-item');
+        items.forEach(item => {
+            const radio = item.querySelector('input[type="radio"]');
+            if (radio) {
+                if (radio.checked) {
+                    item.classList.add('is-checked');
+                } else {
+                    item.classList.remove('is-checked');
+                }
+            }
+        });
+    }
+
+    // Initialize state on load
+    updatePackageCheckedState();
+
+    // Delegate change events for radios within package items
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.matches('.package-item input[type="radio"]')) {
+            // Radios share the same name, clear all then set current
+            document.querySelectorAll('.package-item').forEach(item => item.classList.remove('is-checked'));
+            updatePackageCheckedState();
+        }
+    });
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('fa-trash')) {
             e.target.closest('.benefit-item').remove();
