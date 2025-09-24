@@ -1,10 +1,7 @@
-<%-- 
-    Document   : admin-login
-    Created on : Sep 24, 2025, 7:48:35 AM
-    Author     : ADMIN
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>

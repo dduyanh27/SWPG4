@@ -170,20 +170,20 @@ public class RecruiterDAO extends DBContext {
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new Recruiter(
-                        rs.getInt("RecruiterID"),
-                        rs.getString("Email"),
-                        rs.getString("Password"),
-                        rs.getString("Phone"),
-                        rs.getString("Gender"),
-                        rs.getString("CompanyName"),
-                        rs.getString("CompanyDescription"),
-                        rs.getString("CompanyLogoURL"),
-                        rs.getString("Website"),
-                        rs.getString("Img"),
-                        rs.getInt("CategoryID"),
-                        rs.getString("Status")
-                );
+//                return new Recruiter(
+//                        rs.getInt("RecruiterID"),
+//                        rs.getString("Email"),
+//                        rs.getString("Password"),
+//                        rs.getString("Phone"),
+//                        rs.getString("Gender"),
+//                        rs.getString("CompanyName"),
+//                        rs.getString("CompanyDescription"),
+//                        rs.getString("CompanyLogoURL"),
+//                        rs.getString("Website"),
+//                        rs.getString("Img"),
+//                        rs.getInt("CategoryID"),
+//                        rs.getString("Status")
+//                );
             }
         } catch (Exception e) {
             e.printStackTrace();
