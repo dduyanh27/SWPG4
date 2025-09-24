@@ -115,103 +115,108 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:choose>
-                                        <c:when test="${selectedRole eq 'admin'}">
-                                            <c:choose>
-                                                <c:when test="${not empty adminList}">
-                                                    <c:forEach var="admin" items="${adminList}">
-                                                        <c:if test="${empty param.search or 
-                                                                      fn:containsIgnoreCase(admin.fullName, param.search) or 
-                                                                      fn:containsIgnoreCase(admin.email, param.search) or 
-                                                                      fn:contains(admin.phone, param.search)}">
-                                                              <tr>
-                                                                  <td>${admin.adminId}</td>
-                                                                  <td>${admin.fullName}</td>
-                                                                  <td>${admin.gender}</td>
-                                                                  <td>${admin.email}</td>
-                                                                  <td>${admin.phone}</td>
-                                                                  <td><span class="status ${admin.status}">${admin.status}</span></td>
-                                                                  <td>
-                                                                      <a href="admin-profile.jsp?id=${admin.adminId}&type=admin" class="btn outline">Chi tiết</a>
-                                                                      <a href="delete-account?id=${admin.adminId}&type=admin" class="btn danger" 
-                                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
-                                                                  </td>
-                                                              </tr>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="7" class="no-data">Không có dữ liệu Admin</td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:when>
+                                    <c:if test="${not empty param.msg}">
+                                    <div id="flashMsg" class="alert alert-success" style="transition: opacity 400ms ease;">
+                                        ${param.msg}
+                                    </div>
+                                </c:if>
+                                <c:choose>
+                                    <c:when test="${selectedRole eq 'admin'}">
+                                        <c:choose>
+                                            <c:when test="${not empty adminList}">
+                                                <c:forEach var="admin" items="${adminList}">
+                                                    <c:if test="${empty param.search or 
+                                                                  fn:containsIgnoreCase(admin.fullName, param.search) or 
+                                                                  fn:containsIgnoreCase(admin.email, param.search) or 
+                                                                  fn:contains(admin.phone, param.search)}">
+                                                          <tr>
+                                                              <td>${admin.adminId}</td>
+                                                              <td>${admin.fullName}</td>
+                                                              <td>${admin.gender}</td>
+                                                              <td>${admin.email}</td>
+                                                              <td>${admin.phone}</td>
+                                                              <td><span class="status ${admin.status}">${admin.status}</span></td>
+                                                              <td>
+                                                                  <a href="admin-profile.jsp?id=${admin.adminId}&type=admin" class="btn outline">Chi tiết</a>
+                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${admin.adminId}&type=admin" class="btn danger" 
+                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
+                                                              </td>
+                                                          </tr>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="7" class="no-data">Không có dữ liệu Admin</td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
 
-                                        <c:when test="${selectedRole eq 'jobseeker'}">
-                                            <c:choose>
-                                                <c:when test="${not empty jobSeekerList}">
-                                                    <c:forEach var="js" items="${jobSeekerList}">
-                                                        <c:if test="${empty param.search or 
-                                                                      fn:containsIgnoreCase(js.fullName, param.search) or 
-                                                                      fn:containsIgnoreCase(js.email, param.search) or 
-                                                                      fn:contains(js.phone, param.search)}">
-                                                              <tr>
-                                                                  <td>${js.jobSeekerId}</td>
-                                                                  <td>${js.fullName}</td>
-                                                                  <td>${js.gender}</td>
-                                                                  <td>${js.email}</td>
-                                                                  <td>${js.phone}</td>
-                                                                  <td><span class="status ${js.status}">${js.status}</span></td>
-                                                                  <td>
-                                                                      <a href="admin-profile.jsp?id=${js.jobSeekerId}&type=jobseeker" class="btn outline">Chi tiết</a>
-                                                                      <a href="delete-account?id=${js.jobSeekerId}&type=jobseeker" class="btn danger" 
-                                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
-                                                                  </td>
-                                                              </tr>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="7" class="no-data">Không có dữ liệu JobSeeker</td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:when>
+                                    <c:when test="${selectedRole eq 'jobseeker'}">
+                                        <c:choose>
+                                            <c:when test="${not empty jobSeekerList}">
+                                                <c:forEach var="js" items="${jobSeekerList}">
+                                                    <c:if test="${empty param.search or 
+                                                                  fn:containsIgnoreCase(js.fullName, param.search) or 
+                                                                  fn:containsIgnoreCase(js.email, param.search) or 
+                                                                  fn:contains(js.phone, param.search)}">
+                                                          <tr>
+                                                              <td>${js.jobSeekerId}</td>
+                                                              <td>${js.fullName}</td>
+                                                              <td>${js.gender}</td>
+                                                              <td>${js.email}</td>
+                                                              <td>${js.phone}</td>
+                                                              <td><span class="status ${js.status}">${js.status}</span></td>
+                                                              <td>
+                                                                  <a href="admin-profile.jsp?id=${js.jobSeekerId}&type=jobseeker" class="btn outline">Chi tiết</a>
+                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${js.jobSeekerId}&type=jobseeker" class="btn danger" 
+                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
+                                                              </td>
+                                                          </tr>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="7" class="no-data">Không có dữ liệu JobSeeker</td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
 
-                                        <c:when test="${selectedRole eq 'recruiter'}">
-                                            <c:choose>
-                                                <c:when test="${not empty recruiterList}">
-                                                    <c:forEach var="re" items="${recruiterList}">
-                                                        <c:if test="${empty param.search or 
-                                                                      fn:containsIgnoreCase(re.companyName, param.search) or 
-                                                                      fn:containsIgnoreCase(re.email, param.search) or 
-                                                                      fn:contains(re.phone, param.search)}">
-                                                              <tr>
-                                                                  <td>${re.recruiterId}</td>
-                                                                  <td>${re.companyName}</td>
-                                                                  <td>${re.gender}</td>
-                                                                  <td>${re.email}</td>
-                                                                  <td>${re.phone}</td>
-                                                                  <td><span class="status ${re.status}">${re.status}</span></td>
-                                                                  <td>
-                                                                      <a href="admin-profile.jsp?id=${re.recruiterId}&type=recruiter" class="btn outline">Chi tiết</a>
-                                                                      <a href="delete-account?id=${re.recruiterId}&type=recruiter" class="btn danger" 
-                                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
-                                                                  </td>
-                                                              </tr>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="7" class="no-data">Không có dữ liệu Recruiter</td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:when>
-                                    </c:choose>
+                                    <c:when test="${selectedRole eq 'recruiter'}">
+                                        <c:choose>
+                                            <c:when test="${not empty recruiterList}">
+                                                <c:forEach var="re" items="${recruiterList}">
+                                                    <c:if test="${empty param.search or 
+                                                                  fn:containsIgnoreCase(re.companyName, param.search) or 
+                                                                  fn:containsIgnoreCase(re.email, param.search) or 
+                                                                  fn:contains(re.phone, param.search)}">
+                                                          <tr>
+                                                              <td>${re.recruiterId}</td>
+                                                              <td>${re.companyName}</td>
+                                                              <td>${re.gender}</td>
+                                                              <td>${re.email}</td>
+                                                              <td>${re.phone}</td>
+                                                              <td><span class="status ${re.status}">${re.status}</span></td>
+                                                              <td>
+                                                                  <a href="admin-profile.jsp?id=${re.recruiterId}&type=recruiter" class="btn outline">Chi tiết</a>
+                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${re.recruiterId}&type=recruiter" class="btn danger" 
+                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
+                                                              </td>
+                                                          </tr>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="7" class="no-data">Không có dữ liệu Recruiter</td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:when>
+                                </c:choose>
                                 </tbody>
                             </table>
                         </div>
@@ -235,5 +240,19 @@
                 </section>
             </main>
         </div>
+        <script>
+            (function () {
+                var el = document.getElementById('flashMsg');
+                if (!el) return;
+                setTimeout(function () {
+                    el.style.opacity = '0';
+                    setTimeout(function () {
+                        if (el && el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    }, 500);
+                }, 2500);
+            })();
+        </script>
     </body>
 </html>

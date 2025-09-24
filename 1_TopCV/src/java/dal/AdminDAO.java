@@ -8,7 +8,6 @@ import model.Admin;
 
 public class AdminDAO extends DBContext {
 
-    // Đăng nhập (check email + password)
     public Admin getAdminAccount(String email, String password) {
         String sql = "SELECT * FROM Admins WHERE Email = ? AND Password = ?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
@@ -23,7 +22,7 @@ public class AdminDAO extends DBContext {
                             rs.getString("FullName"),
                             rs.getString("AvatarURL"),
                             rs.getString("Phone"),
-                            rs.getString("Gender"),       // ✅ thêm Gender
+                            rs.getString("Gender"), // ✅ thêm Gender
                             rs.getString("Address"),
                             rs.getDate("DateOfBirth"),
                             rs.getString("Bio"),
@@ -39,12 +38,10 @@ public class AdminDAO extends DBContext {
         return null;
     }
 
-    // Lấy danh sách toàn bộ admin
     public List<Admin> getAllAdmin() {
-        String sql = "SELECT * FROM Admins";
+        String sql = "SELECT * FROM Admins WHERE Status = 'Active'";
         List<Admin> adminList = new ArrayList<>();
-        try (PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Admin admin = new Admin(
                         rs.getInt("AdminID"),
@@ -53,7 +50,7 @@ public class AdminDAO extends DBContext {
                         rs.getString("FullName"),
                         rs.getString("AvatarURL"),
                         rs.getString("Phone"),
-                        rs.getString("Gender"),       // ✅ thêm Gender
+                        rs.getString("Gender"),
                         rs.getString("Address"),
                         rs.getDate("DateOfBirth"),
                         rs.getString("Bio"),
@@ -68,4 +65,99 @@ public class AdminDAO extends DBContext {
         }
         return adminList;
     }
+
+//    public boolean deleteAdminById(int id) {
+//        String sql = "DELETE FROM Admins WHERE AdminID = ?";
+//        try (PreparedStatement ps = c.prepareStatement(sql)) {
+//            ps.setInt(1, id);
+//            int rows = ps.executeUpdate();
+//            return rows > 0;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+    public boolean deleteAdminById(int adminId) {
+        String sql = "UPDATE Admins\n"
+                + "SET Status = 'Inactive'\n"
+                + "WHERE AdminID = ?;";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, adminId);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int getActiveDays(int adminId) {
+        String sql = "SELECT DATEDIFF(DAY, CreatedAt, GETDATE()) AS ActiveDays "
+                + "FROM Admins WHERE AdminID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, adminId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("ActiveDays");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    public Admin getAdminById(int adminId) {
+        String sql = "SELECT * FROM Admins WHERE adminId=?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, adminId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Admin(
+                        rs.getInt("adminId"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("fullName"),
+                        rs.getString("avatarURL"),
+                        rs.getString("phone"),
+                        rs.getString("gender"),
+                        rs.getString("address"),
+                        rs.getDate("dateOfBirth"),
+                        rs.getString("bio"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getTimestamp("updatedAt"),
+                        rs.getString("status")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public void updateAdmin(Admin admin) {
+        String sql = "UPDATE Admins SET phone=?, gender=?, address=?, bio=?, updatedAt=GETDATE() WHERE adminId=?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, admin.getPhone());
+            ps.setString(2, admin.getGender());
+            ps.setString(3, admin.getAddress());
+            ps.setString(4, admin.getBio());
+            ps.setInt(5, admin.getAdminId());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void updatePassword(int adminId, String newPassword) {
+    String sql = "UPDATE Admins SET password=?, updatedAt=GETDATE() WHERE adminId=?";
+    try (PreparedStatement ps = c.prepareStatement(sql)) {
+        ps.setString(1, newPassword);
+        ps.setInt(2, adminId);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+        
+
 }
