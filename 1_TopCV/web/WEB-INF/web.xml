@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-    <servlet>
-        <servlet-name>AdminManageAccountServlet</servlet-name>
-        <servlet-class>controller.AdminManageAccountServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AdminManageAccountServlet</servlet-name>
-        <url-pattern>/adminmanageaccount</url-pattern>
-    </servlet-mapping>
-    
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"> 
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
         <filter-class>filter.AuthenticationFilter</filter-class>
@@ -18,30 +9,115 @@
         <url-pattern>/LoginServlet</url-pattern>
     </filter-mapping>
     
+    <!-- Base/Login -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>controller.LoginServlet</servlet-class>
+        <servlet-class>controller.base.LoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
     </servlet-mapping>
     
+    <!-- Jobseeker -->
     <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>controller.LogoutServlet</servlet-class>
+        <servlet-name>GoogleLoginServlet</servlet-name>
+        <servlet-class>controller.jobseeker.GoogleLoginServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/LogoutServlet</url-pattern>
+        <servlet-name>GoogleLoginServlet</servlet-name>
+        <url-pattern>/googleloginservlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Admin -->
+    <servlet>
+        <servlet-name>AdminAddAccountServlet</servlet-name>
+        <servlet-class>controller.admin.AdminAddAccountServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminAddAccountServlet</servlet-name>
+        <url-pattern>/adminaddaccountservlet</url-pattern>
     </servlet-mapping>
     
     <servlet>
-        <servlet-name>RecruiterRegistrationServlet</servlet-name>
-        <servlet-class>controller.recruiter.RecruiterRegistrationServlet</servlet-class>
+        <servlet-name>AdminChangePassword</servlet-name>
+        <servlet-class>controller.admin.AdminChangePassword</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>RecruiterRegistrationServlet</servlet-name>
-        <url-pattern>/RecruiterRegistrationServlet</url-pattern>
+        <servlet-name>AdminChangePassword</servlet-name>
+        <url-pattern>/adminchangepassword</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AdminDeleteAccount</servlet-name>
+        <servlet-class>controller.admin.AdminDeleteAccount</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminDeleteAccount</servlet-name>
+        <url-pattern>/admindeleteaccount</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AdminManageAccountServlet</servlet-name>
+        <servlet-class>controller.admin.AdminManageAccountServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminManageAccountServlet</servlet-name>
+        <url-pattern>/adminmanageaccountservlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>UpdateAdminProfile</servlet-name>
+        <servlet-class>controller.admin.UpdateAdminProfile</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateAdminProfile</servlet-name>
+        <url-pattern>/updateadminprofile</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Recruiter (package 'recuiter' in sources) -->
+    <servlet>
+        <servlet-name>HomeRecuiterServlet</servlet-name>
+        <servlet-class>controller.recuiter.HomeRecuiterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HomeRecuiterServlet</servlet-name>
+        <url-pattern>/homerecuiterservlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>JobFinalServlet</servlet-name>
+        <servlet-class>controller.recuiter.JobFinalServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JobFinalServlet</servlet-name>
+        <url-pattern>/jobfinalservlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>JobPostingServlet</servlet-name>
+        <servlet-class>controller.recuiter.JobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JobPostingServlet</servlet-name>
+        <url-pattern>/jobpostingservlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ListPostingJobsServlet</servlet-name>
+        <servlet-class>controller.recuiter.ListPostingJobsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ListPostingJobsServlet</servlet-name>
+        <url-pattern>/listpostingjobsservlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>RecruitmentProcessServlet</servlet-name>
+        <servlet-class>controller.recuiter.RecruitmentProcessServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RecruitmentProcessServlet</servlet-name>
+        <url-pattern>/recruitmentprocessservlet</url-pattern>
     </servlet-mapping>
 </web-app>
