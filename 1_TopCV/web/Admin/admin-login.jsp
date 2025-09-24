@@ -70,6 +70,10 @@
         </div>
     </div>
 
+    <c:if test="${not empty error}">
+        <div style="color:#ff4d4f;text-align:center;margin-top:12px;">${error}</div>
+    </c:if>
+
     <script src="${pageContext.request.contextPath}/shared/js/form-utils.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>
 </body>

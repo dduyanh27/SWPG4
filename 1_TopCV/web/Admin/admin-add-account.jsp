@@ -172,72 +172,49 @@
                 color: #2d4a33;
             }
 
-            /* Responsive Design */
+            /* Responsive */
             @media (max-width: 768px) {
                 .container {
                     margin: 10px;
                     border-radius: 10px;
                 }
-
                 .header {
                     padding: 25px 20px;
                 }
-
                 .header h2 {
                     font-size: 24px;
                 }
-
                 .form-container {
                     padding: 30px 20px;
                 }
-
                 .form-input {
                     padding: 12px 15px;
                 }
-
                 .submit-btn {
                     padding: 14px 25px;
                 }
             }
 
-            /* Animation cho form */
+            /* Animation */
             .form-group {
                 animation: slideInUp 0.6s ease forwards;
                 opacity: 0;
             }
-
-            .form-group:nth-child(1) {
-                animation-delay: 0.1s;
-            }
-            .form-group:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-            .form-group:nth-child(3) {
-                animation-delay: 0.3s;
-            }
-            .form-group:nth-child(4) {
-                animation-delay: 0.4s;
-            }
-            .form-group:nth-child(5) {
-                animation-delay: 0.5s;
-            }
+            .form-group:nth-child(1) { animation-delay: 0.1s; }
+            .form-group:nth-child(2) { animation-delay: 0.2s; }
+            .form-group:nth-child(3) { animation-delay: 0.3s; }
+            .form-group:nth-child(4) { animation-delay: 0.4s; }
+            .form-group:nth-child(5) { animation-delay: 0.5s; }
 
             @keyframes slideInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
             }
 
-            /* Icon cho input */
+            /* Input icon */
             .input-with-icon {
                 position: relative;
             }
-
             .input-icon {
                 position: absolute;
                 right: 15px;
@@ -268,49 +245,38 @@
                     </div>
                 </c:if>
 
-                <form action="adminaddaccount" method="post">
+                <!-- Form -->
+                <form action="${pageContext.request.contextPath}/adminaddaccount" method="post">
                     <div class="form-group">
                         <label class="form-label" for="email">📧 Địa chỉ Email</label>
                         <div class="input-with-icon">
-                            <input type="email" 
-                                   id="email"
-                                   name="email" 
-                                   class="form-input" 
-                                   value="${param.email}" 
-                                   required 
+                            <input type="email" id="email" name="email"
+                                   class="form-input"
+                                   value="${param.email}" required
                                    placeholder="Nhập địa chỉ email...">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="password">🔐 Mật khẩu</label>
-                        <input type="password" 
-                               id="password"
-                               name="password" 
-                               class="form-input" 
-                               required 
+                        <input type="password" id="password" name="password"
+                               class="form-input" required
                                placeholder="Nhập mật khẩu...">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="fullName">👤 Họ và tên / Tên công ty</label>
-                        <input type="text" 
-                               id="fullName"
-                               name="fullName" 
-                               class="form-input" 
-                               value="${param.fullName}" 
-                               required 
+                        <input type="text" id="fullName" name="fullName"
+                               class="form-input"
+                               value="${param.fullName}" required
                                placeholder="Nhập họ tên (JobSeeker/Admin) hoặc tên công ty (Recruiter)...">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="phone">📱 Số điện thoại</label>
-                        <input type="tel" 
-                               id="phone"
-                               name="phone" 
-                               class="form-input" 
-                               value="${param.phone}" 
-                               required 
+                        <input type="tel" id="phone" name="phone"
+                               class="form-input"
+                               value="${param.phone}" required
                                placeholder="Nhập số điện thoại...">
                     </div>
 
@@ -345,82 +311,14 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="submit-btn">
-                            ✨ Tạo Tài Khoản
-                        </button>
+                        <button type="submit" class="submit-btn">✨ Tạo Tài Khoản</button>
                     </div>
                 </form>
 
                 <div class="back-link">
-                    <a href="manage-accounts?role=admin">← Quay lại danh sách tài khoản</a>
+                    <a href="${pageContext.request.contextPath}/manage-accounts?role=admin">← Quay lại danh sách tài khoản</a>
                 </div>
             </div>
         </div>
-
-<!--        <script>
-            // Thêm hiệu ứng focus cho form
-            document.querySelectorAll('.form-input').forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.parentElement.style.transform = 'scale(1.02)';
-                });
-
-                input.addEventListener('blur', function () {
-                    this.parentElement.style.transform = 'scale(1)';
-                });
-            });
-
-            // Validation cơ bản
-            document.querySelector('form').addEventListener('submit', function (e) {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const fullName = document.getElementById('fullName').value;
-                const phone = document.getElementById('phone').value;
-                const gender = document.getElementById('gender').value;
-                const role = document.getElementById('role').value;
-                const status = document.getElementById('status').value;
-
-                if (!email.includes('@')) {
-                    alert('Vui lòng nhập địa chỉ email hợp lệ!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (password.length < 6) {
-                    alert('Mật khẩu phải có ít nhất 6 ký tự!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (fullName.trim().length < 2) {
-                    alert('Họ tên phải có ít nhất 2 ký tự!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (phone.trim().length < 10) {
-                    alert('Số điện thoại phải có ít nhất 10 số!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (!gender) {
-                    alert('Vui lòng chọn giới tính!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (!role) {
-                    alert('Vui lòng chọn vai trò!');
-                    e.preventDefault();
-                    return;
-                }
-
-                if (!status) {
-                    alert('Vui lòng chọn trạng thái!');
-                    e.preventDefault();
-                    return;
-                }
-            });
-        </script>-->
     </body>
 </html>

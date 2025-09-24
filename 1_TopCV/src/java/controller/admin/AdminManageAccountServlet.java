@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(name = "AdminManageAccountServlet", urlPatterns = {"/manage-accounts"})
+
 public class AdminManageAccountServlet extends HttpServlet {
 
     @Override
@@ -46,7 +46,7 @@ public class AdminManageAccountServlet extends HttpServlet {
         request.setAttribute("recruiterList", recruiterList);
 
         // Forward sang JSP
-        request.getRequestDispatcher("admin-manage-account.jsp").forward(request, response);
+        request.getRequestDispatcher("Admin/admin-manage-account.jsp").forward(request, response);
     }
 
     @Override

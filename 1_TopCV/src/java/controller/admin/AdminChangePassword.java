@@ -18,7 +18,6 @@ public class AdminChangePassword extends HttpServlet {
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -50,13 +49,13 @@ public class AdminChangePassword extends HttpServlet {
         
         if (!admin.getPassword().equals(pass)) {
             request.setAttribute("error", "Mật khẩu hiện tại không đúng!");
-            request.getRequestDispatcher("change-password.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
         
         if (!npass.equals(cfpass)) {
             request.setAttribute("error", "Xác nhận mật khẩu không khớp!");
-            request.getRequestDispatcher("change-password.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
         
@@ -67,7 +66,7 @@ public class AdminChangePassword extends HttpServlet {
         session.setAttribute("admin", admin);
         
         request.setAttribute("success", "Đổi mật khẩu thành công!");
-        request.getRequestDispatcher("admin-profile.jsp").forward(request, response);
+        request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
     }
 
 

@@ -16,7 +16,7 @@ public class AdminAddAccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Hiển thị form thêm tài khoản
-        request.getRequestDispatcher("admin-add-account.jsp").forward(request, response);
+        request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class AdminAddAccountServlet extends HttpServlet {
                 || gender == null || gender.isEmpty() || role == null || role.isEmpty()
                 || status == null || status.isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin!");
-            request.getRequestDispatcher("admin-add-account.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
 
@@ -80,7 +80,7 @@ public class AdminAddAccountServlet extends HttpServlet {
 
                 default:
                     request.setAttribute("error", "Vai trò không hợp lệ!");
-                    request.getRequestDispatcher("admin-add-account.jsp").forward(request, response);
+                    request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
                     return;
             }
 
@@ -90,7 +90,7 @@ public class AdminAddAccountServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra khi thêm tài khoản: " + e.getMessage());
-            request.getRequestDispatcher("admin-add-account.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-manage-account.jsp").forward(request, response);
         }
     }
 }

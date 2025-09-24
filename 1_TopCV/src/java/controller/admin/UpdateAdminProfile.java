@@ -16,7 +16,7 @@ public class UpdateAdminProfile extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("admin-profile.jsp");
+        response.sendRedirect("Admin/admin-profile.jsp");
     }
 
     @Override
@@ -32,7 +32,7 @@ public class UpdateAdminProfile extends HttpServlet {
 
         if (adminIdRaw == null || adminIdRaw.isEmpty()) {
             request.setAttribute("errorMessage", "Thiếu thông tin adminId.");
-            request.getRequestDispatcher("admin-profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
 
@@ -57,13 +57,13 @@ public class UpdateAdminProfile extends HttpServlet {
             }
 
             request.setAttribute("successMessage", "Cập nhật hồ sơ thành công.");
-            request.getRequestDispatcher("admin-profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
         } catch (NumberFormatException ex) {
             request.setAttribute("errorMessage", "adminId không hợp lệ.");
-            request.getRequestDispatcher("admin-profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
         } catch (Exception ex) {
             request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật hồ sơ.");
-            request.getRequestDispatcher("admin-profile.jsp").forward(request, response);
+            request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
         }
     }
 }

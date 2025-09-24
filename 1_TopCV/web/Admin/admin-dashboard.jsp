@@ -16,7 +16,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Thống kê & Báo cáo - JOBs</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!--        <link rel="stylesheet" type="text/css" href="css/style.css">-->
         <style>
             body {
                 margin: 0;
