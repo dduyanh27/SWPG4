@@ -13,13 +13,20 @@ public class Recruiter {
     private String img;
     private int categoryID;
     private String status;
+    private String companyAddress;
+    private String companySize;
+    private String contactPerson;
+    private String companyBenefits;
+    private String companyVideoURL;
 
     public Recruiter() {
     }
 
     public Recruiter(int recruiterID, String email, String password, String phone, 
                      String gender, String companyName, String companyDescription, 
-                     String companyLogoURL, String website, String img, int categoryID, String status) {
+                     String companyLogoURL, String website, String img, int categoryID, 
+                     String status, String companyAddress, String companySize, 
+                     String contactPerson, String companyBenefits, String companyVideoURL) {
         this.recruiterID = recruiterID;
         this.email = email;
         this.password = password;
@@ -32,6 +39,11 @@ public class Recruiter {
         this.img = img;
         this.categoryID = categoryID;
         this.status = status;
+        this.companyAddress = companyAddress;
+        this.companySize = companySize;
+        this.contactPerson = contactPerson;
+        this.companyBenefits = companyBenefits;
+        this.companyVideoURL = companyVideoURL;
     }
 
     public int getRecruiterID() {
@@ -130,6 +142,46 @@ public class Recruiter {
         this.categoryID = categoryID;
     }
 
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
+
+    public String getCompanySize() {
+        return companySize;
+    }
+
+    public void setCompanySize(String companySize) {
+        this.companySize = companySize;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getCompanyBenefits() {
+        return companyBenefits;
+    }
+
+    public void setCompanyBenefits(String companyBenefits) {
+        this.companyBenefits = companyBenefits;
+    }
+
+    public String getCompanyVideoURL() {
+        return companyVideoURL;
+    }
+
+    public void setCompanyVideoURL(String companyVideoURL) {
+        this.companyVideoURL = companyVideoURL;
+    }
+
     @Override
     public String toString() {
         return "Recruiter{" +
@@ -144,6 +196,11 @@ public class Recruiter {
                 ", img='" + img + '\'' +
                 ", categoryID=" + categoryID +
                 ", status='" + status + '\'' +
+                ", companyAddress='" + companyAddress + '\'' +
+                ", companySize='" + companySize + '\'' +
+                ", contactPerson='" + contactPerson + '\'' +
+                ", companyBenefits='" + companyBenefits + '\'' +
+                ", companyVideoURL='" + companyVideoURL + '\'' +
                 '}';
     }
 }

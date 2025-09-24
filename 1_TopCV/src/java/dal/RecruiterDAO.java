@@ -4,6 +4,7 @@ import model.Recruiter;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import util.MD5Util;
 
 public class RecruiterDAO extends DBContext {
     
@@ -245,4 +246,122 @@ public class RecruiterDAO extends DBContext {
         }
         return false;
     }
+    
+    //MINH
+    public Recruiter getRecruiterByEmail1(String email) {
+        Recruiter recruiter = null;
+        String sql = "SELECT * FROM Recruiter WHERE Email = ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                recruiter = new Recruiter(
+                    rs.getInt("RecruiterID"),
+                    rs.getString("Email"),
+                    rs.getString("Password"),
+                    rs.getString("Phone"),
+                    rs.getString("Gender"),
+                    rs.getString("CompanyName"),
+                    rs.getString("CompanyDescription"),
+                    rs.getString("CompanyLogoURL"),
+                    rs.getString("Website"),
+                    rs.getString("Img"),
+                    rs.getInt("CategoryID"),
+                    rs.getString("Status"),
+                    rs.getString("CompanyAddress"),
+                    rs.getString("CompanySize"),
+                    rs.getString("ContactPerson"),
+                    rs.getString("CompanyBenefits"),
+                    rs.getString("CompanyVideoURL")
+                );
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return recruiter;
+    }
+    
+    public Recruiter login(String email, String password) {
+        Recruiter recruiter = null;
+        String sql = "SELECT * FROM Recruiter WHERE Email = ? AND Password = ? AND Status = 'Active'";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+            // Mã hóa mật khẩu bằng MD5 trước khi so sánh
+            ps.setString(2, MD5Util.getMD5Hash(password));
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                recruiter = new Recruiter(
+                    rs.getInt("RecruiterID"),
+                    rs.getString("Email"),
+                    rs.getString("Password"),
+                    rs.getString("Phone"),
+                    rs.getString("Gender"),
+                    rs.getString("CompanyName"),
+                    rs.getString("CompanyDescription"),
+                    rs.getString("CompanyLogoURL"),
+                    rs.getString("Website"),
+                    rs.getString("Img"),
+                    rs.getInt("CategoryID"),
+                    rs.getString("Status"),
+                    rs.getString("CompanyAddress"),
+                    rs.getString("CompanySize"),
+                    rs.getString("ContactPerson"),
+                    rs.getString("CompanyBenefits"),
+                    rs.getString("CompanyVideoURL")
+                );
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return recruiter;
+    }
+    
+    // Update company information
+    public boolean updateCompanyInfo(int recruiterId, String companyName, String phone, 
+                                   String companyAddress, String companySize, String contactPerson,
+                                   String industry, String companyBenefits, String companyDescription,
+                                   String companyVideoURL, String website, String logoPath, 
+                                   String companyImagesPath) {
+        String sql = "UPDATE Recruiter SET CompanyName = ?, Phone = ?, CompanyAddress = ?, " +
+                    "CompanySize = ?, ContactPerson = ?, CompanyBenefits = ?, " +
+                    "CompanyDescription = ?, CompanyVideoURL = ?, Website = ?, " +
+                    "CompanyLogoURL = ?, Img = ? WHERE RecruiterID = ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, companyAddress);
+            ps.setString(4, companySize);
+            ps.setString(5, contactPerson);
+            ps.setString(6, companyBenefits);
+            ps.setString(7, companyDescription);
+            ps.setString(8, companyVideoURL);
+            ps.setString(9, website);
+            ps.setString(10, logoPath);
+            ps.setString(11, companyImagesPath);
+            ps.setInt(12, recruiterId);
+            
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+            
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    //MINH
 }
