@@ -3,6 +3,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%
+    if (request.getAttribute("adminList") == null) {
+        AdminDAO adminDAO = new AdminDAO();
+        List<Admin> adminList = adminDAO.getAllAdmin();
+        request.setAttribute("adminList", adminList);
+    }
+%>
+
 <!doctype html>
 <html lang="vi">
     <head>
@@ -10,7 +18,7 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Admin - Quản lý tài khoản</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="mana-acc.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/mana-acc.css">
     </head>
     <body>
         <!-- mobile menu toggle -->
@@ -80,15 +88,15 @@
                 <section class="container">
                     <!-- Role tabs -->
                     <div class="role-tabs">
-                        <a href="manage-accounts?role=admin" class="tab-btn ${selectedRole eq 'admin' ? 'active' : ''}">Admin</a>
-                        <a href="manage-accounts?role=jobseeker" class="tab-btn ${selectedRole eq 'jobseeker' ? 'active' : ''}">JobSeeker</a>
-                        <a href="manage-accounts?role=recruiter" class="tab-btn ${selectedRole eq 'recruiter' ? 'active' : ''}">Recruiter</a>
+                        <a href="${pageContext.request.contextPath}/manage-accounts?role=admin" class="tab-btn ${selectedRole eq 'admin' ? 'active' : ''}">Admin</a>
+                        <a href="${pageContext.request.contextPath}/manage-accounts?role=jobseeker" class="tab-btn ${selectedRole eq 'jobseeker' ? 'active' : ''}">JobSeeker</a>
+                        <a href="${pageContext.request.contextPath}/manage-accounts?role=recruiter" class="tab-btn ${selectedRole eq 'recruiter' ? 'active' : ''}">Recruiter</a>
                     </div>
 
                     <div class="card">
                         <div class="toolbar">
                             <div class="left-tools">
-                                <a href="admin-add-account.jsp" class="btn-add">Thêm Tài Khoản</a>
+                                <a href="${pageContext.request.contextPath}/Admin/admin-add-account.jsp" class="btn-add">Thêm Tài Khoản</a>
                             </div>
 
                             <div class="right-tools">
@@ -137,10 +145,13 @@
                                                               <td>${admin.phone}</td>
                                                               <td><span class="status ${admin.status}">${admin.status}</span></td>
                                                               <td>
-                                                                  <a href="admin-profile.jsp?id=${admin.adminId}&type=admin" class="btn outline">Chi tiết</a>
-                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${admin.adminId}&type=admin" class="btn danger" 
+                                                                  <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${admin.adminId}&type=admin" 
+                                                                     class="btn outline">Chi tiết</a>
+                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${admin.adminId}&type=admin" 
+                                                                     class="btn danger" 
                                                                      onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
                                                               </td>
+
                                                           </tr>
                                                     </c:if>
                                                 </c:forEach>
@@ -194,15 +205,15 @@
                                                                   fn:containsIgnoreCase(re.email, param.search) or 
                                                                   fn:contains(re.phone, param.search)}">
                                                           <tr>
-                                                              <td>${re.recruiterId}</td>
+                                                              <td>${re.recruiterID}</td>
                                                               <td>${re.companyName}</td>
                                                               <td>${re.gender}</td>
                                                               <td>${re.email}</td>
                                                               <td>${re.phone}</td>
                                                               <td><span class="status ${re.status}">${re.status}</span></td>
                                                               <td>
-                                                                  <a href="admin-profile.jsp?id=${re.recruiterId}&type=recruiter" class="btn outline">Chi tiết</a>
-                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${re.recruiterId}&type=recruiter" class="btn danger" 
+                                                                  <a href="admin-profile.jsp?id=${re.recruiterID}&type=recruiter" class="btn outline">Chi tiết</a>
+                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${re.recruiterID}&type=recruiter" class="btn danger" 
                                                                      onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
                                                               </td>
                                                           </tr>
@@ -243,7 +254,8 @@
         <script>
             (function () {
                 var el = document.getElementById('flashMsg');
-                if (!el) return;
+                if (!el)
+                    return;
                 setTimeout(function () {
                     el.style.opacity = '0';
                     setTimeout(function () {
