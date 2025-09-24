@@ -356,5 +356,71 @@
                 </div>
             </div>
         </div>
+
+<!--        <script>
+            // Thêm hiệu ứng focus cho form
+            document.querySelectorAll('.form-input').forEach(input => {
+                input.addEventListener('focus', function () {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+
+                input.addEventListener('blur', function () {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // Validation cơ bản
+            document.querySelector('form').addEventListener('submit', function (e) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const fullName = document.getElementById('fullName').value;
+                const phone = document.getElementById('phone').value;
+                const gender = document.getElementById('gender').value;
+                const role = document.getElementById('role').value;
+                const status = document.getElementById('status').value;
+
+                if (!email.includes('@')) {
+                    alert('Vui lòng nhập địa chỉ email hợp lệ!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Mật khẩu phải có ít nhất 6 ký tự!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (fullName.trim().length < 2) {
+                    alert('Họ tên phải có ít nhất 2 ký tự!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (phone.trim().length < 10) {
+                    alert('Số điện thoại phải có ít nhất 10 số!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (!gender) {
+                    alert('Vui lòng chọn giới tính!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (!role) {
+                    alert('Vui lòng chọn vai trò!');
+                    e.preventDefault();
+                    return;
+                }
+
+                if (!status) {
+                    alert('Vui lòng chọn trạng thái!');
+                    e.preventDefault();
+                    return;
+                }
+            });
+        </script>-->
     </body>
 </html>

@@ -158,4 +158,91 @@ public class RecruiterDAO extends DBContext {
         
         return recruiter;
     }
+    
+    //DUY ANH
+    // Lấy Recruiter theo email & password
+    public Recruiter getRecruiterAccount(String email, String password) {
+        String sql = "SELECT * FROM Recruiter WHERE Email = ? AND Password = ?";
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Recruiter(
+                        rs.getInt("RecruiterID"),
+                        rs.getString("Email"),
+                        rs.getString("Password"),
+                        rs.getString("Phone"),
+                        rs.getString("Gender"),
+                        rs.getString("CompanyName"),
+                        rs.getString("CompanyDescription"),
+                        rs.getString("CompanyLogoURL"),
+                        rs.getString("Website"),
+                        rs.getString("Img"),
+                        rs.getInt("CategoryID"),
+                        rs.getString("Status")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Đếm số lượng Recruiter
+    public int countRecruiter() {
+        String sql = "SELECT COUNT(*) FROM Recruiter";
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Lấy tất cả Recruiter đang Active
+//    public List<Recruiter> getAllRecruiters() {
+//        List<Recruiter> list = new ArrayList<>();
+//        String sql = "SELECT * FROM Recruiter WHERE Status = 'Active'";
+//        try {
+//            PreparedStatement ps = c.prepareStatement(sql);
+//            ResultSet rs = ps.executeQuery();
+//            while (rs.next()) {
+//                list.add(new Recruiter(
+//                        rs.getInt("RecruiterID"),
+//                        rs.getString("Email"),
+//                        rs.getString("Password"),
+//                        rs.getString("Phone"),
+//                        rs.getString("Gender"),
+//                        rs.getString("CompanyName"),
+//                        rs.getString("CompanyDescription"),
+//                        rs.getString("CompanyLogoURL"),
+//                        rs.getString("Website"),
+//                        rs.getString("Img"),
+//                        rs.getInt("CategoryID"),
+//                        rs.getString("Status")
+//                ));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return list;
+//    }
+
+    public boolean deleteRecruiterById(int id) {
+        String sql = "UPDATE Recruiter SET Status = 'Inactive' WHERE RecruiterID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
