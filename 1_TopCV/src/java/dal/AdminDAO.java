@@ -2,9 +2,11 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Admin;
+import util.MD5Util;
 
 public class AdminDAO extends DBContext {
 
@@ -156,8 +158,79 @@ public class AdminDAO extends DBContext {
         ps.executeUpdate();
     } catch (Exception e) {
         e.printStackTrace();
-    }
+    }  
 }
+    //Minh
+  public Admin login(String email, String password) {
+        Admin admin = null;
+        String sql = "SELECT * FROM Admins WHERE Email = ? AND Password = ? AND Status = 'Active'";
         
-
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+            // Mã hóa mật khẩu bằng MD5 trước khi so sánh
+            ps.setString(2, MD5Util.getMD5Hash(password));
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                admin = new Admin(
+                    rs.getInt("AdminID"),
+                    rs.getString("Email"),
+                    rs.getString("Password"),
+                    rs.getString("FullName"),
+                    rs.getString("AvatarURL"),
+                    rs.getString("Phone"),
+                    rs.getString("Gender"),
+                    rs.getString("Address"),
+                    rs.getDate("DateOfBirth"),
+                    rs.getString("Bio"),
+                    rs.getTimestamp("CreatedAt"),
+                    rs.getTimestamp("UpdatedAt"),
+                    rs.getString("Status")
+                );
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return admin;
+    }
+    
+    public Admin getAdminByEmail(String email) {
+        Admin admin = null;
+        String sql = "SELECT * FROM Admins WHERE Email = ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, email);
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                admin = new Admin(
+                    rs.getInt("AdminID"),
+                    rs.getString("Email"),
+                    rs.getString("Password"),
+                    rs.getString("FullName"),
+                    rs.getString("AvatarURL"),
+                    rs.getString("Phone"),
+                    rs.getString("Gender"),
+                    rs.getString("Address"),
+                    rs.getDate("DateOfBirth"),
+                    rs.getString("Bio"),
+                    rs.getTimestamp("CreatedAt"),
+                    rs.getTimestamp("UpdatedAt"),
+                    rs.getString("Status")
+                );
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return admin;
+    }      
+ //MINH
 }
