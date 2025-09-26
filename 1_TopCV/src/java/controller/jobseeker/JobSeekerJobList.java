@@ -1,6 +1,7 @@
 package controller.jobseeker;
 
 import dal.JobListDAO;
+import dal.LocationDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,6 +22,7 @@ public class JobSeekerJobList extends HttpServlet {
             throws ServletException, IOException {
 
         JobListDAO dao = new JobListDAO();
+
         String keyword = request.getParameter("keyword");
         if (keyword != null && keyword.trim().isEmpty()) {
             keyword = null;

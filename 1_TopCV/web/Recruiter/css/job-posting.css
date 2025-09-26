@@ -1,0 +1,29 @@
+/* Base styles from existing Recruiter/styles.css */
+@import url("../styles.css");
+
+/* Page-specific overrides and additions for job-posting */
+.job-posting-page .progress-container { margin-top: 70px; }
+.job-posting-page .form-section { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+.job-posting-page .section-header { display: flex; align-items: center; justify-content: space-between; }
+.job-posting-page .section-header h2 { margin: 0; font-size: 18px; }
+.job-posting-page .collapsible .toggle-icon { cursor: pointer; }
+.job-posting-page .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin: 16px 0; }
+.job-posting-page .warning-box { background: #fff7e6; border: 1px solid #ffe58f; color: #ad6800; padding: 10px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+.job-posting-page .salary-input-group, .job-posting-page .input-with-toggle, .job-posting-page .age-range-with-toggle, .job-posting-page .radio-group-with-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.job-posting-page .counter-input { display: inline-flex; align-items: center; gap: 8px; }
+.job-posting-page .counter-btn { width: 32px; height: 32px; border: 1px solid #ddd; background: #f7f7f7; border-radius: 4px; }
+.job-posting-page .dash { padding: 0 6px; color: #999; }
+.job-posting-page .toggle-group { display: inline-flex; align-items: center; gap: 8px; }
+.job-posting-page .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.job-posting-page .toggle-switch input { display: none; }
+.job-posting-page .toggle-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; transition: .2s; border-radius: 24px; }
+.job-posting-page .toggle-switch .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; transition: .2s; border-radius: 50%; }
+.job-posting-page .toggle-switch input:checked + .slider { background: #4caf50; }
+.job-posting-page .toggle-switch input:checked + .slider:before { transform: translateX(20px); }
+.job-posting-page .rich-text-editor .editor-toolbar { display: flex; gap: 6px; margin-bottom: 6px; }
+.job-posting-page .toolbar-btn { border: 1px solid #ddd; background: #f9f9f9; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+.job-posting-page .char-counter { text-align: right; color: #999; font-size: 12px; margin-top: 6px; }
+.job-posting-page .benefits-list .benefit-item { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: start; margin-bottom: 10px; }
+.job-posting-page .add-location-link { font-size: 12px; color: #1890ff; text-decoration: none; }
+
+

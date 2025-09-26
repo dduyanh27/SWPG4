@@ -48,7 +48,7 @@ public class JobListDAO extends DBContext {
                 // Lấy tên location
                 Location l = locationDAO.getLocationById(job.getLocationID());
                 if (l != null) {
-                    job.setLocationName(l.getName());
+                    job.setLocationName(l.getLocationName());
                 }
                 list.add(job);
             }

@@ -1,10 +1,12 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@page import="model.Recruiter" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tuyển Dụng</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Recruiter Dashboard - ${userName}</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -18,13 +20,13 @@
                     <span>RecruitPro</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Dashboard</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp" class="active">Dashboard</a></li>
                     <li><a href="#">Việc Làm</a></li>
                     <li class="dropdown">
                         <a href="#" class="active">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
                             <a href="#">Quản lý theo việc đăng tuyển</a>
-                            <a href="candidate-folder.html" class="highlighted">Quản lý theo thư mục và thẻ</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html" class="highlighted">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
                     <li class="dropdown">
@@ -52,11 +54,12 @@
                             Đăng Tuyển Dụng <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="job-posting.html">Tạo tin tuyển dụng mới</a>
-                            <a href="job-management.html">Quản lý tin đã đăng</a>
+                            <a href="${pageContext.request.contextPath}/jobposting">Tạo tin tuyển dụng mới</a> 
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
+                             
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="window.location.href='candidate-profile.html'">Tìm Ứng Viên</button>
+                    <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">Tìm Ứng Viên</button>
                     <button class="btn btn-white">Mua</button>
                 </div>
                 <div class="nav-icons">
@@ -70,7 +73,9 @@
                             <div class="user-header">
                                 <i class="fas fa-user-circle"></i>
                                 <div class="user-info">
-                                    <div class="user-name">Nguyen Phuoc</div>
+                                    <div class="user-name">${userName}</div>
+                                    <div class="user-role">Recruiter</div>
+                                    <div class="user-id">ID: ${userID}</div>
                                 </div>
                                 <i class="fas fa-times close-menu"></i>
                             </div>
@@ -89,7 +94,7 @@
                                     <i class="fas fa-cog"></i>
                                     <span>Quản lý tài khoản</span>
                                 </a>
-                                <a href="#" class="menu-item highlighted">
+                                <a href="company-info.jsp" class="menu-item highlighted">
                                     <i class="fas fa-building"></i>
                                     <span>Thông tin công ty</span>
                                 </a>
@@ -124,7 +129,7 @@
                             </div>
                             
                             <div class="menu-footer">
-                                <a href="#" class="logout-item">
+                                <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Thoát</span>
                                 </a>
@@ -144,8 +149,8 @@
                 <!-- Welcome Section -->
                 <div class="welcome-section">
                     <div class="welcome-content">
-                        <h1>Xin chào, Experience Customer</h1>
-                        <p>Đây là một số thông tin để bạn có thể bắt đầu sử dụng:</p>
+                        <h1>Xin chào, ${userName}</h1>
+                        <p>Chào mừng bạn đến với Recruiter Dashboard! Đây là một số thông tin để bạn có thể bắt đầu sử dụng:</p>
                         <div class="welcome-links">
                             <a href="#" class="link">FAQ/Hướng dẫn sử dụng</a>
                             <a href="#" class="link">Khám phá sản phẩm</a>
@@ -271,35 +276,18 @@
         <span>Trò chuyện</span>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
     <script>
         // Dashboard Chart
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('statusChart').getContext('2d');
-            
             const chart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: [
-                        'Nhận hồ sơ',
-                        'Duyệt hồ sơ', 
-                        'Kiểm Tra Năng Lực',
-                        'Đề nghị nhận việc',
-                        'Đã tuyển',
-                        'Không đạt',
-                        'Ứng viên từ chối'
-                    ],
+                    labels: ['Nhận hồ sơ','Duyệt hồ sơ','Kiểm Tra Năng Lực','Đề nghị nhận việc','Đã tuyển','Không đạt','Ứng viên từ chối'],
                     datasets: [{
                         data: [34.3, 37.9, 9.5, 0.6, 3.0, 14.2, 0.6],
-                        backgroundColor: [
-                            '#dbeafe', // Light Blue
-                            '#fce7f3', // Pink
-                            '#1e40af', // Dark Blue
-                            '#dcfce7', // Green
-                            '#a855f7', // Purple
-                            '#dc2626', // Red
-                            '#f59e0b'  // Orange
-                        ],
+                        backgroundColor: ['#dbeafe','#fce7f3','#1e40af','#dcfce7','#a855f7','#dc2626','#f59e0b'],
                         borderWidth: 0,
                         cutout: '60%'
                     }]
@@ -310,20 +298,10 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
+                            labels: { usePointStyle: true, padding: 20, font: { size: 12 } }
                         },
                         tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '%';
-                                }
-                            }
+                            callbacks: { label: function(context) { return context.label + ': ' + context.parsed + '%'; } }
                         }
                     }
                 }
@@ -332,3 +310,5 @@
     </script>
 </body>
 </html>
+
+

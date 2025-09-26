@@ -15,8 +15,8 @@ import model.Type;
 
 public class JobSeekerProfileServlet extends HttpServlet {
     private JobSeekerDAO dao = new JobSeekerDAO();
-    LocationDAO locDao = new LocationDAO();
-    TypeDAO typeDao = new TypeDAO();
+    private LocationDAO locDao = new LocationDAO();
+    private TypeDAO typeDao = new TypeDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

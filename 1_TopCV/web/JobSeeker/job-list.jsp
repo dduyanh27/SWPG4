@@ -410,9 +410,9 @@
                                 %>
                                 <div class="filter-item-row">
                                     <label>
-                                        <input type="checkbox" name="categoryIds" value="<%=cat.getId()%>"
-                                               <%= selectedSet.contains(cat.getId()) ? "checked" : "" %> />
-                                        <%=cat.getName()%>
+                                        <input type="checkbox" name="categoryIds" value="<%=cat.getCategoryID()%>"
+                                               <%= selectedSet.contains(cat.getCategoryID()) ? "checked" : "" %> />
+                                        <%=cat.getCategoryName()%>
                                     </label>
                                 </div>
                                 <%
@@ -432,9 +432,9 @@
                                 %>
                                 <div class="filter-item-row">
                                     <label>
-                                        <input type="radio" name="locationId" value="<%=loc.getId()%>" 
-                                               <%= (loc.getId()+"").equals(selectedLocation) ? "checked" : "" %> />
-                                        <%=loc.getName()%>
+                                        <input type="radio" name="locationId" value="<%=loc.getLocationID()%>" 
+                                               <%= (loc.getLocationID()+"").equals(selectedLocation) ? "checked" : "" %> />
+                                        <%=loc.getLocationName()%>
                                     </label>
                                 </div>
                                 <%

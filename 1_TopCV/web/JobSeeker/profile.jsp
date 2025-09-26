@@ -614,7 +614,7 @@
                                 <select name="currentLevelID">
                                     <option value="">Chọn cấp bậc</option>
                                     <c:forEach var="level" items="${types}">
-                                        <option value="${level.typeId}" ${jobSeeker.currentLevelId == level.typeId ? "selected" : ""}>
+                                        <option value="${level.typeID}" ${jobSeeker.currentLevelId == level.typeID ? "selected" : ""}>
                                             ${level.typeName}
                                         </option>
                                     </c:forEach>
@@ -644,7 +644,7 @@
                             <label>Địa điểm <span class="required">*</span></label>
                             <select name="locationID">
                                 <c:forEach var="loc" items="${locations}">
-                                    <option value="${loc.id}" ${jobSeeker.locationId == loc.id ? "selected" : ""}>${loc.name}</option>
+                                    <option value="${loc.locationID}" ${jobSeeker.locationId == loc.locationID ? "selected" : ""}>${loc.locationName}</option>
                                 </c:forEach>
                             </select>
                         </div>

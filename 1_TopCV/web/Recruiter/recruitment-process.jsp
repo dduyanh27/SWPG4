@@ -1,10 +1,11 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thiết lập quy trình và đội ngũ - Recruit Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/css/recruitment-process.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="recruitment-process-page">
@@ -17,13 +18,13 @@
                     <span>RecruitPro</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                     <li><a href="#">Việc Làm</a></li>
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
                             <a href="#">Quản lý theo việc đăng tuyển</a>
-                            <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
                     <li class="dropdown">
@@ -45,11 +46,11 @@
                             ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="job-posting.html" class="active">Tạo tin tuyển dụng mới</a>
-                            <a href="job-management.html">Quản lý tin đã đăng</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp" class="active">Tạo tin tuyển dụng mới</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                         </div>
                     </div>
-                        <button class="btn btn-blue" onclick="window.location.href='candidate-profile.html'">TÌM ỨNG VIÊN</button>
+                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">TÌM ỨNG VIÊN</button>
                     <button class="btn btn-white">Mua</button>
                 </div>
                 <div class="nav-icons">
@@ -244,8 +245,8 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href='job-posting.html'">Quay lại</button>
-                        <button type="button" class="btn btn-primary" onclick="window.location.href='job-posting-final.html'">Lưu và Tiếp Tục</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-posting.jsp'">Quay lại</button>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-posting-final.jsp'">Lưu và Tiếp Tục</button>
                     </div>
             </div>
         </div>
@@ -259,7 +260,7 @@
         </button>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
     <script>
         // Tab functionality
         document.querySelectorAll('.tab-button').forEach(button => {
@@ -316,3 +317,5 @@
     </script>
 </body>
 </html>
+
+

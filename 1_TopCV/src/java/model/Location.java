@@ -1,40 +1,37 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author duong
- */
 public class Location {
-    private int id;
-    private String name;
-
-    public Location() {
-    }
-
-    public Location(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    private int locationID;
+    private String locationName;
+    
+    public Location() {}
+    
+    public Location(int locationID, String locationName) {
+        this.locationID = locationID;
+        this.locationName = locationName;
     }
     
+    public int getLocationID() {
+        return locationID;
+    }
     
+    public void setLocationID(int locationID) {
+        this.locationID = locationID;
+    }
+    
+    public String getLocationName() {
+        return locationName;
+    }
+    
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+    
+    @Override
+    public String toString() {
+        return "Location{" +
+                "locationID=" + locationID +
+                ", locationName='" + locationName + '\'' +
+                '}';
+    }
 }

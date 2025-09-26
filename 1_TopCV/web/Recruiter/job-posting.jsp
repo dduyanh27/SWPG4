@@ -1,11 +1,33 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Tuyển Dụng - Dashboard Tuyển Dụng</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/css/job-posting.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body class="job-posting-page">
     <!-- Top Navigation Bar -->
@@ -17,13 +39,13 @@
                     <span>RecruitPro</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                     <li><a href="#">Việc Làm</a></li>
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
                             <a href="#">Quản lý theo việc đăng tuyển</a>
-                            <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
                     <li class="dropdown">
@@ -45,11 +67,11 @@
                             ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="job-posting.html">Tạo tin tuyển dụng mới</a>
-                            <a href="job-management.html">Quản lý tin đã đăng</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp" class="active">Tạo tin tuyển dụng mới</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                         </div>
                     </div>
-                        <button class="btn btn-blue" onclick="window.location.href='candidate-profile.html'">TÌM ỨNG VIÊN</button>
+                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">TÌM ỨNG VIÊN</button>
                     <button class="btn btn-white">Mua</button>
                 </div>
                 <div class="nav-icons">
@@ -151,6 +173,21 @@
     <!-- Main Content -->
     <main class="job-posting-main">
         <div class="job-posting-container">
+            <!-- Success/Error Messages -->
+            <% if (request.getAttribute("success") != null) { %>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <%= request.getAttribute("success") %>
+                </div>
+            <% } %>
+            <% if (request.getAttribute("error") != null) { %>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= request.getAttribute("error") %>
+                </div>
+            <% } %>
+            
+            <form action="${pageContext.request.contextPath}/jobposting" method="POST" id="job-posting-form">
             <!-- Job Description Section -->
             <div class="form-section">
                 <div class="section-header">
@@ -159,26 +196,32 @@
                 
                 <div class="form-group">
                     <label for="job-title">Chức danh <span class="required">*</span></label>
-                    <input type="text" id="job-title" value="Chuyên Viên Kiểm Thử Và Vận Hành Phần Mềm (Ba/tester)" required>
+                    <input type="text" id="job-title" name="job-title" value="Chuyên Viên Kiểm Thử Và Vận Hành Phần Mềm (Ba/tester)" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="job-level">Cấp bậc <span class="required">*</span></label>
-                        <select id="job-level" required>
-                            <option value="employee" selected>Nhân viên</option>
-                            <option value="senior">Chuyên viên</option>
-                            <option value="manager">Quản lý</option>
-                            <option value="director">Giám đốc</option>
+                        <select id="job-level" name="job-level" required>
+                            <option value="">Chọn cấp bậc</option>
+                            <% if (request.getAttribute("jobLevels") != null) { 
+                                List<model.Type> jobLevels = (List<model.Type>) request.getAttribute("jobLevels");
+                                for (model.Type level : jobLevels) { %>
+                                    <option value="<%= level.getTypeID() %>"><%= level.getTypeName() %></option>
+                                <% }
+                            } %>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="job-type">Loại việc làm <span class="required">*</span></label>
-                        <select id="job-type" required>
-                            <option value="fulltime" selected>Toàn thời gian</option>
-                            <option value="parttime">Bán thời gian</option>
-                            <option value="contract">Hợp đồng</option>
-                            <option value="intern">Thực tập</option>
+                        <select id="job-type" name="job-type" required>
+                            <option value="">Chọn loại việc làm</option>
+                            <% if (request.getAttribute("jobTypes") != null) { 
+                                List<model.Type> jobTypes = (List<model.Type>) request.getAttribute("jobTypes");
+                                for (model.Type type : jobTypes) { %>
+                                    <option value="<%= type.getTypeID() %>"><%= type.getTypeName() %></option>
+                                <% }
+                            } %>
                         </select>
                     </div>
                 </div>
@@ -197,19 +240,36 @@
 
                 <div class="form-group">
                     <label for="job-field">Lĩnh vực công việc <span class="required">*</span></label>
-                    <select id="job-field" required>
-                        <option value="hr" selected>Cung cấp nhân lực</option>
-                        <option value="it">Công nghệ thông tin</option>
-                        <option value="finance">Tài chính</option>
-                        <option value="marketing">Marketing</option>
+                    <select id="job-field" name="job-field" required>
+                        <option value="">Chọn lĩnh vực</option>
+                        <% if (request.getAttribute("categories") != null) { 
+                            List<model.Category> categories = (List<model.Category>) request.getAttribute("categories");
+                            for (model.Category category : categories) { %>
+                                <option value="<%= category.getCategoryID() %>"><%= category.getCategoryName() %></option>
+                            <% }
+                        } %>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="work-location">Địa điểm làm việc <span class="required">*</span></label>
-                    <input type="text" id="work-location" value="Office: Hà Nội, Vietnam" required>
+                    <select id="work-location" name="work-location" required>
+                        <option value="">Chọn địa điểm</option>
+                        <% if (request.getAttribute("locations") != null) { 
+                            List<model.Location> locations = (List<model.Location>) request.getAttribute("locations");
+                            for (model.Location location : locations) { %>
+                                <option value="<%= location.getLocationID() %>"><%= location.getLocationName() %></option>
+                            <% }
+                        } %>
+                    </select>
                     <small class="hint">(Tối đa 3 địa điểm) <i class="fas fa-question-circle"></i></small>
                     <a href="#" class="add-location-link">Thêm địa điểm làm việc</a>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiration-date">Ngày hết hạn <span class="required">*</span></label>
+                    <input type="date" id="expiration-date" name="expiration-date" required>
+                    <small class="hint">Tin tuyển dụng sẽ tự động hết hạn sau ngày này</small>
                 </div>
 
                 <div class="form-group">
@@ -219,7 +279,7 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-description" rows="10" required>• Tham gia vào quá trình phát triển phần mềm từ giai đoạn phân tích yêu cầu đến triển khai
+                        <textarea id="job-description" name="job-description" rows="10" required>• Tham gia vào quá trình phát triển phần mềm từ giai đoạn phân tích yêu cầu đến triển khai
 • Thực hiện kiểm thử chức năng, kiểm thử tích hợp và kiểm thử hệ thống
 • Viết và thực thi các test case, test script
 • Phối hợp với team phát triển để đảm bảo chất lượng sản phẩm
@@ -238,7 +298,7 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-requirements" rows="10" required>1. Tốt nghiệp Đại học chuyên ngành Công nghệ thông tin hoặc tương đương
+                        <textarea id="job-requirements" name="job-requirements" rows="10" required>1. Tốt nghiệp Đại học chuyên ngành Công nghệ thông tin hoặc tương đương
 2. Có ít nhất 2 năm kinh nghiệm làm Tester
 3. Có khả năng giao tiếp tiếng Anh cơ bản
 4. Có kỹ năng mềm tốt, khả năng làm việc nhóm
@@ -257,9 +317,9 @@ Phúc lợi được hưởng:
                 <div class="form-group">
                     <label for="salary">Mức lương <span class="required">*</span> (USD)</label>
                     <div class="salary-input-group">
-                        <input type="number" id="salary-min" value="1000" placeholder="Từ">
+                        <input type="number" id="salary-min" name="salary-min" value="1000" placeholder="Từ">
                         <span class="dash">-</span>
-                        <input type="number" id="salary-max" value="1500" placeholder="Đến">
+                        <input type="number" id="salary-max" name="salary-max" value="1500" placeholder="Đến">
                         <div class="toggle-group">
                             <label class="toggle-label">Hiển thị cho Ứng Viên</label>
                             <label class="toggle-switch">
@@ -278,7 +338,7 @@ Phúc lợi được hưởng:
                     <label for="hiring-count">Số lượng tuyển dụng</label>
                     <div class="counter-input">
                         <button type="button" class="counter-btn minus">-</button>
-                        <input type="number" id="hiring-count" value="1" min="1">
+                        <input type="number" id="hiring-count" name="hiring-count" value="1" min="1">
                         <button type="button" class="counter-btn plus">+</button>
                     </div>
                 </div>
@@ -354,6 +414,15 @@ Phúc lợi được hưởng:
                         <div class="counter-input">
                             <button type="button" class="counter-btn minus">-</button>
                             <input type="number" id="min-experience" value="1" min="0">
+                            <button type="button" class="counter-btn plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age-requirement">Yêu cầu tuổi tối thiểu</label>
+                        <div class="counter-input">
+                            <button type="button" class="counter-btn minus">-</button>
+                            <input type="number" id="age-requirement" name="age-requirement" value="18" min="15" max="65">
                             <button type="button" class="counter-btn plus">+</button>
                         </div>
                     </div>
@@ -630,8 +699,9 @@ Phúc lợi được hưởng:
             </div>
 
             <div class="form-actions">
-                <button type="button" class="btn btn-primary" onclick="window.location.href='recruitment-process.html'">Lưu và Tiếp Tục</button>
+                <button type="submit" class="btn btn-primary">Lưu và Tiếp Tục</button>
             </div>
+            </form>
         </div>
     </main>
 
@@ -643,6 +713,8 @@ Phúc lợi được hưởng:
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
 </body>
 </html>
+
+

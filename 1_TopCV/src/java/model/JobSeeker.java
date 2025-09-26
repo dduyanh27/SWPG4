@@ -10,15 +10,26 @@ public class JobSeeker {
     private String headline;
     private String contactInfo;
     private String address;
-    private int locationId;
+    private Integer locationId;
     private String img;
-    private int currentLevelId;
+    private Integer currentLevelId;
     private String status;
 
-    public JobSeeker() {
-    }
+    // Constructor
+    public JobSeeker() {}
 
-    public JobSeeker(int jobSeekerId, String email, String password, String fullName, String phone, String gender, String headline, String contactInfo, String address, int locationId, String img, int currentLevelId, String status) {
+    public JobSeeker(String email, String password, String fullName, String phone) {
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.phone = phone;
+    }
+    
+    
+
+    public JobSeeker(int jobSeekerId, String email, String password, String fullName, String phone,
+                     String gender, String headline, String contactInfo, String address,
+                     Integer locationId, String img, Integer currentLevelId, String status) {
         this.jobSeekerId = jobSeekerId;
         this.email = email;
         this.password = password;
@@ -33,129 +44,44 @@ public class JobSeeker {
         this.currentLevelId = currentLevelId;
         this.status = status;
     }
-    
-    // Constructor without ID (for new records)
-    public JobSeeker(String email, String password, String fullName, String phone, 
-                    String gender, String headline, String contactInfo, String address, 
-                    Integer locationId, String img, Integer currentLevelId, String status) {
-        this.email = email;
-        this.password = password;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.gender = gender;
-        this.headline = headline;
-        this.contactInfo = contactInfo;
-        this.address = address;
-        this.locationId = locationId;
-        this.img = img;
-        this.currentLevelId = currentLevelId;
-        this.status = status;
-    }
 
-    public int getJobSeekerId() {
-        return jobSeekerId;
-    }
+    // Getter & Setter
+    public int getJobSeekerId() { return jobSeekerId; }
+    public void setJobSeekerId(int jobSeekerId) { this.jobSeekerId = jobSeekerId; }
 
-    public void setJobSeekerId(int jobSeekerId) {
-        this.jobSeekerId = jobSeekerId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getFullName() {
-        return fullName;
-    }
+    public String getHeadline() { return headline; }
+    public void setHeadline(String headline) { this.headline = headline; }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    public String getContactInfo() { return contactInfo; }
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public Integer getLocationId() { return locationId; }
+    public void setLocationId(Integer locationId) { this.locationId = locationId; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getImg() { return img; }
+    public void setImg(String img) { this.img = img; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
+    public Integer getCurrentLevelId() { return currentLevelId; }
+    public void setCurrentLevelId(Integer currentLevelId) { this.currentLevelId = currentLevelId; }
 
-    public String getHeadline() {
-        return headline;
-    }
-
-    public void setHeadline(String headline) {
-        this.headline = headline;
-    }
-
-    public String getContactInfo() {
-        return contactInfo;
-    }
-
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public int getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(int locationId) {
-        this.locationId = locationId;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public int getCurrentLevelId() {
-        return currentLevelId;
-    }
-
-    public void setCurrentLevelId(int currentLevelId) {
-        this.currentLevelId = currentLevelId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
-    
-    
-}    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+}
