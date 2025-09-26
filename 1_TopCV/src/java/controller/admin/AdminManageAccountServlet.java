@@ -37,7 +37,7 @@ public class AdminManageAccountServlet extends HttpServlet {
 
         // Load danh sách JobSeeker
         JobSeekerDAO jsDAO = new JobSeekerDAO();
-        List<JobSeeker> jobSeekerList = jsDAO.getAllJobSeekers();
+        List<JobSeeker> jobSeekerList = jsDAO.getAllJobSeekersActive();
         request.setAttribute("jobSeekerList", jobSeekerList);
 
         // Load danh sách Recruiter

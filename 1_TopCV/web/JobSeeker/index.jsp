@@ -1,4 +1,13 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@page import="dal.LocationDAO"%>
+<%@page import="model.Location"%>
+<%@page import="java.util.List"%>
+<%
+    LocationDAO ldao = new LocationDAO();
+    List<Location> locations = ldao.getAllLocations();
+    request.setAttribute("locations", locations);
+%>
 <!doctype html>
 <html class="no-js" lang="zxx">
     <head>
@@ -25,6 +34,12 @@
             <link rel="stylesheet" href="../assets/css/style.css">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
+                /* Chữ trong dropdown tùy chỉnh màu đen */
+                .nice-select .current,
+                .nice-select .list li {
+                    color: black;
+                }
+
                 :root{
                     --bg-left:  #061f3b;
                     --bg-right: #0a67ff;
@@ -204,16 +219,12 @@
                 </div>
             </div>
             <div class="search-section">
-                <div class="search-bar">
-                    <input type="text" placeholder="Tìm kiếm việc làm, công ty, kỹ năng">
-                    <div class="location-selector">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Tất cả địa điểm</span>
-                    </div>
-                    <button class="search-btn">
+                <form action="${pageContext.request.contextPath}/job-list" method="get" class="search-bar">
+                    <input type="text" name="keyword" placeholder="Tìm kiếm việc làm, công ty">
+                    <button type="submit" class="search-btn">
                         <i class="fas fa-search"></i>
                     </button>
-                </div>
+                </form>
             </div>
             <div class="header-right">
                 <div class="menu-toggle" id="menuToggle">
@@ -222,7 +233,7 @@
                 </div>
                 <button class="recruiter-btn">Nhà tuyển dụng</button>
                 <div class="user-actions">
-                    <a class="profile-icon" href="" title="Tài khoản">
+                    <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
                     </a>
                     <div class="notification-icon">
@@ -241,7 +252,7 @@
             <div class="mega-col">
                 <h4>Việc làm</h4>
                 <a href="#">Việc làm mới nhất</a>
-                <a href="#">Tìm việc làm</a>
+                <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
                 <a href="#">Việc làm quản lý</a>
             </div>
             <div class="mega-col">
@@ -276,22 +287,22 @@
                         <div class="row">
                             <div class="col-xl-8">
                                 <!-- form -->
-                                <form action="#" class="search-box">
+                                <form action="${pageContext.request.contextPath}/job-list" method="get" class="search-box">
                                     <div class="input-form">
-                                        <input type="text" placeholder="Job Tittle or keyword">
+                                        <input type="text" name="keyword" placeholder="Job Tittle or company name">
                                     </div>
                                     <div class="select-form">
                                         <div class="select-itms">
-                                            <select name="select" id="select1">
-                                                <option value="">Location BD</option>
-                                                <option value="">Location PK</option>
-                                                <option value="">Location US</option>
-                                                <option value="">Location UK</option>
+                                            <select name="locationId" id="select1" >
+                                                <option value="" disabled selected>Location</option>
+                                                <c:forEach var="loc" items="${locations}">
+                                                <option value="${loc.locationID}">${loc.locationName}</option>
+                                                </c:forEach>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="search-form">
-                                        <a href="#">Find job</a>
+                                        <a href="#" onclick="this.closest('form').submit(); return false;">Find job</a>
                                     </div>	
                                 </form>	
                             </div>

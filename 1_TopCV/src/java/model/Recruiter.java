@@ -22,6 +22,13 @@ public class Recruiter {
     public Recruiter() {
     }
 
+    public Recruiter(int recruiterID, String companyName) {
+        this.recruiterID = recruiterID;
+        this.companyName = companyName;
+    }
+    
+    
+
     public Recruiter(int recruiterID, String email, String password, String phone, 
                      String gender, String companyName, String companyDescription, 
                      String companyLogoURL, String website, String img, int categoryID, 
