@@ -4,16 +4,19 @@ public class Recruiter {
     private int recruiterID;
     private String email;
     private String password;
-    private String status;
+    private String companyName;
+    private String companyDescription;
+    private String companyLogoURL;
+    private String website;
+    private String img;
+    private int categoryID;
 
     public Recruiter() {
     }
 
-    public Recruiter(int recruiterID, String email, String password, String status) {
+    public Recruiter(int recruiterID, String companyName) {
         this.recruiterID = recruiterID;
-        this.email = email;
-        this.password = password;
-        this.status = status;
+        this.companyName = companyName;
     }
 
     public int getRecruiterID() {
@@ -40,20 +43,51 @@ public class Recruiter {
         this.password = password;
     }
 
-    public String getStatus() {
-        return status;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
-    @Override
-    public String toString() {
-        return "Recruiter{" +
-                "recruiterID=" + recruiterID +
-                ", email='" + email + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+    public String getCompanyDescription() {
+        return companyDescription;
+    }
+
+    public void setCompanyDescription(String companyDescription) {
+        this.companyDescription = companyDescription;
+    }
+
+    public String getCompanyLogoURL() {
+        return companyLogoURL;
+    }
+
+    public void setCompanyLogoURL(String companyLogoURL) {
+        this.companyLogoURL = companyLogoURL;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
+
+    public int getCategoryID() {
+        return categoryID;
+    }
+
+    public void setCategoryID(int categoryID) {
+        this.categoryID = categoryID;
     }
 }

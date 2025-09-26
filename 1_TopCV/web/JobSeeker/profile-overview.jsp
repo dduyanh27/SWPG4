@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -330,5 +331,6 @@
 </body>
 <!-- Derived from bố cục của profile.html -->
 </html>
+
 
 

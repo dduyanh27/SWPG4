@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -359,3 +360,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+

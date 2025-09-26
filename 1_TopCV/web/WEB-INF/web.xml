@@ -4,8 +4,24 @@
         <servlet-name>AdminManageAccountServlet</servlet-name>
         <servlet-class>controller.AdminManageAccountServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>JobSeekerProfileServlet</servlet-name>
+        <servlet-class>controller.jobseeker.JobSeekerProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>JobSeekerJobListServlet</servlet-name>
+        <servlet-class>controller.JobSeekerJobListServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>AdminManageAccountServlet</servlet-name>
         <url-pattern>/adminmanageaccount</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>JobSeekerProfileServlet</servlet-name>
+        <url-pattern>/jobseekerprofile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>JobSeekerJobListServlet</servlet-name>
+        <url-pattern>/jobseekerjoblist</url-pattern>
     </servlet-mapping>
 </web-app>
