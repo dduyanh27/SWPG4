@@ -337,5 +337,58 @@ public JobSeeker getJobSeekerAccount(String email, String password) {
         }
         return null;
     }
+    
+    public boolean updatePassword(int jobSeekerId, String newPassword) {
+        if (c == null) {
+            System.err.println("Database connection is null in JobSeekerDAO.updatePassword");
+            return false;
+        }
+        
+        String sql = "UPDATE JobSeeker SET Password = ? WHERE JobSeekerID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, MD5Util.getMD5Hash(newPassword));
+            ps.setInt(2, jobSeekerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean hasPasswordAccount(String email) {
+        String sql = "SELECT COUNT(*) FROM JobSeeker WHERE Email = ? AND Password != 'GOOGLE_LOGIN' AND Password IS NOT NULL";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    public boolean isGoogleAccount(String email) {
+        String sql = "SELECT COUNT(*) FROM JobSeeker WHERE Email = ? AND Password = 'GOOGLE_LOGIN'";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
     //Minh
 }

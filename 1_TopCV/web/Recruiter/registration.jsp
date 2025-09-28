@@ -609,6 +609,33 @@
             <%
                 String error = request.getParameter("error");
                 String success = request.getParameter("success");
+                
+                // Success message
+                if (success != null && success.equals("registration_success")) {
+            %>
+            <div style="background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bee5eb; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                <h3 style="margin: 10px 0; color: #0c5460;">🎉 Đăng ký thành công!</h3>
+                <p style="margin: 5px 0;">Tài khoản của bạn đã được tạo thành công và đang chờ phê duyệt.</p>
+                <p style="margin: 5px 0; font-size: 14px;">Bạn sẽ được chuyển đến trang đăng nhập sau <span id="countdown">5</span> giây...</p>
+            </div>
+            <script>
+                // Auto redirect after 5 seconds
+                let countdown = 5;
+                const countdownElement = document.getElementById('countdown');
+                const timer = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        window.location.href = '${pageContext.request.contextPath}/Recruiter/recruiter-login.jsp';
+                    }
+                }, 1000);
+            </script>
+            <%
+                }
+                
+                // Error message
                 if (error != null) {
             %>
             <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
@@ -641,7 +668,7 @@
                 }
             %>
             
-            <form id="registrationForm" class="registration-form" action="${pageContext.request.contextPath}/RecruiterRegistrationServlet" method="POST">
+            <form id="registrationForm" class="registration-form" action="${pageContext.request.contextPath}/RecruiterRegistrationServlet" method="POST" <%= success != null && success.equals("registration_success") ? "style='display: none;'" : "" %>>
                 <!-- Step 1: Contact Information -->
                 <div id="step1" class="form-step active">
                     <h2 class="step-title">Thông tin liên lạc</h2>
