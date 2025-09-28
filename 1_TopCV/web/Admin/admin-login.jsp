@@ -1,7 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%-- 
+    Document   : admin-login
+    Created on : Sep 24, 2025, 7:48:35 AM
+    Author     : ADMIN
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +19,18 @@
             <div class="login-header">
                 <h2>Admin Login</h2>
                 <p>Sign in to your admin account</p>
+                
+                <!-- Error Message -->
+                <%
+                    String error = (String) request.getAttribute("error");
+                    if (error != null) {
+                %>
+                <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                </div>
+                <%
+                    }
+                %>
             </div>
             
             <form class="login-form" id="loginForm" action="${pageContext.request.contextPath}/LoginServlet" method="POST" novalidate>
@@ -49,7 +64,7 @@
                             Remember me
                         </span>
                     </label>
-                    <a href="forgotpassword.html" class="forgot-password">Forgot password?</a>
+                    <a href="request-password.jsp" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn btn">
@@ -69,10 +84,6 @@
             </div>
         </div>
     </div>
-
-    <c:if test="${not empty error}">
-        <div style="color:#ff4d4f;text-align:center;margin-top:12px;">${error}</div>
-    </c:if>
 
     <script src="${pageContext.request.contextPath}/shared/js/form-utils.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/script.js"></script>

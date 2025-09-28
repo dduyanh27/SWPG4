@@ -31,6 +31,18 @@
                 <%
                     }
                 %>
+                
+                <!-- Error Message -->
+                <%
+                    String error = (String) request.getAttribute("error");
+                    if (error != null) {
+                %>
+                <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                </div>
+                <%
+                    }
+                %>
             </div>
             
             <form class="login-form" id="loginForm" action="${pageContext.request.contextPath}/LoginServlet" method="POST" novalidate>
@@ -64,7 +76,7 @@
                             Remember me
                         </span>
                     </label>
-                    <a href="forgotpassword.html" class="forgot-password">Forgot password?</a>
+                    <a href="request-password.jsp" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn btn">

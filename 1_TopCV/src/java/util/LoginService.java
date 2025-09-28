@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
 
 import dal.AdminDAO;
@@ -10,8 +6,9 @@ import dal.RecruiterDAO;
 import model.Admin;
 import model.JobSeeker;
 import model.Recruiter;
+
 /**
- *
+ * Centralized authentication service for all user types
  * @author ADMIN
  */
 public class LoginService {
@@ -33,22 +30,30 @@ public class LoginService {
         return instance;
     }
     
+    // ========================================
+    // PUBLIC METHODS
+    // ========================================
+    
     public LoginResult authenticateUser(String email, String password, String loginType) {
         if (email == null || password == null || email.trim().isEmpty() || password.trim().isEmpty()) {
-            return new LoginResult(false, "Email and password are required", null, null);
+            return new LoginResult(false, "Vui lòng nhập đầy đủ email và mật khẩu.", null, null);
         }
         
-        if ("admin".equals(loginType)) {
-            return authenticateAdmin(email, password);
-        } else if ("jobseeker".equals(loginType)) {
-            return authenticateJobSeeker(email, password);
-        } else if ("recruiter".equals(loginType)) {
-            return authenticateRecruiter(email, password);
-        } else {
-            // Auto-detect user type
-            return authenticateAutoDetect(email, password);
+        switch (loginType) {
+            case "admin":
+                return authenticateAdmin(email, password);
+            case "jobseeker":
+                return authenticateJobSeeker(email, password);
+            case "recruiter":
+                return authenticateRecruiter(email, password);
+            default:
+                return new LoginResult(false, "Loại đăng nhập không hợp lệ.", null, null);
         }
     }
+    
+    // ========================================
+    // PRIVATE AUTHENTICATION METHODS
+    // ========================================
     
     private LoginResult authenticateAdmin(String email, String password) {
         Admin admin = adminDAO.login(email, password);
@@ -56,7 +61,7 @@ public class LoginService {
             return new LoginResult(true, "Admin login successful", "admin", admin);
         }
         
-        return new LoginResult(false, "Invalid admin credentials", null, null);
+        return new LoginResult(false, "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.", null, null);
     }
     
     private LoginResult authenticateJobSeeker(String email, String password) {
@@ -65,7 +70,7 @@ public class LoginService {
             return new LoginResult(true, "JobSeeker login successful", "jobseeker", jobSeeker);
         }
         
-        return new LoginResult(false, "Invalid jobseeker credentials", null, null);
+        return new LoginResult(false, "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.", null, null);
     }
     
     private LoginResult authenticateRecruiter(String email, String password) {
@@ -74,30 +79,12 @@ public class LoginService {
             return new LoginResult(true, "Recruiter login successful", "recruiter", recruiter);
         }
         
-        return new LoginResult(false, "Invalid recruiter credentials", null, null);
+        return new LoginResult(false, "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.", null, null);
     }
     
-    private LoginResult authenticateAutoDetect(String email, String password) {
-        // Thử tất cả các loại user theo thứ tự ưu tiên
-        // Admin -> JobSeeker -> Recruiter
-        
-        Admin admin = adminDAO.login(email, password);
-        if (admin != null) {
-            return new LoginResult(true, "Admin login successful", "admin", admin);
-        }
-        
-        JobSeeker jobSeeker = jobSeekerDAO.login(email, password);
-        if (jobSeeker != null) {
-            return new LoginResult(true, "JobSeeker login successful", "jobseeker", jobSeeker);
-        }
-        
-        Recruiter recruiter = recruiterDAO.login(email, password);
-        if (recruiter != null) {
-            return new LoginResult(true, "Recruiter login successful", "recruiter", recruiter);
-        }
-        
-        return new LoginResult(false, "Invalid credentials", null, null);
-    }
+    // ========================================
+    // INNER CLASSES
+    // ========================================
     
     public static class LoginResult {
         private final boolean success;
