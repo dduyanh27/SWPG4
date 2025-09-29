@@ -145,7 +145,9 @@
                 .recruiter-btn{ background:transparent; color:#e8f0ff; border:1px solid rgba(255,255,255,0.6); padding:8px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(2px); }
                 .recruiter-btn:hover{ background:rgba(255,255,255,0.1); }
                 .user-actions{ display:flex; align-items:center; gap:12px; }
-                .user-actions > a, .user-actions > div{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#e8f0ff; border:1px solid rgba(255,255,255,0.35); }
+                .user-actions > a, .user-actions > div{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#e8f0ff; border:1px solid rgba(255,255,255,0.35); transition: all 0.3s ease; }
+                .user-actions > a:hover, .user-actions > div:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.6); }
+                .logout-icon:hover{ background:rgba(255,107,107,0.2) !important; border-color:rgba(255,107,107,0.6) !important; color:#ff6b6b !important; }
                 /* Mega menu */
                 .mega-menu{ position:absolute; left:50%; transform:translateX(-50%); top:72px; width:92%; max-width:1100px; background:#ffffff; color:#0f172a; border-radius:16px; box-shadow:0 24px 60px rgba(2,10,30,0.28); padding:24px; display:none; z-index:1300; border:1px solid rgba(17,24,39,0.08); overflow:hidden; }
                 .mega-menu::before{ content:""; position:absolute; left:0; top:0; right:0; height:6px; background:linear-gradient(90deg, #0b5bdf, #0a67ff); }
@@ -242,6 +244,9 @@
                     <div class="message-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
+                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
                 </div>
             </div>
         </div>
