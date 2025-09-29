@@ -138,7 +138,7 @@
                             </div>
                             
                             <div class="menu-footer">
-                                <a href="#" class="logout-item">
+                                <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Thoát</span>
                                 </a>

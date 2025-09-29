@@ -20,10 +20,18 @@
                 <h2>JobSeeker Login</h2>
                 <p>Sign in to your jobseeker account</p>
                 
-                <!-- OAuth Error Message -->
+                <!-- Error Messages -->
                 <%
+                    String error = (String) request.getAttribute("error");
                     String oauthError = request.getParameter("oauth_error");
-                    if (oauthError != null) {
+                    
+                    if (error != null) {
+                %>
+                <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+                    <i class="fas fa-exclamation-triangle"></i> <%= error %>
+                </div>
+                <%
+                    } else if (oauthError != null) {
                 %>
                 <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
                     <i class="fas fa-exclamation-triangle"></i> <%= oauthError %>
@@ -64,7 +72,7 @@
                             Remember me
                         </span>
                     </label>
-                    <a href="forgotpassword.html" class="forgot-password">Forgot password?</a>
+                    <a href="request-password.jsp" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn btn">

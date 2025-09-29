@@ -34,36 +34,49 @@ public class GoogleLoginServlet extends HttpServlet {
 
             JobSeekerDAO dao = new JobSeekerDAO();
             
-            // Kiểm tra email đã tồn tại trong tất cả các bảng chưa
-            if (dao.isEmailExistsInAllTables(account.getEmail())) {
-                // Email đã tồn tại trong hệ thống, không cho phép Google login
-                response.sendRedirect(request.getContextPath() + "/JobSeeker/jobseeker-login.jsp?oauth_error=" + 
-                    java.net.URLEncoder.encode("Email này đã được sử dụng trong hệ thống. Vui lòng đăng nhập bằng mật khẩu.", 
-                    java.nio.charset.StandardCharsets.UTF_8));
-                return;
-            }
+            // Check if email exists in JobSeeker table
+            JobSeeker user = dao.getJobSeekerByEmail(account.getEmail());
             
-            // Email chưa tồn tại, cho phép tạo tài khoản mới với Google login
-            JobSeeker user = dao.insertJobSeeker(account.getEmail(), "GOOGLE_LOGIN", "Active");
+            if (user == null) {
+                // Email doesn't exist, create new account
+                user = dao.insertJobSeeker(account.getEmail(), "GOOGLE_LOGIN", "Active");
+                
+                if (user == null) {
+                    throw new Exception("Không thể tạo tài khoản mới");
+                }
+            } else {
+                // Email exists, check if it's a password account
+                if (dao.hasPasswordAccount(account.getEmail())) {
+                    // Account exists with password, prevent Google login
+                    throw new Exception("Email này đã được đăng ký với mật khẩu. Vui lòng đăng nhập bằng email và mật khẩu thay vì Google.");
+                } else if (dao.isGoogleAccount(account.getEmail())) {
+                    // It's already a Google account, proceed with login
+                    // No action needed, user is already set
+                } else {
+                    // Account exists but no password set, update to Google login
+                    dao.updatePassword(account.getId(), "GOOGLE_LOGIN");
+                }
+            }
 
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("userType", "jobseeker");
-            if (user != null) {
-                session.setAttribute("userID", user.getJobSeekerId());
-                session.setAttribute("userName", user.getFullName() != null ? user.getFullName() : user.getEmail());
-            }
-
+            session.setAttribute("userID", user.getJobSeekerId());
+            session.setAttribute("userName", user.getFullName() != null ? user.getFullName() : user.getEmail());
+            
             response.sendRedirect(request.getContextPath() + "/JobSeeker/index.jsp");
         } catch (Exception ex) {
             ex.printStackTrace();
+            
             String msg = ex.getMessage();
             if (msg != null) {
                 msg = msg.replace('\n', ' ').replace('\r', ' ');
             } else {
-                msg = "Unknown error";
+                msg = "Có lỗi xảy ra trong quá trình đăng nhập Google. Vui lòng thử lại.";
             }
-            response.sendRedirect(request.getContextPath() + "/JobSeeker/jobseeker-login.jsp?oauth_error=" + java.net.URLEncoder.encode(msg, java.nio.charset.StandardCharsets.UTF_8));
+            
+            response.sendRedirect(request.getContextPath() + "/JobSeeker/jobseeker-login.jsp?oauth_error=" + 
+                java.net.URLEncoder.encode(msg, java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 

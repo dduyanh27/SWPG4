@@ -363,5 +363,192 @@ public class RecruiterDAO extends DBContext {
             return false;
         }
     }
+    
+    // Update password for recruiter
+    public boolean updatePassword(int recruiterId, String newPassword) {
+        if (c == null) {
+            System.err.println("Database connection is null in RecruiterDAO.updatePassword");
+            return false;
+        }
+        
+        String sql = "UPDATE Recruiter SET Password = ? WHERE RecruiterID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, MD5Util.getMD5Hash(newPassword));
+            ps.setInt(2, recruiterId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean isEmailExistsInAllTables(String email) {
+        try {
+            // Check Recruiter table
+            if (checkEmailInTable("Recruiter", email)) {
+                return true;
+            }
+            
+            // Check JobSeeker table
+            if (checkEmailInTable("JobSeeker", email)) {
+                return true;
+            }
+            
+            // Check Admin table (with error handling)
+            try {
+                if (checkEmailInTable("Admin", email)) {
+                    return true;
+                }
+            } catch (SQLException e) {
+                // Admin table might not exist, continue
+            }
+            
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true; // Return true to be safe (prevent registration if error)
+        }
+    }
+    
+    private boolean checkEmailInTable(String tableName, String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE Email = ?";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, email);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+    
+    public Recruiter insertRecruiter(String email, String password, String fullName, String phone, 
+                                   String companyName, String industry, String address, String status) {
+        // Try with CategoryID first
+        String sql = "INSERT INTO Recruiter (Email, Password, Phone, CompanyName, CompanyAddress, Status, ContactPerson, CategoryID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, email);
+            ps.setString(2, password);
+            ps.setString(3, phone);
+            ps.setString(4, companyName);
+            ps.setString(5, address);
+            ps.setString(6, status);
+            ps.setString(7, fullName);
+            ps.setInt(8, 1); // Default category
+            
+            int affectedRows = ps.executeUpdate();
+            
+            if (affectedRows > 0) {
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int recruiterID = generatedKeys.getInt(1);
+                    
+                    Recruiter recruiter = new Recruiter();
+                    recruiter.setRecruiterID(recruiterID);
+                    recruiter.setEmail(email);
+                    recruiter.setPassword(password);
+                    recruiter.setPhone(phone);
+                    recruiter.setCompanyName(companyName);
+                    recruiter.setCompanyAddress(address);
+                    recruiter.setStatus(status);
+                    recruiter.setContactPerson(fullName);
+                    recruiter.setCategoryID(1); // Default category
+                    return recruiter;
+                }
+            }
+        } catch (SQLException e) {
+            // If CategoryID fails, try without it
+            try {
+                String sqlWithoutCategory = "INSERT INTO Recruiter (Email, Password, Phone, CompanyName, CompanyAddress, Status, ContactPerson) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement ps2 = c.prepareStatement(sqlWithoutCategory, PreparedStatement.RETURN_GENERATED_KEYS);
+                ps2.setString(1, email);
+                ps2.setString(2, password);
+                ps2.setString(3, phone);
+                ps2.setString(4, companyName);
+                ps2.setString(5, address);
+                ps2.setString(6, status);
+                ps2.setString(7, fullName);
+                
+                int affectedRows2 = ps2.executeUpdate();
+                
+                if (affectedRows2 > 0) {
+                    ResultSet generatedKeys2 = ps2.getGeneratedKeys();
+                    if (generatedKeys2.next()) {
+                        int recruiterID = generatedKeys2.getInt(1);
+                        
+                        Recruiter recruiter = new Recruiter();
+                        recruiter.setRecruiterID(recruiterID);
+                        recruiter.setEmail(email);
+                        recruiter.setPassword(password);
+                        recruiter.setPhone(phone);
+                        recruiter.setCompanyName(companyName);
+                        recruiter.setCompanyAddress(address);
+                        recruiter.setStatus(status);
+                        recruiter.setContactPerson(fullName);
+                        recruiter.setCategoryID(1); // Default category
+                        return recruiter;
+                    }
+                }
+                ps2.close();
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return null;
+    }
+    
+    public boolean updateCompanyImages(int recruiterId, String companyImagesPath) {
+        String sql = "UPDATE Recruiter SET Img = ? WHERE RecruiterID = ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyImagesPath);
+            ps.setInt(2, recruiterId);
+            
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+            
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean updateCompanyInfo(int recruiterId, String companyName, String phone, 
+                                   String companyAddress, String companySize, String contactPerson,
+                                   String companyBenefits, String companyDescription,
+                                   String companyVideoURL, String website, String logoPath, 
+                                   String companyImagesPath) {
+        String sql = "UPDATE Recruiter SET CompanyName = ?, Phone = ?, CompanyAddress = ?, " +
+                    "CompanySize = ?, ContactPerson = ?, CompanyBenefits = ?, " +
+                    "CompanyDescription = ?, CompanyVideoURL = ?, Website = ?, " +
+                    "CompanyLogoURL = ?, Img = ? WHERE RecruiterID = ?";
+        
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, companyAddress);
+            ps.setString(4, companySize);
+            ps.setString(5, contactPerson);
+            ps.setString(6, companyBenefits);
+            ps.setString(7, companyDescription);
+            ps.setString(8, companyVideoURL);
+            ps.setString(9, website);
+            ps.setString(10, logoPath);
+            ps.setString(11, companyImagesPath);
+            ps.setInt(12, recruiterId);
+            
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+            
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     //MINH
 }

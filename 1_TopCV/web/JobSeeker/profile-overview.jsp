@@ -49,6 +49,9 @@
                     <div class="message-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
+                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
                 </div>
             </div>
         </div>
