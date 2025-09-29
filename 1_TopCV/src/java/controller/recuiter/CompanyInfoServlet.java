@@ -1,0 +1,373 @@
+package controller.recuiter;
+
+import dal.RecruiterDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
+import model.Recruiter;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
+@WebServlet(name = "CompanyInfoServlet", urlPatterns = {"/CompanyInfoServlet"})
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 10,      // 10MB
+    maxRequestSize = 1024 * 1024 * 50     // 50MB
+)
+public class CompanyInfoServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        Recruiter recruiter = (Recruiter) session.getAttribute("user");
+        
+        if (recruiter == null) {
+            response.sendRedirect(request.getContextPath() + "/Recruiter/recruiter-login.jsp");
+            return;
+        }
+        
+        // Load company info from database
+        RecruiterDAO recruiterDAO = new RecruiterDAO();
+        Recruiter fullRecruiter = recruiterDAO.getRecruiterById(recruiter.getRecruiterID());
+        
+        
+        if (fullRecruiter != null) {
+            // Clean up company images - remove any logo paths that might be mixed in
+            if (fullRecruiter.getImg() != null && !fullRecruiter.getImg().isEmpty()) {
+                String cleanedImages = cleanCompanyImages(fullRecruiter.getImg());
+                if (!cleanedImages.equals(fullRecruiter.getImg())) {
+                    // Update database if cleanup was needed
+                    recruiterDAO.updateCompanyImages(fullRecruiter.getRecruiterID(), cleanedImages);
+                    fullRecruiter.setImg(cleanedImages);
+                }
+            }
+            
+            request.setAttribute("recruiter", fullRecruiter);
+        }
+        
+        request.getRequestDispatcher("/Recruiter/company-info.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        HttpSession session = request.getSession();
+        Recruiter recruiter = (Recruiter) session.getAttribute("user");
+        if (recruiter == null) {
+            response.sendRedirect(request.getContextPath() + "/Recruiter/recruiter-login.jsp");
+            return;
+        }
+        
+        try {
+            // Get form data
+            String companyName = request.getParameter("companyName");
+            String phone = request.getParameter("phone");
+            String companyAddress = request.getParameter("companyAddress");
+            String companySize = request.getParameter("companySize");
+            String contactPerson = request.getParameter("contactPerson");
+            String companyBenefits = request.getParameter("companyBenefits");
+            String companyDescription = request.getParameter("companyDescription");
+            String companyVideoURL = request.getParameter("companyVideoURL");
+            String website = request.getParameter("website");
+            
+            // Get removal flags
+            String removedLogo = request.getParameter("removedLogo");
+            String removedImages = request.getParameter("removedImages");
+            
+            // Handle logo upload (single file)
+            String logoPath = handleLogoUpload(request, recruiter.getRecruiterID());
+            
+            // Handle company images upload (multiple files)
+            String companyImagesPath = handleCompanyImagesUpload(request, recruiter.getRecruiterID());
+            
+            // Handle image removal
+            handleImageRemoval(request, removedLogo, removedImages);
+            
+            // Determine final logo and images paths
+            String finalLogoPath = logoPath;
+            String finalImagesPath = companyImagesPath;
+            
+            // If no new logo uploaded but logo was removed, set to null
+            if (logoPath == null && "true".equals(removedLogo)) {
+                finalLogoPath = null;
+            }
+            // If no new logo uploaded and logo not removed, keep existing
+            else if (logoPath == null && !"true".equals(removedLogo)) {
+                finalLogoPath = recruiter.getCompanyLogoURL();
+            }
+            
+            // Handle company images - merge existing and new images
+            if (companyImagesPath != null) {
+                // If new images uploaded, merge with existing images
+                String existingImages = recruiter.getImg();
+                if (existingImages != null && !existingImages.isEmpty()) {
+                    // Remove images that were marked for deletion
+                    if (removedImages != null && !removedImages.isEmpty()) {
+                        existingImages = removeImagesFromExisting(existingImages, removedImages);
+                    }
+                    // Merge existing and new images
+                    finalImagesPath = existingImages + "," + companyImagesPath;
+                } else {
+                    // No existing images, use only new images
+                    finalImagesPath = companyImagesPath;
+                }
+            } else if (removedImages != null && !removedImages.isEmpty()) {
+                // Only removal, no new uploads
+                finalImagesPath = removeImagesFromExisting(recruiter.getImg(), removedImages);
+            } else {
+                // No changes to images
+                finalImagesPath = recruiter.getImg();
+            }
+            
+            // Validate path length before saving to database
+            if (finalImagesPath != null && finalImagesPath.length() > 500) {
+                // Keep only first 5 images if path is too long
+                String[] images = finalImagesPath.split(",");
+                if (images.length > 5) {
+                    StringBuilder truncated = new StringBuilder();
+                    for (int i = 0; i < 5 && i < images.length; i++) {
+                        if (truncated.length() > 0) {
+                            truncated.append(",");
+                        }
+                        truncated.append(images[i].trim());
+                    }
+                    finalImagesPath = truncated.toString();
+                }
+            }
+            
+            // Update recruiter info
+            RecruiterDAO recruiterDAO = new RecruiterDAO();
+            
+            boolean success = recruiterDAO.updateCompanyInfo(
+                recruiter.getRecruiterID(),
+                companyName,
+                phone,
+                companyAddress,
+                companySize,
+                contactPerson,
+                companyBenefits,
+                companyDescription,
+                companyVideoURL,
+                website,
+                finalLogoPath,
+                finalImagesPath
+            );
+            
+            if (success) {
+                // Update session with new data
+                Recruiter updatedRecruiter = recruiterDAO.getRecruiterById(recruiter.getRecruiterID());
+                if (updatedRecruiter != null) {
+                    session.setAttribute("user", updatedRecruiter);
+                }
+                
+                response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?success=updated");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=update_failed");
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=system_error");
+        }
+    }
+    
+    private String handleLogoUpload(HttpServletRequest request, int recruiterId) throws IOException, ServletException {
+        Part logoPart = request.getPart("companyLogo");
+        
+        if (logoPart != null && logoPart.getSize() > 0) {
+            String fileName = getFileName(logoPart);
+            if (fileName != null && !fileName.isEmpty()) {
+                // Create upload directory if not exists
+                String uploadDir = getServletContext().getRealPath("/uploads/logos");
+                File uploadDirFile = new File(uploadDir);
+                if (!uploadDirFile.exists()) {
+                    uploadDirFile.mkdirs();
+                }
+                
+                // Generate shorter unique filename
+                String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                String uniqueFileName = "l" + recruiterId + "_" + System.currentTimeMillis() + fileExtension;
+                
+                // Save file
+                File file = new File(uploadDir, uniqueFileName);
+                try (InputStream input = logoPart.getInputStream()) {
+                    Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                
+                String logoPath = "/uploads/logos/" + uniqueFileName;
+                
+                return logoPath;
+            }
+        }
+        
+        return null;
+    }
+    
+    private String handleCompanyImagesUpload(HttpServletRequest request, int recruiterId) throws IOException, ServletException {
+        StringBuilder imagePaths = new StringBuilder();
+        int maxImages = 5; // Limit to 5 images
+        int imageCount = 0;
+        
+        for (Part part : request.getParts()) {
+            if (part.getName().equals("companyImages") && part.getSize() > 0 && imageCount < maxImages) {
+                String fileName = getFileName(part);
+                if (fileName != null && !fileName.isEmpty()) {
+                    // Create upload directory if not exists
+                    String uploadDir = getServletContext().getRealPath("/uploads/company-images");
+                    File uploadDirFile = new File(uploadDir);
+                    if (!uploadDirFile.exists()) {
+                        uploadDirFile.mkdirs();
+                    }
+                    
+                    // Generate shorter unique filename to save space
+                    String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                    String uniqueFileName = "c" + recruiterId + "_" + System.currentTimeMillis() + "_" + (imageCount + 1) + fileExtension;
+                    
+                    // Save file
+                    File file = new File(uploadDir, uniqueFileName);
+                    try (InputStream input = part.getInputStream()) {
+                        Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    
+                    String imagePath = "/uploads/company-images/" + uniqueFileName;
+                    
+                    if (imagePaths.length() > 0) {
+                        imagePaths.append(",");
+                    }
+                    imagePaths.append(imagePath);
+                    imageCount++;
+                }
+            }
+        }
+        
+        String result = imagePaths.length() > 0 ? imagePaths.toString() : null;
+        return result;
+    }
+    
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        if (contentDisposition != null) {
+            String[] tokens = contentDisposition.split(";");
+            for (String token : tokens) {
+                if (token.trim().startsWith("filename")) {
+                    return token.substring(token.indexOf("=") + 2, token.length() - 1);
+                }
+            }
+        }
+        return null;
+    }
+    
+    private void handleImageRemoval(HttpServletRequest request, String removedLogo, String removedImages) {
+        // Handle logo removal
+        if ("true".equals(removedLogo)) {
+            // Remove logo file from server
+            try {
+                String logoPath = getServletContext().getRealPath("/uploads/logos");
+                File logoDir = new File(logoPath);
+                if (logoDir.exists()) {
+                    File[] logoFiles = logoDir.listFiles((dir, name) -> name.startsWith("logo_"));
+                    if (logoFiles != null) {
+                        for (File logoFile : logoFiles) {
+                            logoFile.delete();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Error removing logo
+            }
+        }
+        
+        // Handle company images removal
+        if (removedImages != null && !removedImages.isEmpty()) {
+            String[] imagesToRemove = removedImages.split(",");
+            for (String imagePath : imagesToRemove) {
+                if (!imagePath.trim().isEmpty()) {
+                    try {
+                        String fullPath = getServletContext().getRealPath(imagePath.trim());
+                        File file = new File(fullPath);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    } catch (Exception e) {
+                        // Error removing image
+                    }
+                }
+            }
+        }
+    }
+    
+    private String removeImagesFromExisting(String existingImages, String removedImages) {
+        if (existingImages == null || existingImages.isEmpty()) {
+            return null;
+        }
+        
+        if (removedImages == null || removedImages.isEmpty()) {
+            return existingImages;
+        }
+        
+        String[] existingArray = existingImages.split(",");
+        String[] removedArray = removedImages.split(",");
+        
+        StringBuilder result = new StringBuilder();
+        
+        for (String existing : existingArray) {
+            String trimmedExisting = existing.trim();
+            boolean shouldRemove = false;
+            
+            // Check if this image should be removed
+            for (String removed : removedArray) {
+                if (trimmedExisting.equals(removed.trim())) {
+                    shouldRemove = true;
+                    break;
+                }
+            }
+            
+            // Also filter out logo images from company images
+            if (!shouldRemove && trimmedExisting.contains("/logos/")) {
+                shouldRemove = true;
+            }
+            
+            if (!shouldRemove) {
+                if (result.length() > 0) {
+                    result.append(",");
+                }
+                result.append(trimmedExisting);
+            }
+        }
+        
+        return result.length() > 0 ? result.toString() : null;
+    }
+    
+    private String cleanCompanyImages(String companyImages) {
+        if (companyImages == null || companyImages.isEmpty()) {
+            return null;
+        }
+        
+        String[] imagePaths = companyImages.split(",");
+        StringBuilder result = new StringBuilder();
+        
+        for (String imagePath : imagePaths) {
+            String trimmedPath = imagePath.trim();
+            if (!trimmedPath.isEmpty() && !trimmedPath.contains("/logos/")) {
+                if (result.length() > 0) {
+                    result.append(",");
+                }
+                result.append(trimmedPath);
+            }
+        }
+        
+        return result.length() > 0 ? result.toString() : null;
+    }
+}

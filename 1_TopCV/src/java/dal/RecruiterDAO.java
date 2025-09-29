@@ -496,5 +496,59 @@ public class RecruiterDAO extends DBContext {
         }
         return null;
     }
+    
+    public boolean updateCompanyImages(int recruiterId, String companyImagesPath) {
+        String sql = "UPDATE Recruiter SET Img = ? WHERE RecruiterID = ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyImagesPath);
+            ps.setInt(2, recruiterId);
+            
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+            
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean updateCompanyInfo(int recruiterId, String companyName, String phone, 
+                                   String companyAddress, String companySize, String contactPerson,
+                                   String companyBenefits, String companyDescription,
+                                   String companyVideoURL, String website, String logoPath, 
+                                   String companyImagesPath) {
+        String sql = "UPDATE Recruiter SET CompanyName = ?, Phone = ?, CompanyAddress = ?, " +
+                    "CompanySize = ?, ContactPerson = ?, CompanyBenefits = ?, " +
+                    "CompanyDescription = ?, CompanyVideoURL = ?, Website = ?, " +
+                    "CompanyLogoURL = ?, Img = ? WHERE RecruiterID = ?";
+        
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, companyAddress);
+            ps.setString(4, companySize);
+            ps.setString(5, contactPerson);
+            ps.setString(6, companyBenefits);
+            ps.setString(7, companyDescription);
+            ps.setString(8, companyVideoURL);
+            ps.setString(9, website);
+            ps.setString(10, logoPath);
+            ps.setString(11, companyImagesPath);
+            ps.setInt(12, recruiterId);
+            
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+            
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     //MINH
 }

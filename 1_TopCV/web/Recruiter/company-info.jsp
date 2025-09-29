@@ -357,7 +357,7 @@
                     <!-- Hình Ảnh Công Ty Section -->
                     <div class="form-section">
                         <h3>Hình Ảnh Công Ty</h3>
-                        <p class="upload-limit">Tối đa 3 ảnh để tránh lỗi hệ thống</p>
+                        <p class="upload-limit">Tối đa 5 ảnh</p>
                         <div class="file-upload">
                             <div class="upload-area" id="imagesUploadArea">
                                 <i class="fas fa-cloud-upload-alt"></i>
@@ -367,7 +367,6 @@
                             <div id="imagesPreview" class="images-preview">
                                 <!-- Existing images from database -->
                                 <% if (recruiter != null && recruiter.getImg() != null && !recruiter.getImg().isEmpty()) { 
-                                    System.out.println("DEBUG JSP: Company images from DB: " + recruiter.getImg());
                                     String[] imagePaths = recruiter.getImg().split(",");
                                     String logoPath = recruiter.getCompanyLogoURL();
                                     
@@ -384,10 +383,10 @@
                                             }
                                             
                                             if (!isLogo) { %>
-                                                <div class="image-preview-item existing-image">
+                                                <div class="image-preview-item existing-image" style="position: relative; display: inline-block; margin: 5px;">
                                                     <img src="<%= request.getContextPath() + imagePath.trim() %>" 
                                                          alt="Company Image" 
-                                                         style="max-width: 150px; max-height: 100px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"
+                                                         style="max-width: 150px; max-height: 100px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;"
                                                          onerror="this.parentElement.style.display='none';">
                                                     <button type="button" class="remove-image" onclick="removeExistingImage(this, '<%= imagePath.trim() %>')" style="position: absolute; top: -8px; right: -8px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                                                         <i class="fas fa-times"></i>
@@ -678,12 +677,8 @@
                 const existingImages = imageElements.preview.querySelectorAll('.existing-image');
                 const alreadySelectedImages = imageElements.preview.querySelectorAll('.image-preview-item:not(.existing-image)');
                 const totalExisting = existingImages.length + alreadySelectedImages.length;
-                const maxImages = 3;
+                const maxImages = 5;
                 
-                console.log('DEBUG: Existing images from DB:', existingImages.length);
-                console.log('DEBUG: Already selected images:', alreadySelectedImages.length);
-                console.log('DEBUG: New files to add:', files.length);
-                console.log('DEBUG: Total would be:', totalExisting + files.length);
                 
                 if (totalExisting + files.length > maxImages) {
                     alert(`Chỉ có thể upload tối đa ${maxImages} ảnh. Bạn đã có ${totalExisting} ảnh và đang thêm ${files.length} ảnh.`);
@@ -738,7 +733,7 @@
                     const fileInfo = document.createElement('div');
                     fileInfo.className = 'file-info';
                     fileInfo.style.cssText = 'position: absolute; bottom: -20px; left: 0; right: 0; font-size: 10px; color: #666; text-align: center;';
-                    fileInfo.textContent = `${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+                    fileInfo.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + 'KB)';
                     
                     const removeBtn = document.createElement('button');
                     removeBtn.type = 'button';
@@ -884,6 +879,7 @@
             flex-wrap: wrap;
             gap: 15px;
             margin-top: 15px;
+            min-height: 50px;
         }
         
         /* Upload limit warning */

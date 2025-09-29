@@ -70,6 +70,13 @@ public class RequestPasswordServlet extends HttpServlet {
                 JobSeekerDAO jobSeekerDAO = new JobSeekerDAO();
                 JobSeeker jobSeeker = jobSeekerDAO.getJobSeekerByEmail(email);
                 if (jobSeeker != null) {
+                    // Kiểm tra xem có phải tài khoản Google không
+                    if (jobSeekerDAO.isGoogleAccount(email)) {
+                        request.setAttribute("mess", "Tài khoản này được đăng nhập bằng Google. Vui lòng đăng nhập bằng Google thay vì reset mật khẩu.");
+                        String forwardPath = "/" + getCorrectFolderName(userType) + "/request-password.jsp";
+                        request.getRequestDispatcher(forwardPath).forward(request, response);
+                        return;
+                    }
                     userExists = true;
                     userId = jobSeeker.getJobSeekerId();
                     userName = jobSeeker.getFullName();
