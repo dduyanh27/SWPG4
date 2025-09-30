@@ -19,6 +19,13 @@
     AdminJobDAO dao = new AdminJobDAO();
     List<AdminJobDetail> jobDetails = dao.getAllDetailJob();
     request.setAttribute("jobDetails", jobDetails);
+
+    String view = request.getParameter("view");
+    boolean showingPending = "pending".equalsIgnoreCase(view);
+    request.setAttribute("showingPending", showingPending);
+    if (showingPending) {
+        request.setAttribute("jobList", pendingJobs);
+    }
 %>
 <!doctype html>
 <html lang="vi">
@@ -52,16 +59,16 @@
 
                 <nav class="sidebar-nav">
                     <div class="nav-title">Menu chính</div>
-                    <a href="#" class="nav-item">📊 Bảng thống kê</a>
-                    <a href="#" class="nav-item active">💼 Tin tuyển dụng</a>
-                    <a href="#" class="nav-item">👥 Quản lý tài khoản</a>
-                    <a href="#" class="nav-item">📂 Quản lý danh mục</a>
-                    <a href="#" class="nav-item">📄 Đơn xin việc</a>
-                    <a href="#" class="nav-item">👤 Hồ sơ cá nhân</a>
+                    <a href="admin-dashboard.jsp" class="nav-item">📊 Bảng thống kê</a>
+                    <a href="admin-jobposting-management.jsp" class="nav-item active">💼 Tin tuyển dụng</a>
+                    <a href="admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
+                    <a href="#" class="nav-item">📁 Quản lý CV</a>
+                    <a href="#" class="nav-item">📝 Quản lý nhân sự</a>
+                    <a href="#" class="nav-item">👤 Quản lý thanh toán</a>
                 </nav>
 
                 <div class="sidebar-actions">
-                    <a href="#" class="action-btn">👤 Hồ sơ cá nhân</a>
+                    <a href="admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
                     <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
                 </div>
             </div>
@@ -191,7 +198,14 @@
                         <div class="table-header">
                             <div class="table-title">📋 Danh sách công việc</div>
                             <div class="table-actions">
-                                <button class="btn btn-ghost btn-sm">📤 Xuất Excel</button>
+                                <c:choose>
+                                    <c:when test="${showingPending}">
+                                        <a class="btn btn-ghost btn-sm" href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp">📋 Tất cả</a>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <a class="btn btn-ghost btn-sm" href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp?view=pending">📤 Danh sách chờ duyệt</a>
+                                    </c:otherwise>
+                                </c:choose>
                                 <button class="btn btn-success btn-sm" onclick="bulkApprove()">✅ Duyệt hàng loạt</button>
                             </div>
                         </div>
@@ -216,7 +230,7 @@
                                 </thead>
                                 <tbody id="jobsTableBody">
                                     <c:choose>
-                                        <c:when test="${empty jobList}">
+                                        <c:when test="${empty jobDetails}">
                                             <tr>
                                                 <td colspan="10" style="text-align: center; padding: 20px;">
                                                     <div style="color: #666;">
@@ -227,32 +241,40 @@
                                             </tr>
                                         </c:when>
                                         <c:otherwise>
-                                            <c:forEach var="job" items="${jobList}">
+                                            <c:forEach var="jobDetail" items="${jobDetails}">
+                                                <c:if test="${( !showingPending || jobDetail.status eq 'Pending') && jobDetail.status ne 'Closed'}">
                                                 <tr>
-                                                    <td><input type="checkbox" class="row-select"></td>
+                                                    <td><input type="checkbox" class="row-select" value="${jobDetail.jobId}"></td>
                                                     <td>
                                                         <div class="job-info">
-                                                            <div class="job-title">${job.jobTitle}</div>
+                                                            <div class="job-title">${jobDetail.jobTitle}</div>
                                                             <div class="job-meta">
-                                                                <span>${job.requirements}</span>
+                                                                <span>${jobDetail.requirements}</span>
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>RecruiterID: ${job.recruiterID}</td>
-                                                    <td>CategoryID: ${job.categoryID}</td>
-                                                    <td><div class="salary-range">${job.salaryRange}</div></td>
-                                                    <td>LocationID: ${job.locationID}</td>
-                                                    <td>Age: ${job.ageRequirement}</td>
-                                                    <td>${job.status}</td>
-                                                    <td><div>${job.postingDate}</div></td>
+                                                    <td>${jobDetail.recruiterName}</td>
+                                                    <td>${jobDetail.categoryName}</td>
+                                                    <td><div class="salary-range">${jobDetail.salaryRange}</div></td>
+                                                    <td>${jobDetail.locationName}</td>
+                                                    <td>-</td>
+                                                    <td>${jobDetail.status}</td>
+                                                    <td><div>-</div></td>
                                                     <td>
                                                         <div class="action-buttons">
-                                                            <button class="btn btn-ghost btn-sm" onclick="viewJob('${job.jobID}')">👁️</button>
-                                                            <button class="btn btn-primary btn-sm" onclick="editJob('${job.jobID}')">✏️</button>
-                                                            <button class="btn btn-danger btn-sm" onclick="deleteJob('${job.jobID}')">🗑️</button>
+                                                            <button class="btn btn-ghost btn-sm" onclick="viewJob('${jobDetail.jobId}')">👁️</button>
+                                                            <button class="btn btn-primary btn-sm" onclick="editJob('${jobDetail.jobId}')">✏️</button>
+                                                            <button class="btn btn-danger btn-sm" onclick="deleteJob('${jobDetail.jobId}')">🗑️</button>
+                                                            <c:if test="${jobDetail.status eq 'Pending'}">
+                                                                 <form action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:inline-block;">
+                                                                     <input type="hidden" name="jobId" value="${jobDetail.jobId}" />
+                                                                    <button type="submit" class="btn btn-success btn-sm">✅ Duyệt</button>
+                                                                </form>
+                                                            </c:if>
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                </c:if>
                                             </c:forEach>
                                         </c:otherwise>
                                     </c:choose>
@@ -264,6 +286,8 @@
 
 
                     </div>
+                    <form id="bulkApproveForm" action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:none;">
+                    </form>
                 </main>
             </div>
         </div>
@@ -375,4 +399,35 @@
             </div>
         </div>
     </body>
+    <script>
+        (function () {
+            var selectAll = document.getElementById('selectAll');
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    var checks = document.querySelectorAll('.row-select');
+                    for (var i = 0; i < checks.length; i++) {
+                        checks[i].checked = this.checked;
+                    }
+                });
+            }
+        })();
+
+        function bulkApprove() {
+            var selected = document.querySelectorAll('.row-select:checked');
+            if (selected.length === 0) {
+                alert('Vui lòng chọn ít nhất 1 tin để duyệt.');
+                return;
+            }
+            var form = document.getElementById('bulkApproveForm');
+            form.innerHTML = '';
+            for (var i = 0; i < selected.length; i++) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'jobId';
+                input.value = selected[i].value;
+                form.appendChild(input);
+            }
+            form.submit();
+        }
+    </script>
 </html>

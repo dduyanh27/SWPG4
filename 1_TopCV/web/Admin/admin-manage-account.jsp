@@ -64,9 +64,9 @@
                     <a href="admin-dashboard.jsp" class="nav-item">📊 Bảng thống kê</a>
                     <a href="admin-jobposting-management.jsp" class="nav-item">💼 Tin tuyển dụng</a>
                     <a href="manage-accounts?role=admin" class="nav-item active">👥 Quản lý tài khoản</a>
-                    <a href="#" class="nav-item">📁 Quản lý danh mục</a>
-                    <a href="#" class="nav-item">📝 Đơn xin việc</a>
-                    <a href="admin-profile.jsp" class="nav-item">👤 Hồ sơ cá nhân</a>
+                    <a href="#" class="nav-item">📁 Quản lý CV</a>
+                    <a href="#" class="nav-item">📝 Quản lý nhân sự</a>
+                    <a href="#" class="nav-item">👤 Quản lý thanh toán</a>
                 </nav>
 
                 <!-- Quick actions -->
