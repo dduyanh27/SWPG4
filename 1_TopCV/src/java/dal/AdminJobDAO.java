@@ -206,11 +206,11 @@ public class AdminJobDAO extends DBContext {
     public List<AdminJobDetail> getAllDetailJob() {
         List<AdminJobDetail> list = new ArrayList<>();
         String sql = "SELECT j.JobID, j.JobTitle, j.Requirements, j.SalaryRange, j.Status, "
-                + "       r.RecruiterName, c.CategoryName, l.LocationName "
+                + "       r.CompanyName AS RecruiterName, c.CategoryName, l.LocationName "
                 + "FROM Jobs j "
-                + "JOIN Recruiters r ON j.RecruiterID = r.RecruiterID "
-                + "JOIN Categories c ON j.CategoryID = c.CategoryID "
-                + "JOIN Locations l ON j.LocationID = l.LocationID";
+                + "LEFT JOIN Recruiter r ON j.RecruiterID = r.RecruiterID "
+                + "LEFT JOIN Categories c ON j.CategoryID = c.CategoryID "
+                + "LEFT JOIN Locations l ON j.LocationID = l.LocationID";
 
         try (PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -273,6 +273,42 @@ public class AdminJobDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    //hàm approve job
+    public void approveJobs(int jobId) {
+        String sql = "UPDATE Jobs\n"
+                + "SET Status = 'Published'\n"
+                + "WHERE JobID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, jobId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Cập nhật thành công: " + rowsAffected + " job đã được publish.");
+            } else {
+                System.out.println("Không tìm thấy job với ID = " + jobId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    //xoa job
+    public void closeJobs(int jobId) {
+        String sql = "UPDATE Jobs\n"
+                + "SET Status = 'Closed'\n"
+                + "WHERE JobID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, jobId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Xóa thành công!");
+            } else {
+                System.out.println("Không tìm thấy job với ID = " + jobId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
