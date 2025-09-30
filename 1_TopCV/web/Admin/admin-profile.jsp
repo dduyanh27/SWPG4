@@ -6,7 +6,7 @@
 <%
     Admin admin = (Admin) session.getAttribute("admin");
     if (admin == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
         return;
     }
 
@@ -78,7 +78,7 @@
 
         <div class="sidebar-actions">
             <a href="admin-dashboard.jsp" class="action-btn">📈 Dashboard</a>
-            <a href="${pageContext.request.contextPath}/LogoutServlet" class="action-btn logout">🚪 Đăng xuất</a>
+            <a href="<c:url value='/logout'/>" class="action-btn logout">🚪 Đăng xuất</a>
         </div>
     </div>
 

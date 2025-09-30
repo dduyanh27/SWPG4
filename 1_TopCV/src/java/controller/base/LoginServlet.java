@@ -53,6 +53,8 @@ public class LoginServlet extends HttpServlet {
             switch (result.getUserType()) {
                 case "admin":
                     model.Admin admin = (model.Admin) result.getUser();
+                    // Store admin object for JSPs that check sessionScope.admin
+                    session.setAttribute("admin", admin);
                     session.setAttribute("userID", admin.getAdminId());
                     session.setAttribute("userName", admin.getFullName());
                     response.sendRedirect(request.getContextPath() + "/Admin/admin-dashboard.jsp");
@@ -60,6 +62,7 @@ public class LoginServlet extends HttpServlet {
                     
                 case "jobseeker":
                     model.JobSeeker jobSeeker = (model.JobSeeker) result.getUser();
+                    session.setAttribute("jobseeker", jobSeeker);
                     session.setAttribute("userID", jobSeeker.getJobSeekerId());
                     session.setAttribute("userName", jobSeeker.getFullName());
                     response.sendRedirect(request.getContextPath() + "/JobSeeker/index.jsp");
@@ -67,6 +70,7 @@ public class LoginServlet extends HttpServlet {
                     
                 case "recruiter":
                     model.Recruiter recruiter = (model.Recruiter) result.getUser();
+                    session.setAttribute("recruiter", recruiter);
                     session.setAttribute("userID", recruiter.getRecruiterID());
                     session.setAttribute("userName", recruiter.getCompanyName());
                     response.sendRedirect(request.getContextPath() + "/Recruiter/index.jsp");
