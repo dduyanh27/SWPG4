@@ -1,571 +1,378 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AccountDAO,java.util.List,model.Account" %>
+<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.List" %>
+<%@ page import="dal.AdminJobDAO" %>
+<%@ page import="model.Job" %>
+<%@ page import="model.AdminJobDetail" %>
+
+<%
+    AdminJobDAO ajd = new AdminJobDAO();
+    List<Job> jobList = ajd.getAllJobs();
+    request.setAttribute("jobList", jobList);
+    List<Job> pendingJobs = ajd.getJobsByStatus("Pending");
+    request.setAttribute("pendingJobs", pendingJobs);
+    List<Job> publishedJobs = ajd.getJobsByStatus("Published");
+    request.setAttribute("publishedJobs", publishedJobs);
+    
+    AdminJobDAO dao = new AdminJobDAO();
+    List<AdminJobDetail> jobDetails = dao.getAllDetailJob();
+    request.setAttribute("jobDetails", jobDetails);
+%>
 <!doctype html>
 <html lang="vi">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Jobs Admin - Quản lý tin tuyển dụng</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-        <style>
-            :root{
-                --bg-dark-1: #031428;   /* Very dark left */
-                --bg-dark-2: #062446;   /* Mid */
-                --bg-bright:  #0a67ff;  /* Bright right */
-                --card-dark:  rgba(6,24,44,0.85);
-                --card-light: rgba(255,255,255,0.02);
-                --muted: rgba(255,255,255,0.75);
-                --muted-2: rgba(255,255,255,0.6);
-                --primary:#2f80ed;
-                --danger:#ff5a6b;
-                --success:#00d68f;
-                --radius:10px;
-                --shadow: 0 10px 30px rgba(2,10,30,0.6);
-            }
-
-            *{
-                box-sizing:border-box
-            }
-            html,body{
-                height:100%
-            }
-            body{
-                margin:0;
-                font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-                background: linear-gradient(110deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 40%, #083d9a 70%, var(--bg-bright) 100%);
-                color: var(--muted);
-                -webkit-font-smoothing:antialiased;
-                -moz-osx-font-smoothing:grayscale;
-                font-size:14px;
-                min-height:100vh;
-                position:relative;
-                overflow-x:hidden;
-            }
-
-            /* faint spotlight on right like screenshot */
-            body::after{
-                content:"";
-                position:fixed;
-                right:-20%;
-                top:0;
-                width:45%;
-                height:100%;
-                background: radial-gradient(circle at left center, rgba(10,103,255,0.08), transparent 35%);
-                pointer-events:none;
-            }
-
-            .container {
-                display: flex;
-            }
-
-            /* Unified left sidebar combining navigation and admin profile */
-            .unified-sidebar {
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 280px;
-                height: 100vh;
-                background: linear-gradient(180deg, rgba(3,18,40,0.95), rgba(6,24,44,0.95));
-                backdrop-filter: blur(15px);
-                border-right: 1px solid rgba(255,255,255,0.1);
-                box-shadow: 4px 0 20px rgba(0,0,0,0.3);
-                z-index: 1000;
-                overflow-y: auto;
-                padding: 20px;
-                box-sizing: border-box;
-            }
-
-            .sidebar-brand {
-                text-align: center;
-                margin-bottom: 25px;
-                padding-bottom: 20px;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-
-            .brand-title {
-                font-size: 24px;
-                font-weight: 700;
-                color: #00e5ff;
-                margin: 0;
-            }
-
-            .brand-subtitle {
-                font-size: 12px;
-                color: rgba(255,255,255,0.6);
-                margin-top: 5px;
-            }
-
-            /* Admin profile section in sidebar */
-            .sidebar-profile {
-                background: rgba(255,255,255,0.08);
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 25px;
-                text-align: center;
-                border: 1px solid rgba(255,255,255,0.05);
-            }
-
-            .sidebar-avatar {
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                border: 2px solid #00e5ff;
-                margin: 0 auto 12px;
-                overflow: hidden;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .sidebar-avatar:hover {
-                transform: scale(1.05);
-                border-color: #40c4ff;
-            }
-
-            .sidebar-avatar img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            .sidebar-avatar-placeholder {
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #00e5ff, #0288d1);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 24px;
-                color: white;
-                font-weight: bold;
-            }
-
-            .sidebar-admin-name {
-                font-size: 16px;
-                font-weight: 600;
-                color: #ffffff;
-                margin-bottom: 5px;
-            }
-
-            .sidebar-admin-role {
-                font-size: 12px;
-                color: #00e5ff;
-                margin-bottom: 12px;
-            }
-
-            .sidebar-status {
-                display: inline-block;
-                padding: 3px 8px;
-                border-radius: 10px;
-                font-size: 10px;
-                font-weight: 600;
-                text-transform: uppercase;
-                background: rgba(76,175,80,0.2);
-                color: #4caf50;
-                border: 1px solid rgba(76,175,80,0.3);
-            }
-
-            /* Navigation in sidebar */
-            .sidebar-nav {
-                margin-bottom: 25px;
-            }
-
-            .nav-title {
-                font-size: 12px;
-                font-weight: 600;
-                color: rgba(255,255,255,0.6);
-                text-transform: uppercase;
-                margin-bottom: 15px;
-                padding-left: 12px;
-            }
-
-            .nav-item {
-                display: block;
-                padding: 12px 16px;
-                border-radius: 8px;
-                color: rgba(255,255,255,0.8);
-                text-decoration: none;
-                font-weight: 500;
-                font-size: 14px;
-                margin-bottom: 5px;
-                transition: all 0.3s ease;
-                position: relative;
-            }
-
-            .nav-item:hover,
-            .nav-item.active {
-                background: rgba(0,229,255,0.15);
-                color: #ffffff;
-                transform: translateX(5px);
-            }
-
-            .nav-item.active::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 3px;
-                height: 20px;
-                background: #00e5ff;
-                border-radius: 0 2px 2px 0;
-            }
-
-            /* Quick actions in sidebar */
-            .sidebar-actions {
-                margin-top: auto;
-                padding-top: 20px;
-                border-top: 1px solid rgba(255,255,255,0.1);
-            }
-
-            .action-btn {
-                display: block;
-                width: 100%;
-                padding: 10px 16px;
-                background: rgba(0,229,255,0.1);
-                border: 1px solid rgba(0,229,255,0.2);
-                border-radius: 8px;
-                color: #ffffff;
-                text-decoration: none;
-                font-size: 13px;
-                font-weight: 500;
-                text-align: center;
-                margin-bottom: 8px;
-                transition: all 0.3s ease;
-            }
-
-            .action-btn:hover {
-                background: rgba(0,229,255,0.2);
-                border-color: rgba(0,229,255,0.4);
-            }
-
-            .action-btn.logout {
-                background: rgba(255,107,107,0.1);
-                border-color: rgba(255,107,107,0.2);
-                color: #ff6b6b;
-            }
-
-            .action-btn.logout:hover {
-                background: rgba(255,107,107,0.2);
-                border-color: rgba(255,107,107,0.4);
-            }
-
-            /* Main content adjusted for sidebar */
-            .main {
-                margin-left: 280px;
-                padding: 0;
-                width: calc(100% - 280px);
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                min-height: 100vh;
-            }
-
-            /* Topbar */
-            .topbar{
-                height:70px;
-                display:flex;
-                align-items:center;
-                justify-content:space-between;
-                background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-                padding:0 20px;
-                border-bottom:1px solid rgba(255,255,255,0.03);
-                backdrop-filter:blur(10px);
-                color: var(--muted);
-            }
-
-            .topbar .title{
-                font-weight:700;
-                color:#eaf4ff;
-                font-size:20px;
-            }
-
-            /* Content */
-            .content{
-                padding:28px;
-                max-width:1200px;
-                margin:0 auto;
-                width:100%;
-                flex: 1;
-            }
-
-            .card{
-                background: linear-gradient(180deg, var(--card-dark), rgba(6,24,44,0.6));
-                border-radius:var(--radius);
-                padding:18px;
-                box-shadow:var(--shadow);
-                border:1px solid rgba(255,255,255,0.03);
-                color: #eaf4ff;
-            }
-
-            .card .card-title{
-                font-size:16px;
-                font-weight:600;
-                color:#f8fcff;
-                margin-bottom:12px;
-            }
-
-            /* Table */
-            .table-wrap{
-                overflow-x:auto;
-            }
-            table{
-                width:100%;
-                border-collapse:collapse;
-                min-width:900px;
-                font-size:13px;
-                color: #eaf4ff;
-            }
-            thead th{
-                text-align:left;
-                padding:14px 12px;
-                background: rgba(255,255,255,0.03);
-                color: rgba(255,255,255,0.75);
-                font-weight:600;
-                border-bottom:1px solid rgba(255,255,255,0.04);
-                vertical-align:middle;
-            }
-            tbody td{
-                padding:14px 12px;
-                border-bottom:1px solid rgba(255,255,255,0.02);
-                vertical-align:middle;
-                color:#eaf4ff;
-            }
-            tbody tr:hover{
-                background: rgba(255,255,255,0.01)
-            }
-            .id-col{
-                width:48px;
-                color:rgba(255,255,255,0.6);
-                font-weight:600
-            }
-            .job-title{
-                font-weight:600;
-                color:#ffffff
-            }
-            .muted{
-                color:var(--muted-2);
-                font-size:13px
-            }
-            .center{
-                text-align:center
-            }
-
-            /* buttons */
-            .btn{
-                display:inline-block;
-                padding:8px 12px;
-                border-radius:6px;
-                font-weight:600;
-                font-size:13px;
-                cursor:pointer;
-                border:0;
-                box-shadow: 0 6px 16px rgba(2,10,30,0.45);
-            }
-            .btn.confirm{
-                background:linear-gradient(90deg,var(--primary),#0b63ff);
-                color:#fff
-            }
-            .btn.danger{
-                background:linear-gradient(90deg,#ff5a6b,#e74c3c);
-                color:#fff
-            }
-            .btn.ghost{
-                background:transparent;
-                border:1px solid rgba(255,255,255,0.06);
-                color:var(--primary)
-            }
-
-            /* status */
-            .status{
-                display:inline-block;
-                padding:6px 10px;
-                border-radius:999px;
-                font-weight:600;
-                font-size:12px;
-            }
-            .status.ok{
-                background: rgba(0,255,150,0.06);
-                color:#bff7d6
-            }
-            .status.pending{
-                background: rgba(255,215,90,0.06);
-                color:#ffe8a6
-            }
-
-            /* Employer link styling */
-            .employer-link{
-                color:var(--primary);
-                text-decoration:none;
-                font-weight:600;
-            }
-            .employer-link:hover{
-                color:#fff;
-                text-decoration:underline;
-            }
-
-            /* Mobile menu toggle */
-            .mobile-menu-toggle{
-                display:none;
-                position:fixed;
-                top:20px;
-                left:20px;
-                z-index:1001;
-                background:rgba(0,229,255,0.9);
-                color:#fff;
-                border:none;
-                border-radius:8px;
-                width: 45px;
-                height: 45px;
-                cursor:pointer;
-                font-size: 18px;
-                box-shadow: 0 4px 15px rgba(0,229,255,0.3);
-            }
-
-            /* Responsive */
-            @media (max-width: 1024px) {
-                .unified-sidebar {
-                    transform: translateX(-100%);
-                    transition: transform 0.3s ease;
-                }
-
-                .unified-sidebar.show {
-                    transform: translateX(0);
-                }
-
-                .main {
-                    margin-left: 0;
-                    width: 100%;
-                }
-
-                .mobile-menu-toggle {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-            }
-
-            @media (max-width:768px) {
-                .content{
-                    padding:14px
-                }
-                table{
-                    min-width:700px
-                }
-                .unified-sidebar {
-                    width: 260px;
-                }
-            }
-
-            @media (min-width: 1025px) {
-                .mobile-menu-toggle {
-                    display: none;
-                }
-            }
-        </style>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/ad-jobpos.css">
     </head>
     <body>
-        <!-- Mobile menu toggle button for responsive design -->
         <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="display: none;">
             ☰
         </button>
 
         <div class="container">
-            <!-- Unified sidebar combining navigation and admin profile -->
             <div class="unified-sidebar" id="unifiedSidebar">
-                <!-- Brand section -->
                 <div class="sidebar-brand">
                     <h1 class="brand-title">JOBs</h1>
                     <p class="brand-subtitle">Admin Dashboard</p>
                 </div>
 
-                <!-- Admin profile section -->
                 <div class="sidebar-profile">
                     <div class="sidebar-avatar">
-                        <c:choose>
-                            <c:when test="${not empty adminProfile.avatarURL}">
-                                <img src="${adminProfile.avatarURL}" alt="Avatar">
-                            </c:when>
-                            <c:otherwise>
-                                <div class="sidebar-avatar-placeholder">
-                                    ${fn:substring(sessionScope.admin.fullName, 0, 1)}
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                        <div class="sidebar-avatar-placeholder">A</div>
                     </div>
-                    <div class="sidebar-admin-name">
-                        <c:choose>
-                            <c:when test="${not empty sessionScope.admin}">
-                                ${sessionScope.admin.fullName}
-                            </c:when>
-                            <c:otherwise>
-                                Quản trị viên
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                    <div class="sidebar-admin-name">${sessionScope.admin.fullName}</div>
                     <div class="sidebar-admin-role">🛡️ Quản trị viên</div>
                     <span class="sidebar-status">Hoạt động</span>
                 </div>
 
-                <!-- Navigation section -->
                 <nav class="sidebar-nav">
                     <div class="nav-title">Menu chính</div>
-                    <a href="admin-dashboard.jsp" class="nav-item">📊 Bảng thống kê</a>
-                    <a href="admin-jobposting-management.jsp" class="nav-item active">💼 Tin tuyển dụng</a>
-                    <a href="admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
-                    <a href="#" class="nav-item">📁 Quản lý danh mục</a>
-                    <a href="#" class="nav-item">📝 Đơn xin việc</a>
-                    <a href="admin-profile.jsp" class="nav-item">👤 Hồ sơ cá nhân</a>
+                    <a href="#" class="nav-item">📊 Bảng thống kê</a>
+                    <a href="#" class="nav-item active">💼 Tin tuyển dụng</a>
+                    <a href="#" class="nav-item">👥 Quản lý tài khoản</a>
+                    <a href="#" class="nav-item">📂 Quản lý danh mục</a>
+                    <a href="#" class="nav-item">📄 Đơn xin việc</a>
+                    <a href="#" class="nav-item">👤 Hồ sơ cá nhân</a>
                 </nav>
 
-                <!-- Quick actions -->
                 <div class="sidebar-actions">
-                    <a href="admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
-                    <a href="logout" class="action-btn logout">🚪 Đăng xuất</a>
+                    <a href="#" class="action-btn">👤 Hồ sơ cá nhân</a>
+                    <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
                 </div>
             </div>
 
             <div class="main">
-                <!-- Enhanced topbar -->
                 <header class="topbar">
-                    <div class="title">Quản lý tin tuyển dụng</div>
+                    <div class="title">Quản lý công việc</div>
+                    <div class="topbar-actions">
+                        <button class="btn btn-ghost btn-sm">🔄 Làm mới</button>
+                        <button class="btn btn-primary btn-sm" onclick="showCreateJobModal()">➕ Tạo tin mới</button>
+                    </div>
                 </header>
 
                 <main class="content">
-                    <div class="card">
-                        <div class="card-title">Danh sách tin tuyển dụng</div>
+                    <!-- Statistics Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">💼</div>
+                                <div class="stat-trend trend-up">↗️ +12%</div>
+                            </div>
+                            <div class="stat-value">${fn:length(jobList)}</div>
+                            <div class="stat-label">Tổng tin tuyển dụng</div>
+                        </div>
 
-                        <div class="table-wrap">
-                            <!-- Aggregated table: Nhà tuyển dụng | Danh mục | Số tin còn hoạt động -->
-                            <table aria-label="Danh sách nhà tuyển dụng">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-trend trend-up">↗️ +8%</div>
+                            </div>
+                            <div class="stat-value">${fn:length(publishedJobs)}</div>
+                            <div class="stat-label">Đã duyệt</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">⏳</div>
+                                <div class="stat-trend trend-down">↘️ -5%</div>
+                            </div>
+                            <div class="stat-value">${fn:length(pendingJobs)}</div>
+                            <div class="stat-label">Chờ duyệt</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-trend trend-up">↗️ +23%</div>
+                            </div>
+                            <div class="stat-value">15,439</div>
+                            <div class="stat-label">Lượt ứng tuyển</div>
+                        </div>
+                    </div>
+
+                    <!-- Controls Section -->
+                    <div class="controls-section">
+                        <div class="controls-header">
+                            <div class="section-title">🔍 Tìm kiếm & Bộ lọc</div>
+                            <button class="btn btn-ghost btn-sm" onclick="resetFilters()">↺ Đặt lại</button>
+                        </div>
+
+                        <div class="filters-grid">
+                            <div class="filter-group">
+                                <label class="filter-label">Tìm kiếm</label>
+                                <input type="text" class="filter-input" placeholder="Tên công việc, công ty..." id="searchInput">
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Địa điểm</label>
+                                <select class="filter-input" id="locationFilter">
+                                    <option value="">Tất cả địa điểm</option>
+                                    <option value="hanoi">Hà Nội</option>
+                                    <option value="hcm">TP. Hồ Chí Minh</option>
+                                    <option value="danang">Đà Nẵng</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Loại hình</label>
+                                <select class="filter-input" id="typeFilter">
+                                    <option value="">Tất cả loại hình</option>
+                                    <option value="fulltime">Toàn thời gian</option>
+                                    <option value="parttime">Bán thời gian</option>
+                                    <option value="contract">Hợp đồng</option>
+                                    <option value="internship">Thực tập</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Trạng thái</label>
+                                <select class="filter-input" id="statusFilter">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="active">Đang hoạt động</option>
+                                    <option value="pending">Chờ duyệt</option>
+                                    <option value="expired">Đã hết hạn</option>
+                                    <option value="draft">Bản nháp</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Danh mục</label>
+                                <select class="filter-input" id="categoryFilter">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option value="it">Công nghệ thông tin</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="sales">Kinh doanh</option>
+                                    <option value="hr">Nhân sự</option>
+                                    <option value="finance">Tài chính</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Mức lương</label>
+                                <select class="filter-input" id="salaryFilter">
+                                    <option value="">Tất cả mức lương</option>
+                                    <option value="0-10">Dưới 10 triệu</option>
+                                    <option value="10-20">10-20 triệu</option>
+                                    <option value="20-30">20-30 triệu</option>
+                                    <option value="30+">Trên 30 triệu</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Listings Table -->
+                    <div class="data-table-container">
+                        <div class="table-header">
+                            <div class="table-title">📋 Danh sách công việc</div>
+                            <div class="table-actions">
+                                <button class="btn btn-ghost btn-sm">📤 Xuất Excel</button>
+                                <button class="btn btn-success btn-sm" onclick="bulkApprove()">✅ Duyệt hàng loạt</button>
+                            </div>
+                        </div>
+
+
+                        <!-- Bang -->
+                        <div class="table-wrapper">
+                            <table id="jobsTable">
                                 <thead>
                                     <tr>
-                                        <th>Nhà tuyển dụng</th>
-                                        <th>Danh mục</th>
-                                        <th class="center">Số tin còn hoạt động</th>
+                                        <th><input type="checkbox" id="selectAll"></th>
+                                        <th class="sortable" onclick="sortTable(1)">Công việc</th>
+                                        <th class="sortable" onclick="sortTable(2)">Công ty</th>
+                                        <th class="sortable" onclick="sortTable(3)">Danh mục</th>
+                                        <th class="sortable" onclick="sortTable(4)">Mức lương</th>
+                                        <th class="sortable" onclick="sortTable(5)">Địa điểm</th>
+                                        <th class="sortable" onclick="sortTable(6)">Ứng viên</th>
+                                        <th class="sortable" onclick="sortTable(7)">Trạng thái</th>
+                                        <th class="sortable" onclick="sortTable(8)">Ngày tạo</th>
+                                        <th>Hành động</th>
                                     </tr>
                                 </thead>
-                                <tbody id="employers-table"></tbody>
+                                <tbody id="jobsTableBody">
+                                    <c:choose>
+                                        <c:when test="${empty jobList}">
+                                            <tr>
+                                                <td colspan="10" style="text-align: center; padding: 20px;">
+                                                    <div style="color: #666;">
+                                                        <p>Không có dữ liệu job nào được tìm thấy.</p>
+                                                        <p>Debug: jobList size = ${fn:length(jobList)}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="job" items="${jobList}">
+                                                <tr>
+                                                    <td><input type="checkbox" class="row-select"></td>
+                                                    <td>
+                                                        <div class="job-info">
+                                                            <div class="job-title">${job.jobTitle}</div>
+                                                            <div class="job-meta">
+                                                                <span>${job.requirements}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>RecruiterID: ${job.recruiterID}</td>
+                                                    <td>CategoryID: ${job.categoryID}</td>
+                                                    <td><div class="salary-range">${job.salaryRange}</div></td>
+                                                    <td>LocationID: ${job.locationID}</td>
+                                                    <td>Age: ${job.ageRequirement}</td>
+                                                    <td>${job.status}</td>
+                                                    <td><div>${job.postingDate}</div></td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <button class="btn btn-ghost btn-sm" onclick="viewJob('${job.jobID}')">👁️</button>
+                                                            <button class="btn btn-primary btn-sm" onclick="editJob('${job.jobID}')">✏️</button>
+                                                            <button class="btn btn-danger btn-sm" onclick="deleteJob('${job.jobID}')">🗑️</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </tbody>
+
+
                             </table>
                         </div>
 
-                        <!-- Modal to show active jobs for an employer -->
-                        <div id="jobsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:9999">
-                            <div style="background:var(--card-dark);padding:18px;border-radius:10px;max-width:900px;width:90%;color:#eaf4ff;box-shadow:var(--shadow);">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                                    <div style="font-weight:700">Tin đang hoạt động</div>
-                                    <button onclick="closeJobsModal()" style="background:transparent;border:0;color:var(--muted);font-weight:700;cursor:pointer">Đóng ✕</button>
-                                </div>
-                                <div id="modalJobsList" style="max-height:60vh;overflow:auto"></div>
-                            </div>
-                        </div>
 
                     </div>
                 </main>
             </div>
         </div>
 
-        
+        <!-- Job Detail Modal -->
+        <div id="jobDetailModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">📋 Chi tiết tin tuyển dụng</div>
+                    <button class="modal-close" onclick="closeModal('jobDetailModal')">&times;</button>
+                </div>
+                <div id="jobDetailContent">
+                    <!-- Job details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Create/Edit Job Modal -->
+        <div id="createJobModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 1000px;">
+                <div class="modal-header">
+                    <div class="modal-title">➕ Tạo tin tuyển dụng mới</div>
+                    <button class="modal-close" onclick="closeModal('createJobModal')">&times;</button>
+                </div>
+                <div id="createJobForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="filter-group">
+                            <label class="filter-label">Tiêu đề công việc *</label>
+                            <input type="text" class="filter-input" placeholder="VD: Senior Frontend Developer">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Công ty *</label>
+                            <select class="filter-input">
+                                <option>Chọn công ty</option>
+                                <option>TechGlobal Solutions</option>
+                                <option>Digital Marketing Pro</option>
+                                <option>StartupTech Vietnam</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Danh mục *</label>
+                            <select class="filter-input">
+                                <option>Chọn danh mục</option>
+                                <option>Công nghệ thông tin</option>
+                                <option>Marketing</option>
+                                <option>Thiết kế</option>
+                                <option>Dữ liệu</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Loại hình *</label>
+                            <select class="filter-input">
+                                <option>Toàn thời gian</option>
+                                <option>Bán thời gian</option>
+                                <option>Hợp đồng</option>
+                                <option>Thực tập</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Mức lương tối thiểu (VND)</label>
+                            <input type="number" class="filter-input" placeholder="15000000">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Mức lương tối đa (VND)</label>
+                            <input type="number" class="filter-input" placeholder="25000000">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Địa điểm *</label>
+                            <select class="filter-input">
+                                <option>Hà Nội</option>
+                                <option>TP. Hồ Chí Minh</option>
+                                <option>Đà Nẵng</option>
+                                <option>Khác</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Kinh nghiệm yêu cầu</label>
+                            <select class="filter-input">
+                                <option>Chưa có kinh nghiệm</option>
+                                <option>Dưới 1 năm</option>
+                                <option>1-2 năm</option>
+                                <option>3-5 năm</option>
+                                <option>Trên 5 năm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 20px;">
+                        <label class="filter-label">Mô tả công việc *</label>
+                        <textarea class="filter-input" rows="5" placeholder="Mô tả chi tiết về công việc, trách nhiệm, yêu cầu..."></textarea>
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 20px;">
+                        <label class="filter-label">Yêu cầu ứng viên</label>
+                        <textarea class="filter-input" rows="4" placeholder="Các yêu cầu về kỹ năng, trình độ, kinh nghiệm..."></textarea>
+                    </div>
+
+                    <div class="filter-group" style="margin-bottom: 20px;">
+                        <label class="filter-label">Quyền lợi</label>
+                        <textarea class="filter-input" rows="3" placeholder="Các quyền lợi, phúc lợi cho ứng viên..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-ghost" onclick="closeModal('createJobModal')">Hủy</button>
+                        <button class="btn btn-primary">Lưu nháp</button>
+                        <button class="btn btn-success">Đăng ngay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
