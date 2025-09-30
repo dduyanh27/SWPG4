@@ -251,28 +251,28 @@
             </div>
         </div>
     </header>
-    <!-- Mega menu panel -->
-    <div class="mega-menu" id="megaMenu">
-        <div class="mega-grid">
-            <div class="mega-col">
-                <h4>Việc làm</h4>
-                <a href="#">Việc làm mới nhất</a>
-                <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
-                <a href="#">Việc làm quản lý</a>
-            </div>
-            <div class="mega-col">
-                <h4>Việc của tôi</h4>
-                <a href="#">Việc đã lưu</a>
-                <a href="#">Việc đã ứng tuyển</a>
-                <a href="#">Thông báo việc làm</a>
-                <a href="#">Việc dành cho bạn</a>
-            </div>
-            <div class="mega-col">
-                <h4>Công ty</h4>
-                <a href="#">Tất cả công ty</a>
+        <!-- Mega menu panel -->
+        <div class="mega-menu" id="megaMenu">
+            <div class="mega-grid">
+                <div class="mega-col">
+                    <h4>Việc làm</h4>
+                    <a href="#">Việc làm mới nhất</a>
+                    <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
+                    <a href="#">Việc làm quản lý</a>
+                </div>
+                <div class="mega-col">
+                    <h4>Việc của tôi</h4>
+                    <a href="#">Việc đã lưu</a>
+                    <a href="#">Việc đã ứng tuyển</a>
+                    <a href="#">Thông báo việc làm</a>
+                    <a href="#">Việc dành cho bạn</a>
+                </div>
+                <div class="mega-col">
+                    <h4>Công ty</h4>
+                    <a href="#">Tất cả công ty</a>
+                </div>
             </div>
         </div>
-    </div>
     <main>
 
         <!-- slider Area Start-->
