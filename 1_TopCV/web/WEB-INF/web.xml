@@ -83,6 +83,24 @@
         <url-pattern>/updateadminprofile</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>AdminApproveJobPost</servlet-name>
+        <servlet-class>controller.admin.AdminApproveJobPost</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminApproveJobPost</servlet-name>
+        <url-pattern>/adminapprovejobpost</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AdminCloseJobPost</servlet-name>
+        <servlet-class>controller.admin.AdminCloseJobPost</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminCloseJobPost</servlet-name>
+        <url-pattern>/adminclosejobpost</url-pattern>
+    </servlet-mapping>
+    
     <!-- Recruiter (package 'recuiter' in sources) -->
     <servlet>
         <servlet-name>HomeRecuiterServlet</servlet-name>

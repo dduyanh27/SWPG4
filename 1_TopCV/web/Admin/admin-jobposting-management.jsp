@@ -264,7 +264,10 @@
                                                         <div class="action-buttons">
                                                             <button class="btn btn-ghost btn-sm" onclick="viewJob('${jobDetail.jobId}')">👁️</button>
                                                             <button class="btn btn-primary btn-sm" onclick="editJob('${jobDetail.jobId}')">✏️</button>
-                                                            <button class="btn btn-danger btn-sm" onclick="deleteJob('${jobDetail.jobId}')">🗑️</button>
+                                                            <form action="${pageContext.request.contextPath}/adminclosejobpost" method="post" style="display:inline-block;">
+                                                                <input type="hidden" name="jobId" value="${jobDetail.jobId}" />
+                                                                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                                            </form>
                                                             <c:if test="${jobDetail.status eq 'Pending'}">
                                                                  <form action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:inline-block;">
                                                                      <input type="hidden" name="jobId" value="${jobDetail.jobId}" />
