@@ -211,6 +211,67 @@ body {
     background: rgba(255, 255, 255, 0.2);
 }
 
+/* Mega Menu Styles */
+.mega-menu {
+    position: fixed;
+    top: 72px; /* Height of header */
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: var(--transition);
+    padding: 2rem;
+}
+
+.mega-menu.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.mega-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.mega-col h4 {
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--bg-bright);
+}
+
+.mega-col a {
+    display: block;
+    color: #666;
+    text-decoration: none;
+    padding: 0.5rem 0;
+    transition: var(--transition-fast);
+    border-left: 3px solid transparent;
+    padding-left: 1rem;
+}
+
+.mega-col a:hover {
+    color: var(--bg-bright);
+    border-left-color: var(--bg-bright);
+    background: rgba(10, 103, 255, 0.05);
+    transform: translateX(5px);
+}
+
+.mega-col a.highlighted {
+    color: var(--bg-bright);
+    font-weight: 500;
+}
+
 /* Main Container */
 .main-container {
     display: flex;

@@ -20,7 +20,7 @@ public class JobListDAO extends DBContext {
         String sql = "SELECT JobID, RecruiterID, JobTitle, Description, Requirements, "
                 + "JobLevelID, LocationID, SalaryRange, PostingDate, ExpirationDate, "
                 + "CategoryID, AgeRequirement, Status "
-                + "FROM Jobs";
+                + "FROM Jobs WHERE Status = 'Published'";
 
         try (PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
@@ -59,7 +59,7 @@ public class JobListDAO extends DBContext {
     }
 
     public int getTotalJobs() {
-        String sql = "SELECT COUNT(*) FROM Jobs";
+        String sql = "SELECT COUNT(*) FROM Jobs WHERE Status = 'Published'";
         try (PreparedStatement ps = c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
@@ -83,7 +83,7 @@ public class JobListDAO extends DBContext {
                     + "FROM Jobs j "
                     + "JOIN Recruiter r ON j.RecruiterID = r.RecruiterID "
                     + "JOIN Locations l ON j.LocationID = l.LocationID "
-                    + "WHERE 1=1"
+                    + "WHERE j.Status = 'Published'"
             );
 
             List<Object> params = new ArrayList<>();

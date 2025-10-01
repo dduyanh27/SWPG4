@@ -405,53 +405,539 @@
     font-size: 14px;
     color: #999;
 }
+/* Mega menu open state */
+.mega-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+}
 
+/* Logo link styles */
+.logo {
+    text-decoration: none;
+    display: block;
+}
+
+.logo h1 {
+    color: white;
+    margin: 0;
+}
+
+.logo .tagline {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.logo:hover h1 {
+    color: #e6f3ff;
+}
+
+.logo:hover .tagline {
+    color: rgba(255, 255, 255, 0.9);
+}
 </style>
+
+<style>
+    :root {
+        --primary: #0a67ff;
+        --primary-dark: #0b5bdf;
+        --success: #10b981;
+        --danger: #ef4444;
+        --text-dark: #1f2937;
+        --text-muted: #6b7280;
+        --border: #e5e7eb;
+        --bg-light: #f9fafb;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+        --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+        --radius-md: 12px;
+        --radius-lg: 16px;
+    }
+
+    .profile-documents-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        box-shadow: var(--shadow-sm);
+        margin: 24px 0;
+    }
+
+    .profile-documents-section h3 {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 24px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .profile-documents-section h3::before {
+        content: '\f15c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--primary);
+        font-size: 28px;
+    }
+
+    /* ========== UPLOAD AREA ========== */
+    .upload-area {
+        background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 100%);
+        border: 3px dashed var(--primary);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 32px;
+        transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+        background: linear-gradient(135deg, #e6f3ff 0%, #dbeafe 100%);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .upload-area.drag-over {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-color: var(--primary-dark);
+        transform: scale(1.02);
+    }
+
+    .upload-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        margin-bottom: 16px;
+    }
+
+    .upload-btn i {
+        font-size: 48px;
+        color: var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    .upload-btn:hover i {
+        transform: scale(1.1) rotate(90deg);
+        color: var(--primary-dark);
+    }
+
+    .upload-btn span {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .upload-note {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin: 16px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .upload-note i {
+        color: var(--primary);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(10,103,255,0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-submit::before {
+        content: '\f093';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(10,103,255,0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ========== UPLOADED FILES ========== */
+    .uploaded-files {
+        display: grid;
+        gap: 16px;
+    }
+
+    .file-item {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .file-item:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .file-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .file-item:hover::before {
+        opacity: 1;
+    }
+
+    .file-info {
+        flex: 1;
+    }
+
+    .file-info h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .file-info h4::before {
+        content: '\f1c2';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--primary);
+        font-size: 20px;
+    }
+
+    .file-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .file-meta i {
+        color: var(--primary);
+    }
+
+    .view-as-recruiter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .view-as-recruiter::before {
+        content: '\f06e';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    .view-as-recruiter:hover {
+        background: rgba(10,103,255,0.1);
+        color: var(--primary-dark);
+    }
+
+    /* ========== FILE ACTIONS ========== */
+    .file-actions {
+        position: relative;
+    }
+
+    .file-menu-btn {
+        background: var(--bg-light);
+        border: 2px solid var(--border);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--text-muted);
+    }
+
+    .file-menu-btn:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+        transform: rotate(90deg);
+    }
+
+    .file-dropdown {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
+        background: white;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        min-width: 240px;
+        padding: 8px;
+        display: none;
+        z-index: 100;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .file-dropdown.active {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .dropdown-item:hover {
+        background: var(--bg-light);
+    }
+
+    .dropdown-item i {
+        color: var(--primary);
+        width: 20px;
+        text-align: center;
+    }
+
+    .dropdown-item span:first-child {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* ========== TOGGLE SWITCH ========== */
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 26px;
+        display: inline-block;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #cbd5e1;
+        border-radius: 26px;
+        transition: all 0.3s;
+    }
+
+    .slider::before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch input:checked + .slider {
+        background: var(--success);
+    }
+
+    .toggle-switch input:checked + .slider::before {
+        transform: translateX(24px);
+    }
+
+    .toggle-switch:hover .slider {
+        box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .uploaded-files > p {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 16px;
+        padding: 60px 20px;
+        background: var(--bg-light);
+        border-radius: var(--radius-md);
+        border: 2px dashed var(--border);
+    }
+
+    .uploaded-files > p::before {
+        content: '\f15b';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        display: block;
+        font-size: 48px;
+        color: var(--primary);
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .profile-documents-section {
+            padding: 20px;
+        }
+
+        .upload-area {
+            padding: 30px 20px;
+        }
+
+        .file-item {
+            flex-direction: column;
+        }
+
+        .file-actions {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .file-dropdown {
+            right: 0;
+        }
+    }
+
+    /* ========== LOADING STATE ========== */
+    .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    .btn-submit.loading::before {
+        content: '\f1ce';
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
 <body>
-    <!-- Header -->
+    <!-- Preloader Start -->
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="logo">
-                    <h1>TopFinder</h1>
-                </div>
+                <a href="${pageContext.request.contextPath}/JobSeeker/index.jsp" class="logo">
+                    <h1>Top</h1>
+                    <span class="tagline">Empower growth</span>
+                </a>
             </div>
-            
             <div class="search-section">
-                <div class="search-bar">
-                    <input type="text" placeholder="Tìm kiếm việc làm, công ty, kỹ năng">
-                    <div class="location-selector">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Tất cả địa điểm</span>
-                    </div>
-                    <button class="search-btn">
+                <form action="${pageContext.request.contextPath}/job-list" method="get" class="search-bar">
+                    <input type="text" name="keyword" placeholder="Tìm kiếm việc làm, công ty">
+                    <button type="submit" class="search-btn">
                         <i class="fas fa-search"></i>
                     </button>
-                </div>
+                </form>
             </div>
-            
             <div class="header-right">
-                <div class="menu-toggle">
+                <div class="menu-toggle" id="menuToggle">
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
                 <button class="recruiter-btn">Nhà tuyển dụng</button>
                 <div class="user-actions">
-                    <div class="profile-icon">
+                    <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
-                        <span>Vi</span>
-                    </div>
+                    </a>
                     <div class="notification-icon">
                         <i class="fas fa-bell"></i>
                     </div>
                     <div class="message-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
+                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </header>
-
+    <!-- Mega menu panel -->
+    <div class="mega-menu" id="megaMenu">
+        <div class="mega-grid">
+            <div class="mega-col">
+                <h4>Việc làm</h4>
+                <a href="#">Việc làm mới nhất</a>
+                <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
+                <a href="#">Việc làm quản lý</a>
+            </div>
+            <div class="mega-col">
+                <h4>Việc của tôi</h4>
+                <a href="#">Việc đã lưu</a>
+                <a href="${pageContext.request.contextPath}/myApplications">Việc đã ứng tuyển</a>
+                <a href="#">Thông báo việc làm</a>
+                <a href="#">Việc dành cho bạn</a>
+            </div>
+            <div class="mega-col">
+                <h4>Công ty</h4>
+                <a href="#">Tất cả công ty</a>
+            </div>
+        </div>
+    </div>
     <div class="main-container">
         <!-- Left Sidebar -->
         <aside class="sidebar">
@@ -498,15 +984,15 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="nav-item">
-                            <i class="fas fa-building"></i>
-                            <span>Công Ty Của Tôi</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="index.html" class="nav-item">
                             <i class="fas fa-briefcase"></i>
                             <span>Việc Làm Của Tôi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/applied-jobs" class="nav-item">
+                            <i class="fas fa-history"></i>
+                            <span>Lịch Sử Ứng Tuyển</span>
                         </a>
                     </li>
                     <li>
@@ -581,6 +1067,107 @@
                     <i class="fas fa-pencil-alt"></i>
                 </button>
             </div>
+
+            <!-- Desired Job Section -->
+            <!--            <div class="desired-job-section">
+                            <h3>Công Việc Mong Muốn</h3>
+                            <div class="desired-job-info">
+                                <div class="job-preference">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Nơi làm việc: Hà Nội</span>
+                                </div>
+                                <div class="job-preference">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span>Mức lương mong muốn (USD / tháng): 200</span>
+                                </div>
+                            </div>
+                        </div>-->
+            <!-- Profile Documents Section -->
+            <div class="profile-documents-section">
+    <h3>Hồ sơ đã tải lên</h3>
+    
+    <!-- Upload Form -->
+    <form action="${pageContext.request.contextPath}/UploadCVServlet"
+          method="post"
+          enctype="multipart/form-data"
+          class="upload-area"
+          id="uploadForm">
+        
+        <label class="upload-btn" id="uploadLabel" for="cvFileInput">
+            <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+            <span id="uploadText">Chọn hoặc kéo thả hồ sơ từ máy của bạn</span>
+            <input type="file" 
+                   name="cvFile" 
+                   id="cvFileInput"
+                   hidden 
+                   required 
+                   accept=".doc,.docx,.pdf">
+        </label>
+        
+        <p class="upload-note" id="uploadNote">
+            Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB
+        </p>
+        
+        <button type="submit" class="btn-submit" id="submitBtn">
+            Tải lên
+        </button>
+    </form>
+
+    <!-- Danh sách CV đã upload -->
+    <div class="uploaded-files">
+        <c:forEach var="cv" items="${uploadedCVs}">
+            <div class="file-item">
+                <div class="file-info">
+                    <h4>${cv.cvTitle}</h4>
+                    <div class="file-meta">
+                        <i class="fas fa-clock"></i>
+                        <span>Ngày tải lên: ${cv.creationDate}</span>
+                    </div>
+                    <a href="${pageContext.request.contextPath}${cv.cvURL}" 
+                       target="_blank"
+                       class="view-as-recruiter">
+                        Xem hồ sơ
+                    </a>
+                </div>
+                
+                <div class="file-actions">
+                    <button class="file-menu-btn" onclick="toggleDropdown(event, this)">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="file-dropdown">
+                        <a href="${pageContext.request.contextPath}${cv.cvURL}" 
+                           download="${cv.cvTitle}"
+                           class="dropdown-item">
+                            <i class="fas fa-download"></i>
+                            <span>Tải xuống</span>
+                        </a>
+                        <div class="dropdown-item">
+                            <span>Cho phép tìm kiếm</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox"
+                                       ${cv.active ? "checked" : ""}
+                                       onchange="toggleSearchable(${cv.cvId}, this.checked)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </c:forEach>
+
+        <!-- Empty State -->
+        <c:if test="${empty uploadedCVs}">
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <i class="fas fa-folder-open" style="font-size: 48px; color: #ddd; margin-bottom: 16px;"></i>
+                <p style="font-size: 16px;">Chưa có hồ sơ nào được tải lên</p>
+                <p style="font-size: 14px; color: #999;">Hãy tải lên hồ sơ đầu tiên của bạn</p>
+            </div>
+        </c:if>
+    </div>
+</div>
+    </div>
+
+
     <!-- Profile Edit Modal -->
     <div class="profile-modal" id="profileModal">
         <div class="modal-overlay"></div>
@@ -681,6 +1268,251 @@
     </main>
 
     <script src="${pageContext.request.contextPath}/JobSeeker/script.js"></script>
+        <script>
+            (function(){
+                const toggle = document.getElementById('menuToggle');
+                const panel = document.getElementById('megaMenu');
+                if(!toggle || !panel) return;
+                function closeOnOutside(e){
+                    if(!panel.contains(e.target) && !toggle.contains(e.target)){
+                        panel.classList.remove('open');
+                        document.removeEventListener('click', closeOnOutside);
+                    }
+                }
+                toggle.addEventListener('click', function(e){
+                    e.stopPropagation();
+                    panel.classList.toggle('open');
+                    if(panel.classList.contains('open')){
+                        document.addEventListener('click', closeOnOutside);
+                    }
+                });
+            })();
+            // Toggle hiển thị menu 3 chấm
+document.addEventListener("click", function (e) {
+    if (e.target.closest(".file-menu-btn")) {
+        const dropdown = e.target.closest(".file-actions").querySelector(".file-dropdown");
+        dropdown.classList.toggle("active");
+    } else {
+        document.querySelectorAll(".file-dropdown").forEach(d => d.classList.remove("active"));
+    }
+});
+
+// Ajax bật/tắt searchable
+function toggleSearchable(cvId, isChecked) {
+    fetch(contextPath + "/ToggleSearchableServlet?cvId=" + cvId + "&searchable=" + isChecked, {
+        method: "POST"
+    }).then(res => {
+        if (!res.ok) {
+            alert("Không thể cập nhật trạng thái hồ sơ!");
+        }
+    });
+}
+
+        </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadArea = document.querySelector('.upload-area');
+    const fileInput = document.getElementById('cvFileInput');
+    const uploadText = document.getElementById('uploadText');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const uploadNote = document.getElementById('uploadNote');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // ========== File Input Change ==========
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const fileName = file.name;
+            const fileSize = (file.size / 1024).toFixed(2);
+            
+            // Cập nhật giao diện
+            uploadIcon.className = 'fas fa-file-pdf';
+            uploadText.innerHTML = '<strong>' + fileName + '</strong><br><small>(' + fileSize + ' KB)</small>';
+            uploadNote.style.color = '#10b981';
+            uploadNote.innerHTML = '<i class="fas fa-check-circle"></i> File đã sẵn sàng để tải lên';
+            uploadArea.style.borderColor = '#10b981';
+            uploadArea.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)';
+            
+            console.log('File selected:', fileName, fileSize + 'KB');
+        } else {
+            // Reset về trạng thái ban đầu
+            resetUploadArea();
+        }
+    });
+
+    // ========== Drag & Drop ==========
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('drag-over');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('drag-over');
+        });
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            fileInput.files = files;
+            
+            // Trigger change event manually
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+    });
+    
+    // ========== Reset Upload Area ==========
+    function resetUploadArea() {
+        uploadIcon.className = 'fas fa-cloud-upload-alt';
+        uploadText.textContent = 'Chọn hoặc kéo thả hồ sơ từ máy của bạn';
+        uploadNote.style.color = '';
+        uploadNote.innerHTML = '<i class="fas fa-info-circle"></i> Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB';
+        uploadArea.style.borderColor = '';
+        uploadArea.style.background = '';
+    }
+
+    // ========== Form Submit ==========
+    uploadForm.addEventListener('submit', function(e) {
+        if (!fileInput.files || !fileInput.files[0]) {
+            e.preventDefault();
+            showNotification('Vui lòng chọn file trước khi tải lên', 'error');
+            return false;
+        }
+        
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+        
+        // Tạo icon loading
+        const loadingIcon = document.createElement('i');
+        loadingIcon.className = 'fas fa-spinner fa-spin';
+        loadingIcon.style.marginRight = '8px';
+        
+        submitBtn.textContent = 'Đang tải lên...';
+        submitBtn.insertBefore(loadingIcon, submitBtn.firstChild);
+        
+        console.log('Form submitting...');
+    });
+
+    // ========== Close Dropdowns on Outside Click ==========
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.file-actions')) {
+            document.querySelectorAll('.file-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('active');
+            });
+        }
+    });
+});
+
+// ========== Toggle Dropdown ==========
+function toggleDropdown(event, button) {
+    event.stopPropagation();
+    
+    // Close all other dropdowns
+    document.querySelectorAll('.file-dropdown').forEach(dropdown => {
+        if (dropdown !== button.nextElementSibling) {
+            dropdown.classList.remove('active');
+        }
+    });
+    
+    // Toggle current dropdown
+    const dropdown = button.nextElementSibling;
+    dropdown.classList.toggle('active');
+}
+
+// ========== Toggle Searchable ==========
+function toggleSearchable(cvId, isChecked) {
+    fetch('${pageContext.request.contextPath}/ToggleSearchableServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `cvId=${cvId}&searchable=${isChecked}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
+            showNotification(message, 'success');
+        } else {
+            showNotification('Có lỗi xảy ra', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Có lỗi xảy ra', 'error');
+    });
+}
+
+// ========== Show Notification ==========
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    
+    const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+    
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.background = bgColor;
+    notification.style.color = 'white';
+    notification.style.padding = '16px 24px';
+    notification.style.borderRadius = '8px';
+    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    notification.style.zIndex = '9999';
+    notification.style.animation = 'slideIn 0.3s ease';
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(function() {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(function() {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS for notification animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>    
+
 </body>
 </html>
 

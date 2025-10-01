@@ -373,15 +373,97 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Form validation and submission
-    submitApplication.addEventListener('click', function() {
+    submitApplication.addEventListener('click', function(e) {
+        e.preventDefault();
+        
         if (!privacyCheck.checked) {
             alert('Vui lòng đồng ý với quy định bảo mật trước khi ứng tuyển.');
             return;
         }
         
-        // Here you would typically submit the form data
-        alert('Đơn ứng tuyển đã được gửi thành công!');
-        closeModal();
+        // Kiểm tra xem có login không
+        if (!isLoggedIn) {
+            alert('Vui lòng đăng nhập để ứng tuyển.');
+            window.location.href = contextPath + '/JobSeeker/jobseeker-login.jsp';
+            return;
+        }
+        
+        const form = document.getElementById('applicationForm');
+        const formData = new FormData(form);
+        
+        // Kiểm tra có chọn CV hoặc upload file mới không
+        const cvSelect = document.getElementById('cvSelect');
+        const newCVFile = document.getElementById('newCVFile');
+        
+        // Kiểm tra xem có ít nhất một trong hai: CV có sẵn hoặc CV mới
+        const hasSelectedCV = cvSelect && cvSelect.value;
+        const hasNewCV = newCVFile && newCVFile.files && newCVFile.files.length > 0;
+        
+        if (!hasSelectedCV && !hasNewCV) {
+            if (cvSelect) {
+                alert('Vui lòng chọn CV hoặc tải lên CV mới để ứng tuyển.');
+            } else {
+                alert('Vui lòng tải lên CV để ứng tuyển.');
+            }
+            return;
+        }
+        
+        // Nếu có cả CV có sẵn và CV mới, hiển thị xác nhận
+        if (hasSelectedCV && hasNewCV) {
+            if (!confirm('Bạn đã chọn cả CV có sẵn và tải lên CV mới. Hệ thống sẽ sử dụng CV mới được tải lên. Bạn có muốn tiếp tục?')) {
+                return;
+            }
+            // Xóa CV đã chọn để ưu tiên CV mới
+            cvSelect.value = '';
+        }
+        
+        // Kiểm tra định dạng file nếu có upload file mới
+        if (hasNewCV) {
+            const file = newCVFile.files[0];
+            const allowedExtensions = ['.pdf', '.doc', '.docx'];
+            const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+            
+            if (!allowedExtensions.includes(fileExtension)) {
+                alert('Vui lòng chọn file CV có định dạng PDF, DOC hoặc DOCX.');
+                return;
+            }
+            
+            // Kiểm tra kích thước file (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Kích thước file CV không được vượt quá 10MB.');
+                return;
+            }
+        }
+        
+        // Disable submit button và hiển thị loading
+        submitApplication.disabled = true;
+        submitApplication.textContent = 'Đang gửi...';
+        
+        // Submit form via AJAX
+        fetch(contextPath + '/job-application', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Đơn ứng tuyển đã được gửi thành công!');
+                closeModal();
+                // Có thể reload trang để update UI
+                location.reload();
+            } else {
+                alert('Lỗi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Đã xảy ra lỗi khi gửi đơn ứng tuyển. Vui lòng thử lại.');
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitApplication.disabled = !privacyCheck.checked;
+            submitApplication.textContent = 'Ứng tuyển';
+        });
     });
     
     // Enable/disable submit button based on privacy checkbox
