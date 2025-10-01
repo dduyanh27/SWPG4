@@ -288,6 +288,9 @@
                     </div>
                     <form id="bulkApproveForm" action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:none;">
                     </form>
+                    <form id="deleteJobForm" action="${pageContext.request.contextPath}/adminclosejobpost" method="post" style="display:none;">
+                        <input type="hidden" name="jobId" id="deleteJobId" />
+                    </form>
                 </main>
             </div>
         </div>
@@ -428,6 +431,17 @@
                 form.appendChild(input);
             }
             form.submit();
+        }
+
+        function deleteJob(jobId) {
+            if (!jobId) return;
+            var confirmMsg = 'Bạn có chắc chắn muốn xóa/đóng tin tuyển dụng này?';
+            if (!confirm(confirmMsg)) return;
+            var input = document.getElementById('deleteJobId');
+            if (!input) return;
+            input.value = jobId;
+            var form = document.getElementById('deleteJobForm');
+            if (form) form.submit();
         }
     </script>
 </html>
