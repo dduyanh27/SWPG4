@@ -327,6 +327,80 @@
             .filter-dropdown.active {
                 display: block;
             }
+
+            /* Mega Menu Styles */
+            .mega-menu {
+                position: fixed;
+                top: 72px; /* Height of header */
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 2rem;
+            }
+
+            .mega-menu.open {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            .mega-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 2rem;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .mega-col h4 {
+                color: #333;
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #0a67ff;
+            }
+
+            .mega-col a {
+                display: block;
+                color: #666;
+                text-decoration: none;
+                padding: 0.5rem 0;
+                transition: color 0.2s;
+            }
+
+            .mega-col a:hover {
+                color: #0a67ff;
+            }
+
+            /* Logo link styles */
+            .logo {
+                text-decoration: none;
+                display: block;
+            }
+
+            .logo h1 {
+                color: white;
+                margin: 0;
+            }
+
+            .logo .tagline {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .logo:hover h1 {
+                color: #e6f3ff;
+            }
+
+            .logo:hover .tagline {
+                color: rgba(255, 255, 255, 0.9);
+            }
             
         </style>
     </head>
@@ -335,10 +409,10 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo-section">
-                    <div class="logo">
+                    <a href="${pageContext.request.contextPath}/JobSeeker/index.jsp" class="logo">
                         <h1>Top</h1>
                         <span class="tagline">Empower growth</span>
-                    </div>
+                    </a>
                 </div>
                 <div class="search-section">
                     <form action="job-list" method="get" class="search-bar">
@@ -357,26 +431,51 @@
                 </div>
 
                 <div class="header-right">
-                    <div class="menu-toggle">
+                    <div class="menu-toggle" id="menuToggle">
                         <i class="fas fa-bars"></i>
                         <span>Tất cả danh mục</span>
                     </div>
                     <button class="recruiter-btn">Nhà tuyển dụng</button>
-                    <div class="user-actions">
-                        <div class="profile-icon">
-                            <i class="fas fa-user"></i>
-                            <span>Vi</span>
-                        </div>
-                        <div class="notification-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="message-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
+                <div class="user-actions">
+                    <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
                     </div>
+                    <div class="message-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
                 </div>
             </div>
         </header>
+
+        <!-- Mega menu panel -->
+        <div class="mega-menu" id="megaMenu">
+            <div class="mega-grid">
+                <div class="mega-col">
+                    <h4>Việc làm</h4>
+                    <a href="#">Việc làm mới nhất</a>
+                    <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
+                    <a href="#">Việc làm quản lý</a>
+                </div>
+                <div class="mega-col">
+                    <h4>Việc của tôi</h4>
+                    <a href="#">Việc đã lưu</a>
+                    <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
+                    <a href="#">Thông báo việc làm</a>
+                    <a href="#">Việc dành cho bạn</a>
+                </div>
+                <div class="mega-col">
+                    <h4>Công ty</h4>
+                    <a href="#">Tất cả công ty</a>
+                </div>
+            </div>
+        </div>
 
         <form action="job-list" method="get">
             <c:if test="${not empty param.keyword}">
@@ -492,14 +591,14 @@
                                     </div>
                                 </div>
                                 <div class="actions">
-                                    <a href="job-detail?id=${job.jobID}" class="btn-primary">Xem chi tiết</a>
+                                    <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="btn-primary">Xem chi tiết</a>
                                     <button class="btn-outline"><i class="far fa-heart"></i></button>
                                 </div>
                             </div>
                         </c:forEach>
                     </div>
 
-                    <!-- Pagination: tạm để fix cứng -->
+                    <!-- Pagination-->
                     <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:1rem;">
                         <button class="btn-outline" disabled><i class="fas fa-chevron-left"></i></button>
                         <span style="display:flex; align-items:center; color:#666;">1/50</span>
@@ -654,6 +753,39 @@ sortDateBtn.addEventListener('click', () => {
 // Set tab "Tất cả" làm active mặc định
 setActiveTab(sortAllBtn);
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('menuToggle');
+    const panel = document.getElementById('megaMenu');
+    
+    console.log('Toggle element:', toggle);
+    console.log('Panel element:', panel);
+    
+    if(!toggle || !panel) {
+        console.error('Menu elements not found!');
+        return;
+    }
+    
+    function closeOnOutside(e){
+        if(!panel.contains(e.target) && !toggle.contains(e.target)){
+            panel.classList.remove('open');
+            document.removeEventListener('click', closeOnOutside);
+        }
+    }
+    
+    toggle.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Menu toggle clicked!');
+        panel.classList.toggle('open');
+        console.log('Panel classes:', panel.className);
+        if(panel.classList.contains('open')){
+            document.addEventListener('click', closeOnOutside);
+        }
+    });
+});
+</script>
+
 
             <!-- Reuses the same topbar markup as other pages like profile-overview.html and job-detail.html -->
     </body>

@@ -1,22 +1,22 @@
 package model;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class CV {
-    private int cvID;
-    private int jobSeekerID;
+    private int cvId;
+    private int jobSeekerId;
     private String cvTitle;
     private String cvContent;
     private String cvURL;
     private boolean isActive;
-    private LocalDateTime creationDate;
+    private Date creationDate;
 
-    public CV() {}
+    public CV() {
+    }
 
-    public CV(int cvID, int jobSeekerID, String cvTitle, String cvContent, 
-              String cvURL, boolean isActive, LocalDateTime creationDate) {
-        this.cvID = cvID;
-        this.jobSeekerID = jobSeekerID;
+    public CV(int cvId, int jobSeekerId, String cvTitle, String cvContent, String cvURL, boolean isActive, Date creationDate) {
+        this.cvId = cvId;
+        this.jobSeekerId = jobSeekerId;
         this.cvTitle = cvTitle;
         this.cvContent = cvContent;
         this.cvURL = cvURL;
@@ -24,20 +24,20 @@ public class CV {
         this.creationDate = creationDate;
     }
 
-    public int getCvID() {
-        return cvID;
+    public int getCvId() {
+        return cvId;
     }
 
-    public void setCvID(int cvID) {
-        this.cvID = cvID;
+    public void setCvId(int cvId) {
+        this.cvId = cvId;
     }
 
-    public int getJobSeekerID() {
-        return jobSeekerID;
+    public int getJobSeekerId() {
+        return jobSeekerId;
     }
 
-    public void setJobSeekerID(int jobSeekerID) {
-        this.jobSeekerID = jobSeekerID;
+    public void setJobSeekerId(int jobSeekerId) {
+        this.jobSeekerId = jobSeekerId;
     }
 
     public String getCvTitle() {
@@ -72,19 +72,19 @@ public class CV {
         isActive = active;
     }
 
-    public LocalDateTime getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
     @Override
     public String toString() {
         return "CV{" +
-                "cvID=" + cvID +
-                ", jobSeekerID=" + jobSeekerID +
+                "cvId=" + cvId +
+                ", jobSeekerId=" + jobSeekerId +
                 ", cvTitle='" + cvTitle + '\'' +
                 ", cvContent='" + cvContent + '\'' +
                 ", cvURL='" + cvURL + '\'' +

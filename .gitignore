@@ -6,3 +6,5 @@
 # Nếu sau này có file config thì ignore luôn
 config.properties
 *.orig
+*.iml
+.idea/
