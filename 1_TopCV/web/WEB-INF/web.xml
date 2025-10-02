@@ -146,12 +146,4 @@
         <url-pattern>/applied-jobs</url-pattern>
     </servlet-mapping>
     
-    <servlet>
-        <servlet-name>AppliedJobsTestServlet</servlet-name>
-        <servlet-class>controller.jobseeker.AppliedJobsTestServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AppliedJobsTestServlet</servlet-name>
-        <url-pattern>/applied-jobs-test</url-pattern>
-    </servlet-mapping>
 </web-app>
