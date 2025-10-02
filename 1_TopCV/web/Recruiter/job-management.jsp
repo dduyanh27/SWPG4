@@ -1,4 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,7 +11,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="job-management-page">
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
@@ -47,7 +48,7 @@
                         </button>
                         <div class="dropdown-content">
                             <a href="${pageContext.request.contextPath}/jobposting">Tạo tin tuyển dụng mới</a>
-                            <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp" class="active">Quản lý tin đã đăng</a>
+                            <a href="${pageContext.request.contextPath}/listpostingjobs" class="active">Quản lý tin đã đăng</a>
                         </div>
                     </div>
                     <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">TÌM ỨNG VIÊN</button>
@@ -63,7 +64,7 @@
                             <div class="user-header">
                                 <i class="fas fa-user-circle"></i>
                                 <div class="user-info">
-                                    <div class="user-name">Nguyen Phuoc</div>
+                                    <div class="user-name">${userName}</div>
                                 </div>
                                 <i class="fas fa-times close-menu"></i>
                             </div>
@@ -117,7 +118,7 @@
                             </div>
                             
                             <div class="menu-footer">
-                                <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-item">
+                                <a href="#" class="logout-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Thoát</span>
                                 </a>
@@ -129,13 +130,11 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="job-management-main">
-            <!-- Filter Tabs -->
             <div class="filter-tabs">
                 <div class="tab active">
-                    <span>Đang Hiển Thị (1)</span>
+                    <span>Đang Hiển Thị (<c:out value="${jobList.size()}" default="0"/>)</span>
                 </div>
                 <div class="tab">
                     <span>Đang Ẩn (3)</span>
@@ -153,8 +152,7 @@
                     <span>Việc Làm Ảo (19)</span>
                 </div>
             </div>
-
-            <!-- Action Bar -->
+            
             <div class="action-bar">
                 <div class="search-container">
                     <div class="search-box">
@@ -173,87 +171,128 @@
                 </div>
             </div>
 
-            <!-- Job List -->
             <div class="job-list">
-                <div class="job-item">
-                    <div class="job-title-section">
-                        <div class="column-header">Chức danh</div>
-                        <h3 class="job-title">Embedded Linux Engineer (Junior/ Senior)</h3>
-                        <div class="job-meta">
-                            <span class="views">
-                                <i class="fas fa-eye"></i>
-                                3857
-                            </span>
-                            <span class="category">Hồ Chí Minh</span>
-                            <span class="posted-by">Đăng bởi: [Tên người đăng]</span>
-                        </div>
-                        <div class="job-actions">
-                            <button class="action-btn" title="Chỉnh sửa">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn" title="Sao chép">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                            <button class="action-btn" title="Xem">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-btn" title="Thêm">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <button class="action-btn repost-btn" title="Đăng lại">
-                                Đăng lại
-                            </button>
-                        </div>
-                    </div>
+                <c:choose>
+                    <c:when test="${not empty jobList}">
+                        <c:forEach var="job" items="${jobList}">
+                            <div class="job-item">
+                                <div class="job-title-section">
+                                    <div class="column-header">Chức danh</div>
+                                    <%-- Sử dụng job.getTitle() --%>
+                                    <h3 class="job-title">${job.title}</h3>
+                                    <div class="job-meta">
+                                        <span class="views">
+                                            <i class="fas fa-eye"></i>
+                                            <%-- Giả định có job.getViews() --%>
+                                            <c:out value="${job.views}" default="0"/>
+                                        </span>
+                                        <span class="category">
+                                            <%-- Giả định có job.getLocation() --%>
+                                            <c:out value="${job.location}" default="N/A"/>
+                                        </span>
+                                        <span class="posted-by">
+                                            <%-- Sử dụng userName đã set trong servlet --%>
+                                            Đăng bởi: ${userName}
+                                        </span>
+                                    </div>
+                                    <div class="job-actions">
+                                        <%-- Thêm id công việc vào URL chỉnh sửa, xem chi tiết --%>
+                                        <button class="action-btn" title="Chỉnh sửa" onclick="window.location.href='${pageContext.request.contextPath}/jobedit?id=${job.jobID}'">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn" title="Sao chép">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="action-btn" title="Xem" onclick="window.open('${pageContext.request.contextPath}/jobdetails?id=${job.jobID}', '_blank')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn" title="Thêm">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <button class="action-btn repost-btn" title="Đăng lại">
+                                            Đăng lại
+                                        </button>
+                                    </div>
+                                </div>
 
-                    <div class="service-section">
-                        <div class="column-header">Dịch vụ</div>
-                        <div class="service-items-container">
-                            <div class="service-item">
-                                <span class="service-name">Đăng Tuyển Dụng</span>
+                                <div class="service-section">
+                                    <div class="column-header">Dịch vụ</div>
+                                    <div class="service-items-container">
+                                        <%-- Cần lặp qua list service của job nếu có --%>
+                                        <div class="service-item">
+                                            <span class="service-name">Đăng Tuyển Dụng</span>
+                                        </div>
+                                        <%-- Có thể thêm logic if để hiển thị các dịch vụ khác --%>
+                                        <div class="service-item">
+                                            <span class="service-name">Làm Mới Tin Tuyển Dụng</span>
+                                        </div>
+                                        <div class="service-item">
+                                            <span class="service-name">Việc Cần Tuyển Gấp</span>
+                                        </div>
+                                    </div>
+                                    <div class="service-buttons">
+                                        <button class="btn-upgrade">Nâng cấp dịch vụ</button>
+                                        <button class="btn-view-cv">Xem những CV phù hợp</button>
+                                    </div>
+                                </div>
+
+                                <div class="expiration-section">
+                                    <div class="column-header">Hết hạn</div>
+                                    <c:set var="daysLeft" value="${(job.expirationDate.time - job.postDate.time) / (1000 * 60 * 60 * 24)}"/>
+                                    <div class="expiration-status <c:if test="${daysLeft < 7}">expired</c:if>">
+                                        <%-- Giả định job.getExpirationDate() có tồn tại --%>
+                                        <c:choose>
+                                            <c:when test="${job.expirationDate.time > job.postDate.time}">
+                                                <span>Hết hạn trong <fmt:formatNumber value="${daysLeft}" maxFractionDigits="0"/> ngày</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span>Đã hết hạn</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="expiration-dates">
+                                        <%-- Format ngày tháng --%>
+                                        <fmt:formatDate value="${job.postDate}" pattern="dd/MM/yy"/> - 
+                                        <fmt:formatDate value="${job.expirationDate}" pattern="dd/MM/yy"/>
+                                    </div>
+                                </div>
+
+                                <div class="applications-section">
+                                    <div class="column-header">Hồ sơ ứng tuyển</div>
+                                    <div class="application-count">
+                                        <%-- Giả định có job.getApplicantCount() và job.getRequiredApplicants() --%>
+                                        <span><c:out value="${job.applicantCount}" default="0"/>/<c:out value="${job.requiredApplicants}" default="N/A"/></span>
+                                    </div>
+                                </div>
+
+                                <div class="refresh-section">
+                                    <div class="column-header">Làm mới lại</div>
+                                    <div class="last-refresh">
+                                        <%-- Giả định có job.getLastRefreshDate() --%>
+                                        <span class="refresh-date">
+                                            <c:choose>
+                                                <c:when test="${not empty job.lastRefreshDate}">
+                                                    <fmt:formatDate value="${job.lastRefreshDate}" pattern="dd/MM/yy"/>
+                                                </c:when>
+                                                <c:otherwise>-</c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="service-item">
-                                <span class="service-name">Làm Mới Tin Tuyển Dụng</span>
-                            </div>
-                            <div class="service-item">
-                                <span class="service-name">Việc Cần Tuyển Gấp</span>
-                            </div>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-jobs">
+                            <p>Bạn chưa đăng tin tuyển dụng nào.</p>
+                            <a href="${pageContext.request.contextPath}/jobposting" class="btn btn-orange">Đăng tin tuyển dụng ngay!</a>
                         </div>
-                        <div class="service-buttons">
-                            <button class="btn-upgrade">Nâng cấp dịch vụ</button>
-                            <button class="btn-view-cv">Xem những CV phù hợp</button>
-                        </div>
-                    </div>
-
-                    <div class="expiration-section">
-                        <div class="column-header">Hết hạn</div>
-                        <div class="expiration-status expired">
-                            <span>Hết hạn trong 5 ngày</span>
-                        </div>
-                        <div class="expiration-dates">
-                            <span>19/09/24 - 19/10/24</span>
-                        </div>
-                    </div>
-
-                    <div class="applications-section">
-                        <div class="column-header">Hồ sơ ứng tuyển</div>
-                        <div class="application-count">
-                            <span>0/8</span>
-                        </div>
-                    </div>
-
-                    <div class="refresh-section">
-                        <div class="column-header">Làm mới lại</div>
-                        <div class="last-refresh">
-                            <span class="refresh-date">-</span>
-                        </div>
-                    </div>
-                </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Right Buttons -->
     <div class="bottom-buttons">
         <button class="three-dots-btn">
             <i class="fas fa-ellipsis-h"></i>

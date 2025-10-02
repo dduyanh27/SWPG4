@@ -9,13 +9,92 @@ import java.util.List;
 public class JobDAO extends DBContext {
     
     // Thêm job mới
-    public boolean addJob(Job job) {
-        String sql = "INSERT INTO Jobs (RecruiterID, JobTitle, Description, Requirements, " +
-                    "JobLevelID, LocationID, SalaryRange, ExpirationDate, CategoryID, " +
-                    "AgeRequirement, Status, JobTypeID, HiringCount) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+  public List<Job> getAllJobs() {
+        List<Job> list = new ArrayList<>();
+        String sql = "SELECT JobID, RecruiterID, JobTitle, Description, Requirements, "
+                + "JobLevelID, LocationID, SalaryRange, PostingDate, ExpirationDate, "
+                + "CategoryID, AgeRequirement, Status, JobTypeID, CertificatesID, HiringCount "
+                + "FROM Jobs";
+        try (PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Timestamp postTs = rs.getTimestamp("PostingDate");
+                LocalDateTime postingDate = postTs != null ? postTs.toLocalDateTime() : null;
+                Timestamp expTs = rs.getTimestamp("ExpirationDate");
+                LocalDateTime expirationDate = expTs != null ? expTs.toLocalDateTime() : null;
+
+                Job job = new Job(
+                        rs.getInt("JobID"),
+                        rs.getInt("RecruiterID"),
+                        rs.getString("JobTitle"),
+                        rs.getString("Description"),
+                        rs.getString("Requirements"),
+                        rs.getInt("JobLevelID"),
+                        rs.getInt("LocationID"),
+                        rs.getString("SalaryRange"),
+                        postingDate,
+                        expirationDate,
+                        rs.getInt("CategoryID"),
+                        rs.getInt("AgeRequirement"),
+                        rs.getString("Status"),      // <-- CHÚ Ý: status ở vị trí này (String)
+                        rs.getInt("JobTypeID"),
+                        rs.getInt("CertificatesID"),
+                        rs.getInt("HiringCount")
+                );
+                list.add(job);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Lấy job theo ID
+    public Job getJobById(int id) {
+        String sql = "SELECT * FROM Jobs WHERE JobID = ?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Timestamp postTs = rs.getTimestamp("PostingDate");
+                    LocalDateTime postingDate = postTs != null ? postTs.toLocalDateTime() : null;
+                    Timestamp expTs = rs.getTimestamp("ExpirationDate");
+                    LocalDateTime expirationDate = expTs != null ? expTs.toLocalDateTime() : null;
+
+                    return new Job(
+                            rs.getInt("JobID"),
+                            rs.getInt("RecruiterID"),
+                            rs.getString("JobTitle"),
+                            rs.getString("Description"),
+                            rs.getString("Requirements"),
+                            rs.getInt("JobLevelID"),
+                            rs.getInt("LocationID"),
+                            rs.getString("SalaryRange"),
+                            postingDate,
+                            expirationDate,
+                            rs.getInt("CategoryID"),
+                            rs.getInt("AgeRequirement"),
+                            rs.getString("Status"),
+                            rs.getInt("JobTypeID"),
+                            rs.getInt("CertificatesID"),
+                            rs.getInt("HiringCount")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Thêm job (trả về jobId tạo được, -1 nếu lỗi)
+    public int addJob(Job job) {
+        String sql = "INSERT INTO Jobs (RecruiterID, JobTitle, Description, Requirements, "
+                + "JobLevelID, LocationID, SalaryRange, ExpirationDate, CategoryID, "
+                + "AgeRequirement, JobTypeID, CertificatesID, HiringCount, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        int newId = -1;
+        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, job.getRecruiterID());
             ps.setString(2, job.getJobTitle());
             ps.setString(3, job.getDescription());
@@ -23,80 +102,37 @@ public class JobDAO extends DBContext {
             ps.setInt(5, job.getJobLevelID());
             ps.setInt(6, job.getLocationID());
             ps.setString(7, job.getSalaryRange());
-            ps.setTimestamp(8, job.getExpirationDate() != null ? 
-                Timestamp.valueOf(job.getExpirationDate()) : null);
+            // expirationDate có thể null — xử lý an toàn
+            if (job.getExpirationDate() != null) {
+                ps.setTimestamp(8, Timestamp.valueOf(job.getExpirationDate()));
+            } else {
+                ps.setNull(8, Types.TIMESTAMP);
+            }
             ps.setInt(9, job.getCategoryID());
             ps.setInt(10, job.getAgeRequirement());
-            ps.setString(11, job.getStatus());
-            ps.setInt(12, job.getJobTypeID());
+            ps.setInt(11, job.getJobTypeID());
+            ps.setInt(12, job.getCertificatesID());
             ps.setInt(13, job.getHiringCount());
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    // Lấy job theo ID
-    public Job getJobById(int jobId) {
-        String sql = "SELECT * FROM Jobs WHERE JobID = ?";
-        
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return mapResultSetToJob(rs);
+            ps.setString(14, "Draft");
+
+            int rows = ps.executeUpdate();
+            if (rows > 0) {
+                try (ResultSet gk = ps.getGeneratedKeys()) {
+                    if (gk.next()) newId = gk.getInt(1);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return newId;
     }
-    
-    // Lấy tất cả jobs của một recruiter
-    public List<Job> getJobsByRecruiterId(int recruiterId) {
-        List<Job> jobs = new ArrayList<>();
-        String sql = "SELECT * FROM Jobs WHERE RecruiterID = ? ORDER BY PostingDate DESC";
-        
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, recruiterId);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                jobs.add(mapResultSetToJob(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return jobs;
-    }
-    
-    // Lấy tất cả jobs đang active
-    public List<Job> getActiveJobs() {
-        List<Job> jobs = new ArrayList<>();
-        String sql = "SELECT * FROM Jobs WHERE Status = 'Published' AND ExpirationDate > GETDATE() ORDER BY PostingDate DESC";
-        
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                jobs.add(mapResultSetToJob(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return jobs;
-    }
-    
+
     // Cập nhật job
     public boolean updateJob(Job job) {
-        String sql = "UPDATE Jobs SET JobTitle = ?, Description = ?, Requirements = ?, " +
-                    "JobLevelID = ?, LocationID = ?, SalaryRange = ?, ExpirationDate = ?, " +
-                    "CategoryID = ?, AgeRequirement = ?, Status = ?, JobTypeID = ?, " +
-                    "HiringCount = ? WHERE JobID = ?";
-        
+        String sql = "UPDATE Jobs SET JobTitle=?, Description=?, Requirements=?, "
+                + "JobLevelID=?, LocationID=?, SalaryRange=?, ExpirationDate=?, "
+                + "CategoryID=?, AgeRequirement=?, JobTypeID=?, CertificatesID=?, "
+                + "HiringCount=?, Status=? WHERE JobID=?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, job.getJobTitle());
             ps.setString(2, job.getDescription());
@@ -104,33 +140,76 @@ public class JobDAO extends DBContext {
             ps.setInt(4, job.getJobLevelID());
             ps.setInt(5, job.getLocationID());
             ps.setString(6, job.getSalaryRange());
-            ps.setTimestamp(7, job.getExpirationDate() != null ? 
-                Timestamp.valueOf(job.getExpirationDate()) : null);
+            if (job.getExpirationDate() != null) {
+                ps.setTimestamp(7, Timestamp.valueOf(job.getExpirationDate()));
+            } else {
+                ps.setNull(7, Types.TIMESTAMP);
+            }
             ps.setInt(8, job.getCategoryID());
             ps.setInt(9, job.getAgeRequirement());
-            ps.setString(10, job.getStatus());
-            ps.setInt(11, job.getJobTypeID());
+            ps.setInt(10, job.getJobTypeID());
+            ps.setInt(11, job.getCertificatesID());
             ps.setInt(12, job.getHiringCount());
-            ps.setInt(13, job.getJobID());
-            
+            ps.setString(13, job.getStatus());
+            ps.setInt(14, job.getJobID());
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
-    
+
     // Xóa job
-    public boolean deleteJob(int jobId) {
+    public boolean deleteJob(int id) {
         String sql = "DELETE FROM Jobs WHERE JobID = ?";
-        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobId);
+            ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
+    }
+
+    // Lấy jobs theo recruiter
+    public List<Job> getJobsByRecruiterId(int recruiterId) {
+        List<Job> list = new ArrayList<>();
+        String sql = "SELECT * FROM Jobs WHERE RecruiterID = ? ORDER BY PostingDate DESC";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Timestamp postTs = rs.getTimestamp("PostingDate");
+                    LocalDateTime postingDate = postTs != null ? postTs.toLocalDateTime() : null;
+                    Timestamp expTs = rs.getTimestamp("ExpirationDate");
+                    LocalDateTime expirationDate = expTs != null ? expTs.toLocalDateTime() : null;
+
+                    Job job = new Job(
+                            rs.getInt("JobID"),
+                            rs.getInt("RecruiterID"),
+                            rs.getString("JobTitle"),
+                            rs.getString("Description"),
+                            rs.getString("Requirements"),
+                            rs.getInt("JobLevelID"),
+                            rs.getInt("LocationID"),
+                            rs.getString("SalaryRange"),
+                            postingDate,
+                            expirationDate,
+                            rs.getInt("CategoryID"),
+                            rs.getInt("AgeRequirement"),
+                            rs.getString("Status"),
+                            rs.getInt("JobTypeID"),
+                            rs.getInt("CertificatesID"),
+                            rs.getInt("HiringCount")
+                    );
+                    list.add(job);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
     
     // Tìm kiếm jobs

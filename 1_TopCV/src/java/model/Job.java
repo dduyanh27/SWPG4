@@ -8,15 +8,16 @@ public class Job {
     private String jobTitle;
     private String description;
     private String requirements;
-    private int jobLevelID;
+    private int jobLevelID; 
     private int locationID;
     private String salaryRange;
     private LocalDateTime postingDate;
     private LocalDateTime expirationDate;
     private int categoryID;
-    private int ageRequirement;
+    private int ageRequirement; 
     private String status;
-    private int jobTypeID;
+    private int jobTypeID; 
+    private int certificatesID; 
     private int hiringCount;
 
     public Job() {}
@@ -24,7 +25,7 @@ public class Job {
     public Job(int jobID, int recruiterID, String jobTitle, String description, String requirements,
                int jobLevelID, int locationID, String salaryRange, LocalDateTime postingDate,
                LocalDateTime expirationDate, int categoryID, int ageRequirement, String status,
-               int jobTypeID, int hiringCount) {
+               int jobTypeID, int certificatesID, int hiringCount) {
         this.jobID = jobID;
         this.recruiterID = recruiterID;
         this.jobTitle = jobTitle;
@@ -39,10 +40,10 @@ public class Job {
         this.ageRequirement = ageRequirement;
         this.status = status;
         this.jobTypeID = jobTypeID;
+        this.certificatesID = certificatesID;
         this.hiringCount = hiringCount;
     }
 
-    // Getters and Setters
     public int getJobID() {
         return jobID;
     }
@@ -83,11 +84,11 @@ public class Job {
         this.requirements = requirements;
     }
 
-    public int getJobLevelID() {
+    public int getJobLevelID() { 
         return jobLevelID;
     }
 
-    public void setJobLevelID(int jobLevelID) {
+    public void setJobLevelID(int jobLevelID) { 
         this.jobLevelID = jobLevelID;
     }
 
@@ -131,11 +132,11 @@ public class Job {
         this.categoryID = categoryID;
     }
 
-    public int getAgeRequirement() {
+    public int getAgeRequirement() { 
         return ageRequirement;
     }
 
-    public void setAgeRequirement(int ageRequirement) {
+    public void setAgeRequirement(int ageRequirement) { 
         this.ageRequirement = ageRequirement;
     }
 
@@ -147,14 +148,22 @@ public class Job {
         this.status = status;
     }
 
-    public int getJobTypeID() {
+    public int getJobTypeID() { 
         return jobTypeID;
     }
 
-    public void setJobTypeID(int jobTypeID) {
+    public void setJobTypeID(int jobTypeID) { 
         this.jobTypeID = jobTypeID;
     }
 
+    public int getCertificatesID() { 
+        return certificatesID;
+    }
+
+    public void setCertificatesID(int certificatesID) { 
+        this.certificatesID = certificatesID;
+    }
+    
     public int getHiringCount() {
         return hiringCount;
     }
@@ -180,6 +189,7 @@ public class Job {
                 ", ageRequirement=" + ageRequirement +
                 ", status='" + status + '\'' +
                 ", jobTypeID=" + jobTypeID +
+                ", certificatesID=" + certificatesID + 
                 ", hiringCount=" + hiringCount +
                 '}';
     }

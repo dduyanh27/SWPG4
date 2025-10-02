@@ -73,7 +73,7 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("recruiter", recruiter);
                     session.setAttribute("userID", recruiter.getRecruiterID());
                     session.setAttribute("userName", recruiter.getCompanyName());
-                    response.sendRedirect(request.getContextPath() + "/Recruiter/index.jsp");
+                    response.sendRedirect(request.getContextPath() + "/homerecuiter");
                     break;
                     
                 default:
