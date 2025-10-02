@@ -875,6 +875,33 @@
     }
 </style>
 
+<style>
+    /* Error message styles */
+    #fullNameError,
+    #phoneError {
+        display: block;
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        min-height: 16px;
+    }
+
+    /* Character count styles */
+    .char-count {
+        color: #666;
+        font-size: 12px;
+        margin-top: 4px;
+        display: block;
+    }
+
+    /* Input error state */
+    input.error,
+    textarea.error {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+</style>
+
 <body>
     <!-- Preloader Start -->
     <header class="header">
@@ -928,7 +955,7 @@
             <div class="mega-col">
                 <h4>Việc của tôi</h4>
                 <a href="#">Việc đã lưu</a>
-                <a href="${pageContext.request.contextPath}/myApplications">Việc đã ứng tuyển</a>
+                <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                 <a href="#">Thông báo việc làm</a>
                 <a href="#">Việc dành cho bạn</a>
             </div>
@@ -964,7 +991,6 @@
                                ${jobSeeker.status == 'Active' ? 'checked' : ''}>
                         <span class="slider"></span>
                     </label>
-                    <span class="resume-file" data-field="active-cv">Chưa có CV</span>
                 </div>
             </div>
 
@@ -1037,12 +1063,11 @@
                     </div>
                     <div class="profile-details">
                         <h2 data-field="fullName">${jobSeeker.fullName}</h2>
-                        <p class="job-title" data-field="headline-experience">${jobSeeker.headline != null ? jobSeeker.headline : 'Chưa cập nhật Headline'} - 
-                            ${jobSeeker.currentLevelId != null ? jobSeeker.currentLevelId : 'Chưa cập nhật level'}</p>
+                        <p class="job-title" data-field="headline-experience">${jobSeeker.headline != null ? jobSeeker.headline : 'Chưa cập nhật Headline'}</p>
                         <div class="profile-meta">
                             <div class="meta-item">
                                 <i class="fas fa-user-tag"></i>
-                                <span data-field="currentLevel">${jobSeeker.currentLevelId != null ? jobSeeker.currentLevelId : 'Chưa cập nhật'}</span>
+                                <span data-field="currentLevel">${jobSeeker.currentLevelId != null ? typeName : 'Chưa cập nhật'}</span>
                             </div>
                             <div class="meta-item">
                                 <i class="fas fa-envelope"></i>
@@ -1183,7 +1208,8 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Họ và tên <span class="required">*</span></label>
-                            <input type="text" name="fullName" value="${jobSeeker.fullName}" required>
+                            <input type="text" name="fullName" id="fullName" value="${jobSeeker.fullName}" required>
+                            <span id="fullNameError" style="color:red"></span>
                         </div>
                         <div class="form-group">
                             <label>Email <span class="required">*</span></label>
@@ -1193,27 +1219,28 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Headline/Chức danh <span class="required">*</span></label>
-                            <input type="text" name="headline" value="${jobSeeker.headline}" placeholder="VD: Software Engineer">
+                            <label>Headline/Chức danh</label>
+                            <input type="text" name="headline" id="headline" value="${jobSeeker.headline}" placeholder="VD: Software Engineer">
                         </div>
-                            <div class="form-group">
-                                <label>Cấp bậc hiện tại <span class="required">*</span></label>
-                                <select name="currentLevelID">
-                                    <option value="">Chọn cấp bậc</option>
-                                    <c:forEach var="level" items="${types}">
-                                        <option value="${level.typeID}" ${jobSeeker.currentLevelId == level.typeID ? "selected" : ""}>
-                                            ${level.typeName}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-
+                        <div class="form-group">
+                            <label>Cấp bậc hiện tại</label>
+                            <select name="currentLevelID">
+                                <option value="">Chọn cấp bậc</option>
+                                <c:forEach var="level" items="${types}">
+                                    <option value="${level.typeID}" ${jobSeeker.currentLevelId == level.typeID ? "selected" : ""}>
+                                        ${level.typeName}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Số điện thoại</label>
-                            <input type="tel" name="phone" value="${jobSeeker.phone}">
+                            <input type="tel" pattern="[0-9]{10,11}" name="phone" id="phone" value="${jobSeeker.phone}"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            <span id="phoneError" style="color:red"></span>
                         </div>
                         <div class="form-group">
                             <label>Giới tính</label>
@@ -1228,8 +1255,9 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Địa điểm <span class="required">*</span></label>
+                            <label>Địa điểm</label>
                             <select name="locationID">
+                                <option value="">Chọn địa điểm</option>
                                 <c:forEach var="loc" items="${locations}">
                                     <option value="${loc.locationID}" ${jobSeeker.locationId == loc.locationID ? "selected" : ""}>${loc.locationName}</option>
                                 </c:forEach>
@@ -1256,6 +1284,9 @@
                         <textarea name="contactInfo" rows="2">${jobSeeker.contactInfo}</textarea>
                     </div>
                     <p class="required-note">* Thông tin bắt buộc</p>
+                    <c:if test="${not empty error}">
+                        <p style="color:red">${error}</p>
+                    </c:if>
                 </form>                    
             </div>
 
@@ -1267,8 +1298,12 @@
     </div>
     </main>
 
+    <script>
+        // Định nghĩa contextPath để sử dụng trong JavaScript
+        const contextPath = '${pageContext.request.contextPath}';
+    </script>
     <script src="${pageContext.request.contextPath}/JobSeeker/script.js"></script>
-        <script>
+    <script>
             (function(){
                 const toggle = document.getElementById('menuToggle');
                 const panel = document.getElementById('megaMenu');
@@ -1287,232 +1322,483 @@
                     }
                 });
             })();
+            
             // Toggle hiển thị menu 3 chấm
-document.addEventListener("click", function (e) {
-    if (e.target.closest(".file-menu-btn")) {
-        const dropdown = e.target.closest(".file-actions").querySelector(".file-dropdown");
-        dropdown.classList.toggle("active");
-    } else {
-        document.querySelectorAll(".file-dropdown").forEach(d => d.classList.remove("active"));
-    }
-});
+            document.addEventListener("click", function (e) {
+                if (e.target.closest(".file-menu-btn")) {
+                    const dropdown = e.target.closest(".file-actions").querySelector(".file-dropdown");
+                    dropdown.classList.toggle("active");
+                } else {
+                    document.querySelectorAll(".file-dropdown").forEach(d => d.classList.remove("active"));
+                }
+            });
 
-// Ajax bật/tắt searchable
-function toggleSearchable(cvId, isChecked) {
-    fetch(contextPath + "/ToggleSearchableServlet?cvId=" + cvId + "&searchable=" + isChecked, {
-        method: "POST"
-    }).then(res => {
-        if (!res.ok) {
-            alert("Không thể cập nhật trạng thái hồ sơ!");
-        }
-    });
-}
-
-        </script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uploadForm = document.getElementById('uploadForm');
-    const uploadArea = document.querySelector('.upload-area');
-    const fileInput = document.getElementById('cvFileInput');
-    const uploadText = document.getElementById('uploadText');
-    const uploadIcon = document.getElementById('uploadIcon');
-    const uploadNote = document.getElementById('uploadNote');
-    const submitBtn = document.getElementById('submitBtn');
-
-    // ========== File Input Change ==========
-    fileInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            const file = this.files[0];
-            const fileName = file.name;
-            const fileSize = (file.size / 1024).toFixed(2);
-            
-            // Cập nhật giao diện
-            uploadIcon.className = 'fas fa-file-pdf';
-            uploadText.innerHTML = '<strong>' + fileName + '</strong><br><small>(' + fileSize + ' KB)</small>';
-            uploadNote.style.color = '#10b981';
-            uploadNote.innerHTML = '<i class="fas fa-check-circle"></i> File đã sẵn sàng để tải lên';
-            uploadArea.style.borderColor = '#10b981';
-            uploadArea.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)';
-            
-            console.log('File selected:', fileName, fileSize + 'KB');
-        } else {
-            // Reset về trạng thái ban đầu
-            resetUploadArea();
-        }
-    });
-
-    // ========== Drag & Drop ==========
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, () => {
-            uploadArea.classList.add('drag-over');
-        });
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        uploadArea.addEventListener(eventName, () => {
-            uploadArea.classList.remove('drag-over');
-        });
-    });
-
-    uploadArea.addEventListener('drop', function(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        
-        if (files.length > 0) {
-            fileInput.files = files;
-            
-            // Trigger change event manually
-            const event = new Event('change', { bubbles: true });
-            fileInput.dispatchEvent(event);
-        }
-    });
+    </script>
     
-    // ========== Reset Upload Area ==========
-    function resetUploadArea() {
-        uploadIcon.className = 'fas fa-cloud-upload-alt';
-        uploadText.textContent = 'Chọn hoặc kéo thả hồ sơ từ máy của bạn';
-        uploadNote.style.color = '';
-        uploadNote.innerHTML = '<i class="fas fa-info-circle"></i> Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB';
-        uploadArea.style.borderColor = '';
-        uploadArea.style.background = '';
-    }
+    <script>
+        // Ajax bật/tắt searchable - Phải ở global scope để HTML có thể gọi
+        function toggleSearchable(cvId, isChecked) {
+            console.log('toggleSearchable called:', cvId, isChecked);
+            
+            fetch(contextPath + "/ToggleSearchableServlet?cvId=" + cvId + "&searchable=" + isChecked, {
+                method: "POST"
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message || 'Không thể cập nhật trạng thái hồ sơ!', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Có lỗi xảy ra khi cập nhật trạng thái hồ sơ!', 'error');
+            });
+        }
+    </script>
+    
+    <script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadForm = document.getElementById('uploadForm');
+            const uploadArea = document.querySelector('.upload-area');
+            const fileInput = document.getElementById('cvFileInput');
+            const uploadText = document.getElementById('uploadText');
+            const uploadIcon = document.getElementById('uploadIcon');
+            const uploadNote = document.getElementById('uploadNote');
+            const submitBtn = document.getElementById('submitBtn');
 
-    // ========== Form Submit ==========
-    uploadForm.addEventListener('submit', function(e) {
-        if (!fileInput.files || !fileInput.files[0]) {
-            e.preventDefault();
-            showNotification('Vui lòng chọn file trước khi tải lên', 'error');
+            // ========== File Input Change ==========
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const fileName = file.name;
+                    const fileSize = (file.size / 1024).toFixed(2);
+
+                    // Cập nhật giao diện
+                    uploadIcon.className = 'fas fa-file-pdf';
+                    uploadText.innerHTML = '<strong>' + fileName + '</strong><br><small>(' + fileSize + ' KB)</small>';
+                    uploadNote.style.color = '#10b981';
+                    uploadNote.innerHTML = '<i class="fas fa-check-circle"></i> File đã sẵn sàng để tải lên';
+                    uploadArea.style.borderColor = '#10b981';
+                    uploadArea.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)';
+
+                    console.log('File selected:', fileName, fileSize + 'KB');
+                } else {
+                    // Reset về trạng thái ban đầu
+                    resetUploadArea();
+                }
+            });
+
+            // ========== Drag & Drop ==========
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('drag-over');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('drag-over');
+                });
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+
+                    // Trigger change event manually
+                    const event = new Event('change', { bubbles: true });
+                    fileInput.dispatchEvent(event);
+                }
+            });
+
+            // ========== Reset Upload Area ==========
+            function resetUploadArea() {
+                uploadIcon.className = 'fas fa-cloud-upload-alt';
+                uploadText.textContent = 'Chọn hoặc kéo thả hồ sơ từ máy của bạn';
+                uploadNote.style.color = '';
+                uploadNote.innerHTML = '<i class="fas fa-info-circle"></i> Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB';
+                uploadArea.style.borderColor = '';
+                uploadArea.style.background = '';
+            }
+
+            // ========== Form Submit ==========
+            uploadForm.addEventListener('submit', function(e) {
+                if (!fileInput.files || !fileInput.files[0]) {
+                    e.preventDefault();
+                    showNotification('Vui lòng chọn file trước khi tải lên', 'error');
+                    return false;
+                }
+
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+
+                // Tạo icon loading
+                const loadingIcon = document.createElement('i');
+                loadingIcon.className = 'fas fa-spinner fa-spin';
+                loadingIcon.style.marginRight = '8px';
+
+                submitBtn.textContent = 'Đang tải lên...';
+                submitBtn.insertBefore(loadingIcon, submitBtn.firstChild);
+
+                console.log('Form submitting...');
+            });
+
+            // ========== Close Dropdowns on Outside Click ==========
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.file-actions')) {
+                    document.querySelectorAll('.file-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('active');
+                    });
+                }
+            });
+        });
+
+        // ========== Toggle Dropdown ==========        
+        function toggleDropdown(event, button) {
+            event.stopPropagation();
+
+            // Close all other dropdowns
+            document.querySelectorAll('.file-dropdown').forEach(dropdown => {
+                if (dropdown !== button.nextElementSibling) {
+                    dropdown.classList.remove('active');
+                }
+            });
+
+            // Toggle current dropdown
+            const dropdown = button.nextElementSibling;
+            dropdown.classList.toggle('active');
+        }
+
+        // ========== Toggle Searchable ==========        
+        function toggleSearchable(cvId, isChecked) {
+            fetch('${pageContext.request.contextPath}/ToggleSearchableServlet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `cvId=${cvId}&searchable=${isChecked}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
+                    showNotification(message, 'success');
+                } else {
+                    showNotification('Có lỗi xảy ra', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Có lỗi xảy ra', 'error');
+            });
+        }
+
+        // ========== Show Notification ==========        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+
+            const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.background = bgColor;
+            notification.style.color = 'white';
+            notification.style.padding = '16px 24px';
+            notification.style.borderRadius = '8px';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            notification.style.zIndex = '9999';
+            notification.style.animation = 'slideIn 0.3s ease';
+
+            document.body.appendChild(notification);
+
+            setTimeout(function() {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(function() {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for notification animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ========== Profile Modal Reset Logic ==========        
+        // Lưu giá trị gốc khi mở modal
+        let originalProfileData = {};
+
+        function openProfileModal() {
+            // Lưu lại giá trị gốc khi mở modal
+            const form = document.getElementById('profileForm');
+            if (form) {
+                originalProfileData = {
+                    fullName: form.fullName.value,
+                    email: form.email.value,
+                    headline: form.headline.value,
+                    currentLevelID: form.currentLevelID.value,
+                    phone: form.phone.value,
+                    gender: form.gender.value,
+                    locationID: form.locationID.value,
+                    status: form.status.value,
+                    address: form.address.value,
+                    contactInfo: form.contactInfo.value
+                };
+            }
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function closeProfileModal() {
+            // Reset lại form về giá trị gốc
+            const form = document.getElementById('profileForm');
+            if (form && originalProfileData && Object.keys(originalProfileData).length > 0) {
+                form.fullName.value = originalProfileData.fullName;
+                form.email.value = originalProfileData.email;
+                form.headline.value = originalProfileData.headline;
+                form.currentLevelID.value = originalProfileData.currentLevelID;
+                form.phone.value = originalProfileData.phone;
+                form.gender.value = originalProfileData.gender;
+                form.locationID.value = originalProfileData.locationID;
+                form.status.value = originalProfileData.status;
+                form.address.value = originalProfileData.address;
+                form.contactInfo.value = originalProfileData.contactInfo;
+                // Xóa thông báo lỗi nếu có
+                const fullNameError = document.getElementById('fullNameError');
+                if (fullNameError) fullNameError.textContent = '';
+                const phoneError = document.getElementById('phoneError');
+                if (phoneError) phoneError.textContent = '';
+            }
+            document.getElementById('profileModal').classList.remove('show');
+        }
+    </script>
+<script>
+    // ========== Validation Functions ==========
+    
+    // Validate Họ và tên
+    function validateFullName() {
+        let name = document.getElementById("fullName").value.trim();
+        let error = document.getElementById("fullNameError");
+
+        if (name.length === 0) {
+            error.textContent = "Họ và tên không được để trống.";
             return false;
         }
-        
-        submitBtn.classList.add('loading');
-        submitBtn.disabled = true;
-        
-        // Tạo icon loading
-        const loadingIcon = document.createElement('i');
-        loadingIcon.className = 'fas fa-spinner fa-spin';
-        loadingIcon.style.marginRight = '8px';
-        
-        submitBtn.textContent = 'Đang tải lên...';
-        submitBtn.insertBefore(loadingIcon, submitBtn.firstChild);
-        
-        console.log('Form submitting...');
-    });
 
-    // ========== Close Dropdowns on Outside Click ==========
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.file-actions')) {
-            document.querySelectorAll('.file-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('active');
+        if (name.length > 100) {
+            error.textContent = "Họ và tên không được vượt quá 100 ký tự.";
+            return false;
+        }
+
+        let regex = /^[\p{L}\s]+$/u; 
+        if (!regex.test(name)) {
+            error.textContent = "Họ và tên chỉ được chứa chữ cái và khoảng trắng.";
+            return false;
+        }
+
+        error.textContent = "";
+        return true;
+    }
+
+    // Validate Số điện thoại
+    function validatePhone() {
+        let phone = document.getElementById("phone").value.trim();
+        let error = document.getElementById("phoneError");
+
+        // Nếu để trống thì bỏ qua (không bắt buộc)
+        if (phone.length === 0) {
+            error.textContent = "";
+            return true;
+        }
+
+        // Kiểm tra chỉ chứa số
+        if (!/^\d+$/.test(phone)) {
+            error.textContent = "Số điện thoại chỉ được chứa chữ số.";
+            return false;
+        }
+
+        // Kiểm tra độ dài 10-11 số
+        if (phone.length < 10 || phone.length > 11) {
+            error.textContent = "Số điện thoại phải có 10-11 chữ số.";
+            return false;
+        }
+
+        error.textContent = "";
+        return true;
+    }
+
+    // Validate Headline
+    function validateHeadline(input) {
+        const maxLength = 200;
+        if (input.value.length > maxLength) {
+            input.value = input.value.substring(0, maxLength);
+            showNotification(`Headline không được vượt quá 200 ký tự`, 'error');
+            return false;
+        }
+        return true;
+    }
+
+    // Validate Địa chỉ chi tiết
+    function validateAddress(textarea) {
+        const maxLength = 255;
+        if (textarea.value.length > maxLength) {
+            textarea.value = textarea.value.substring(0, maxLength);
+            showNotification(`Địa chỉ không được vượt quá 255 ký tự`, 'error');
+            return false;
+        }
+        return true;
+    }
+
+    // Validate Thông tin liên hệ
+    function validateContactInfo(textarea) {
+        const maxLength = 255;
+        if (textarea.value.length > maxLength) {
+            textarea.value = textarea.value.substring(0, maxLength);
+            showNotification(`Thông tin liên hệ không được vượt quá 255 ký tự`, 'error');
+            return false;
+        }
+        return true;
+    }
+
+    // ========== Real-time Validation ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const fullNameInput = document.getElementById('fullName');
+        const phoneInput = document.getElementById('phone');
+        const headlineInput = document.querySelector('input[name="headline"]');
+        const addressTextarea = document.querySelector('textarea[name="address"]');
+        const contactInfoTextarea = document.querySelector('textarea[name="contactInfo"]');
+
+        // Real-time validate cho Họ và tên
+        if (fullNameInput) {
+            fullNameInput.addEventListener('blur', validateFullName);
+            fullNameInput.addEventListener('input', function() {
+                if (this.value.length > 100) {
+                    this.value = this.value.substring(0, 100);
+                    showNotification('Họ và tên không được vượt quá 100 ký tự', 'error');
+                }
+            });
+        }
+
+        // Real-time validate cho Số điện thoại
+        if (phoneInput) {
+            phoneInput.addEventListener('blur', validatePhone);
+            phoneInput.addEventListener('input', function() {
+                // Chỉ cho phép nhập số
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Giới hạn 11 ký tự
+                if (this.value.length > 11) {
+                    this.value = this.value.substring(0, 11);
+                    showNotification('Số điện thoại không được vượt quá 11 số', 'error');
+                }
+            });
+        }
+
+        // Real-time validate cho Headline
+        if (headlineInput) {
+            headlineInput.addEventListener('input', function() {
+                validateHeadline(this);
+            });
+        }
+
+        // Real-time validate cho Địa chỉ
+        if (addressTextarea) {
+            addressTextarea.addEventListener('input', function() {
+                validateAddress(this);
+            });
+        }
+
+        // Real-time validate cho Thông tin liên hệ
+        if (contactInfoTextarea) {
+            contactInfoTextarea.addEventListener('input', function() {
+                validateContactInfo(this);
+            });
+        }
+
+        // ========== Form Submit Validation ==========
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Validate Họ và tên (bắt buộc)
+                if (!validateFullName()) {
+                    isValid = false;
+                }
+
+                // Validate Số điện thoại (không bắt buộc nhưng phải đúng format nếu có)
+                if (!validatePhone()) {
+                    isValid = false;
+                }
+
+                // Validate các field khác
+                if (headlineInput && !validateHeadline(headlineInput)) {
+                    isValid = false;
+                }
+
+                if (addressTextarea && !validateAddress(addressTextarea)) {
+                    isValid = false;
+                }
+
+                if (contactInfoTextarea && !validateContactInfo(contactInfoTextarea)) {
+                    isValid = false;
+                }
+
+                // Nếu có lỗi, ngăn submit
+                if (!isValid) {
+                    e.preventDefault();
+                    showNotification('Vui lòng kiểm tra lại thông tin nhập vào', 'error');
+                    return false;
+                }
             });
         }
     });
-});
 
-// ========== Toggle Dropdown ==========
-function toggleDropdown(event, button) {
-    event.stopPropagation();
-    
-    // Close all other dropdowns
-    document.querySelectorAll('.file-dropdown').forEach(dropdown => {
-        if (dropdown !== button.nextElementSibling) {
-            dropdown.classList.remove('active');
-        }
-    });
-    
-    // Toggle current dropdown
-    const dropdown = button.nextElementSibling;
-    dropdown.classList.toggle('active');
-}
-
-// ========== Toggle Searchable ==========
-function toggleSearchable(cvId, isChecked) {
-    fetch('${pageContext.request.contextPath}/ToggleSearchableServlet', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `cvId=${cvId}&searchable=${isChecked}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
-            showNotification(message, 'success');
-        } else {
-            showNotification('Có lỗi xảy ra', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Có lỗi xảy ra', 'error');
-    });
-}
-
-// ========== Show Notification ==========
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    
-    const bgColor = type === 'success' ? '#10b981' : '#ef4444';
-    
-    notification.style.position = 'fixed';
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.background = bgColor;
-    notification.style.color = 'white';
-    notification.style.padding = '16px 24px';
-    notification.style.borderRadius = '8px';
-    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    notification.style.zIndex = '9999';
-    notification.style.animation = 'slideIn 0.3s ease';
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(function() {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(function() {
-            notification.remove();
-        }, 300);
-    }, 3000);
-}
-
-// Add CSS for notification animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-</script>    
-
+</script>
 </body>
 </html>
 

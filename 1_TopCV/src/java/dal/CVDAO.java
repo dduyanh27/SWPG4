@@ -10,7 +10,7 @@ public class CVDAO extends DBContext {
     public List<CV> getCVsByJobSeekerId(int jobSeekerId) {
         List<CV> list = new ArrayList<>();
         String sql = "SELECT CVID, JobSeekerID, CVTitle, CVContent, CVURL, IsActive, CreationDate " +
-                     "FROM CVs WHERE JobSeekerID = ? AND IsActive = 1";
+                     "FROM CVs WHERE JobSeekerID = ?";
 
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, jobSeekerId);
@@ -79,5 +79,24 @@ public class CVDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    /**
+     * Cập nhật trạng thái IsActive của CV
+     * @param cvId ID của CV cần cập nhật
+     * @param isActive true = Cho phép tìm kiếm (1), false = Không cho phép tìm kiếm (0)
+     * @return true nếu cập nhật thành công, false nếu thất bại
+     */
+    public boolean updateIsActive(int cvId, boolean isActive) {
+        String sql = "UPDATE CVs SET IsActive = ? WHERE CVID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setBoolean(1, isActive);
+            ps.setInt(2, cvId);
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

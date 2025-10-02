@@ -63,6 +63,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
             JobSeeker js = dao.getJobSeekerById(id);
             List<Location> locations = locDao.getAllLocations();
             List<Type> types = typeDao.getJobLevels();
+            String typeName = typeDao.getTypeNameByCurrentLevelId(js.getCurrentLevelId());
             
             // Lấy danh sách CV của người dùng
             List<CV> uploadedCVs = cvDAO.getCVsByJobSeekerId(id);
@@ -71,6 +72,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
             request.setAttribute("locations", locations);
             request.setAttribute("types", types);
             request.setAttribute("uploadedCVs", uploadedCVs);
+            request.setAttribute("typeName", typeName);
             
             request.getRequestDispatcher("JobSeeker/profile.jsp").forward(request, response);
         } catch (Exception e) {
@@ -115,6 +117,43 @@ public class JobSeekerProfileServlet extends HttpServlet {
 
             int locationId = (locStr != null && !locStr.isEmpty()) ? Integer.parseInt(locStr) : 0;
             int currentLevelId = (levelStr != null && !levelStr.isEmpty()) ? Integer.parseInt(levelStr) : 0;
+
+            // Validate Họ và tên
+            if (fullName == null || fullName.trim().isEmpty() || fullName.length() > 100 || !fullName.matches("^[\\p{L}\\s]+$")) {
+                request.setAttribute("error", "Họ và tên chỉ được chứa chữ cái và khoảng trắng, tối đa 100 ký tự.");
+                request.getRequestDispatcher("/JobSeeker/profile.jsp").forward(request, response);
+                return;
+            }
+
+            // Validate Số điện thoại
+            if (phone != null && !phone.trim().isEmpty()) {
+                if (!phone.matches("^\\d{10,11}$")) {
+                    request.setAttribute("error", "Số điện thoại không hợp lệ.");
+                    request.getRequestDispatcher("/JobSeeker/profile.jsp").forward(request, response);
+                    return;
+                }
+            }
+
+            // Validate Headline
+            if (headline != null && headline.length() > 200) {
+                request.setAttribute("error", "Headline không được vượt quá 200 ký tự.");
+                request.getRequestDispatcher("/JobSeeker/profile.jsp").forward(request, response);
+                return;
+            }
+
+            // Validate Địa chỉ chi tiết
+            if (address != null && address.length() > 255) {
+                request.setAttribute("error", "Địa chỉ không được vượt quá 255 ký tự.");
+                request.getRequestDispatcher("/JobSeeker/profile.jsp").forward(request, response);
+                return;
+            }
+
+            // Validate Thông tin liên hệ
+            if (contactInfo != null && contactInfo.length() > 255) {
+                request.setAttribute("error", "Thông tin liên hệ không được vượt quá 255 ký tự.");
+                request.getRequestDispatcher("/JobSeeker/profile.jsp").forward(request, response);
+                return;
+            }
 
             // Tạo đối tượng JobSeeker để update
             JobSeeker js = new JobSeeker();

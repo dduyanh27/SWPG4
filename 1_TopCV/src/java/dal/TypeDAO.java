@@ -122,4 +122,19 @@ public class TypeDAO extends DBContext {
             return false;
         }
     }
+    
+    public String getTypeNameByCurrentLevelId(int currentLevelId) {
+        String sql = "SELECT TypeName FROM Types WHERE TypeID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, currentLevelId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("TypeName");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
 }

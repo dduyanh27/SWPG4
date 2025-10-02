@@ -159,7 +159,7 @@
             <div class="mega-col">
                 <h4>Việc của tôi</h4>
                 <a href="#">Việc đã lưu</a>
-                <a href="${pageContext.request.contextPath}/myApplications">Việc đã ứng tuyển</a>
+                <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                 <a href="#">Thông báo việc làm</a>
                 <a href="#">Việc dành cho bạn</a>
             </div>
