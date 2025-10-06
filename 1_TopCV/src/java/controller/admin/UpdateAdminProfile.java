@@ -49,7 +49,6 @@ public class UpdateAdminProfile extends HttpServlet {
             AdminDAO adminDAO = new AdminDAO();
             adminDAO.updateAdmin(adminUpdate);
 
-            // refresh session admin info
             Admin refreshed = adminDAO.getAdminById(adminId);
             if (refreshed != null) {
                 HttpSession session = request.getSession();

@@ -34,7 +34,7 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>Jobs Admin - Quản lý tin tuyển dụng</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/ad-jobpos.css">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/ad-jobpos.css">   
     </head>
     <body>
         <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="display: none;">

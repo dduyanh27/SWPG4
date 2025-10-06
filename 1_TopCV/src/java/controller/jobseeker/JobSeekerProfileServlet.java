@@ -115,6 +115,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
 
             int locationId = (locStr != null && !locStr.isEmpty()) ? Integer.parseInt(locStr) : 0;
             int currentLevelId = (levelStr != null && !levelStr.isEmpty()) ? Integer.parseInt(levelStr) : 0;
+            
 
             // Tạo đối tượng JobSeeker để update
             JobSeeker js = new JobSeeker();
