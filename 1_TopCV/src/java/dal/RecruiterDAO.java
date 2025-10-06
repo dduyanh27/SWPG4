@@ -389,18 +389,18 @@ public class RecruiterDAO extends DBContext {
             }
             
             // Check JobSeeker table
-            if (checkEmailInTable("JobSeeker", email)) {
-                return true;
-            }
-            
-            // Check Admin table (with error handling)
-            try {
-                if (checkEmailInTable("Admin", email)) {
-                    return true;
-                }
-            } catch (SQLException e) {
-                // Admin table might not exist, continue
-            }
+//            if (checkEmailInTable("JobSeeker", email)) {
+//                return true;
+//            }
+//            
+//            // Check Admin table (with error handling)
+//            try {
+//                if (checkEmailInTable("Admin", email)) {
+//                    return true;
+//                }
+//            } catch (SQLException e) {
+//                // Admin table might not exist, continue
+//            }
             
             return false;
         } catch (SQLException e) {

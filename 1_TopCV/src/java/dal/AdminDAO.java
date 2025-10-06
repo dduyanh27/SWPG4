@@ -168,7 +168,6 @@ public class AdminDAO extends DBContext {
         try {
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, email);
-            // Mã hóa mật khẩu bằng MD5 trước khi so sánh
             ps.setString(2, MD5Util.getMD5Hash(password));
             
             ResultSet rs = ps.executeQuery();

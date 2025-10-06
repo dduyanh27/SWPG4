@@ -9,25 +9,6 @@
         List<Admin> adminList = adminDAO.getAllAdmin();
         request.setAttribute("adminList", adminList);
     }
-    
-    // TODO: Load real statistics from database
-    // Example: UserDAO, JobDAO, ApplicationDAO, PaymentDAO
-    // int totalUsers = userDAO.getTotalUsers();
-    // int totalJobs = jobDAO.getTotalActiveJobs();
-    // int totalApplications = applicationDAO.getTotalApplications();
-    // double totalRevenue = paymentDAO.getTotalRevenue();
-    
-    // For now, using placeholder values
-    request.setAttribute("totalUsers", 1250);
-    request.setAttribute("totalJobs", 3450);
-    request.setAttribute("totalApplications", 7200);
-    request.setAttribute("totalRevenue", 12500);
-    
-    // User growth trend (positive = up, negative = down)
-    request.setAttribute("userTrend", 12.5);
-    request.setAttribute("jobTrend", 8.3);
-    request.setAttribute("applicationTrend", -3.2);
-    request.setAttribute("revenueTrend", 15.7);
 %>
 <!DOCTYPE html>
 <html lang="vi">
