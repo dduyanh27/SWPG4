@@ -158,7 +158,7 @@
             </div>
             <div class="mega-col">
                 <h4>Việc của tôi</h4>
-                <a href="#">Việc đã lưu</a>
+                <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
                 <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                 <a href="#">Thông báo việc làm</a>
                 <a href="#">Việc dành cho bạn</a>
@@ -191,10 +191,10 @@
                                     <a href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp" class="apply-btn">Đăng nhập để ứng tuyển</a>
                                 </c:otherwise>
                             </c:choose>
-                            <button class="save-btn">
+<!--                            <button class="save-btn" data-job-id="${job.jobID}">
                                 <i class="far fa-heart"></i>
                                 <span>Chưa lưu</span>
-                            </button>
+                            </button>-->
                         </div>
                     </div>
                 </div>
@@ -471,9 +471,9 @@
                         <a href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp" class="apply-btn">Đăng nhập để ứng tuyển</a>
                     </c:otherwise>
                 </c:choose>
-                <button class="save-btn">
+<!--                <button class="save-btn" data-job-id="${job.jobID}">
                     <i class="far fa-heart"></i>
-                </button>
+                </button>-->
             </div>
         </div>
     </div>

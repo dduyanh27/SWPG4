@@ -117,6 +117,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
 
             int locationId = (locStr != null && !locStr.isEmpty()) ? Integer.parseInt(locStr) : 0;
             int currentLevelId = (levelStr != null && !levelStr.isEmpty()) ? Integer.parseInt(levelStr) : 0;
+            
 
             // Validate Họ và tên
             if (fullName == null || fullName.trim().isEmpty() || fullName.length() > 100 || !fullName.matches("^[\\p{L}\\s]+$")) {

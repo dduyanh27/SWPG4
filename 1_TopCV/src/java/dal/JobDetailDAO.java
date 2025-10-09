@@ -41,7 +41,7 @@ public class JobDetailDAO extends DBContext {
             LEFT JOIN Categories c ON j.CategoryID = c.CategoryID
             LEFT JOIN Types jlevel ON j.JobLevelID = jlevel.TypeID AND jlevel.TypeCategory = 'JobLevel'
             LEFT JOIN Types jtype ON j.JobTypeID = jtype.TypeID AND jtype.TypeCategory = 'JobType'
-            LEFT JOIN Types cert ON j.CertificatesID = cert.TypeID AND cert.TypeCategory = 'certificates'
+            LEFT JOIN Types cert ON j.CertificatesID = cert.TypeID AND cert.TypeCategory = 'Certificate'
             
             WHERE j.JobID = ?
         """;
@@ -130,7 +130,7 @@ public class JobDetailDAO extends DBContext {
         Type certificate = new Type();
         certificate.setTypeID(rs.getInt("CertificateID"));
         certificate.setTypeName(rs.getString("CertificateName"));
-        certificate.setTypeCategory("certificates");
+        certificate.setTypeCategory("Certificate");
         jobDetail.setCertificates(certificate);
         
         return jobDetail;

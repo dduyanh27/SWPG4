@@ -72,7 +72,7 @@ public class RecruiterRegistrationServlet extends HttpServlet {
                 companyName, 
                 industry, 
                 address, 
-                "Pending"
+                "Active"
             );
 
             if (recruiter != null) {

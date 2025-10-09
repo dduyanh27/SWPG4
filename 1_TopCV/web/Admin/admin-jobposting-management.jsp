@@ -59,16 +59,16 @@
 
                 <nav class="sidebar-nav">
                     <div class="nav-title">Menu chính</div>
-                    <a href="admin-dashboard.jsp" class="nav-item">📊 Bảng thống kê</a>
-                    <a href="admin-jobposting-management.jsp" class="nav-item active">💼 Tin tuyển dụng</a>
-                    <a href="admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
-                    <a href="#" class="nav-item">📁 Quản lý CV</a>
-                    <a href="#" class="nav-item">📝 Quản lý nhân sự</a>
-                    <a href="#" class="nav-item">👤 Quản lý thanh toán</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-dashboard.jsp" class="nav-item">📊 Bảng thống kê</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp" class="nav-item active">💼 Tin tuyển dụng</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
+                    <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
+                    <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
                 </nav>
 
                 <div class="sidebar-actions">
-                    <a href="admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
                     <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
                 </div>
             </div>

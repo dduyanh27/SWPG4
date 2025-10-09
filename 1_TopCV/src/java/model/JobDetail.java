@@ -18,7 +18,7 @@ public class JobDetail {
     private int ageRequirement;
     private int hiringCount;
     private String status;
-    private Integer views; // Số lượt xem (có thể null)
+    private Integer views;
     
     // Related objects
     private Recruiter recruiter;

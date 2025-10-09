@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
-    <title>Danh sách công việc đã ứng tuyển</title>
+    <title>Danh sách công việc đã lưu</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
     <style>
         /* CSS Variables */
@@ -310,7 +310,7 @@
             left: 0;
             width: 100%;
             height: 5px;
-            background: linear-gradient(90deg, var(--blue-dark), var(--blue), #06b6d4);
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
         }
 
         .job-card:hover {
@@ -362,58 +362,17 @@
             font-weight: 600;
         }
 
-        /* ========== STATUS BADGES ========== */
-        .status {
+        /* ========== ACTION BUTTONS ========== */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
             display: inline-flex;
             align-items: center;
-            padding: 7px 16px;
-            border-radius: 25px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        .status::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status.pending {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #78350f;
-        }
-
-        .status.pending::before {
-            background: #78350f;
-        }
-
-        .status.accepted {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: var(--white);
-        }
-
-        .status.accepted::before {
-            background: var(--white);
-        }
-
-        .status.rejected {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: var(--white);
-        }
-
-        .status.rejected::before {
-            background: var(--white);
-        }
-
-        /* ========== ACTION BUTTON ========== */
-        .action-btn {
-            display: inline-block;
-            margin-top: 20px;
+            gap: 8px;
             padding: 13px 28px;
             background: linear-gradient(135deg, var(--blue-dark), var(--blue));
             color: var(--white);
@@ -423,31 +382,22 @@
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(10,103,255,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .action-btn:hover::before {
-            width: 300px;
-            height: 300px;
+            border: none;
+            cursor: pointer;
         }
 
         .action-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(10,103,255,0.5);
+        }
+
+        .unsave-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 4px 15px rgba(239,68,68,0.3);
+        }
+
+        .unsave-btn:hover {
+            box-shadow: 0 8px 25px rgba(239,68,68,0.5);
         }
 
         /* ========== EMPTY STATE ========== */
@@ -521,6 +471,10 @@
 
             .job-info strong {
                 min-width: auto;
+            }
+
+            .action-buttons {
+                flex-direction: column;
             }
         }
 
@@ -617,15 +571,15 @@
 
     <!-- ========== MAIN CONTENT ========== -->
     <div class="container">
-        <h2>Danh sách công việc đã ứng tuyển</h2>
+        <h2>Danh sách công việc đã lưu</h2>
 
         <!-- Empty State -->
-        <c:if test="${empty applications}">
+        <c:if test="${empty savedJobs}">
             <div class="empty-state">
-                <i class="fas fa-briefcase"></i>
-                <p>Bạn chưa ứng tuyển công việc nào</p>
+                <i class="fas fa-heart"></i>
+                <p>Bạn chưa lưu công việc nào</p>
                 <p style="font-size: 14px; color: rgba(255,255,255,0.6);">
-                    Hãy khám phá các cơ hội việc làm phù hợp với bạn!
+                    Hãy lưu các công việc yêu thích để dễ dàng theo dõi!
                 </p>
                 <a href="${pageContext.request.contextPath}/job-list" class="action-btn" style="margin-top: 25px;">
                     <i class="fas fa-search"></i> Tìm việc làm ngay
@@ -634,51 +588,44 @@
         </c:if>
 
         <!-- Job Cards -->
-        <c:forEach var="app" items="${applications}">
-            <div class="job-card">
-                <div class="job-title">${app.jobTitle}</div>
-                <div class="company">${app.companyName}</div>
+        <c:forEach var="saved" items="${savedJobs}">
+            <div class="job-card" data-job-id="${saved.jobID}">
+                <div class="job-title">${saved.jobTitle}</div>
+                <div class="company">${saved.companyName}</div>
                 
                 <div class="job-info">
                     <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
-                    <span>${app.locationName}</span>
+                    <span>${saved.locationName}</span>
                 </div>
                 
                 <div class="job-info">
                     <strong><i class="fas fa-money-bill-wave"></i> Mức lương:</strong>
-                    <span>${app.salaryRange}</span>
+                    <span>${saved.salaryRange}</span>
                 </div>
                 
                 <div class="job-info">
                     <strong><i class="fas fa-briefcase"></i> Ngành nghề:</strong>
-                    <span>${app.industry}</span>
+                    <span>${saved.industry}</span>
                 </div>
                 
                 <div class="job-info">
-                    <strong><i class="fas fa-file-alt"></i> CV đã nộp:</strong>
-                    <span>${app.cvTitle}</span>
+                    <strong><i class="fas fa-calendar-alt"></i> Ngày đăng:</strong>
+                    <span>${saved.postingDate}</span>
                 </div>
                 
                 <div class="job-info">
-                    <strong><i class="fas fa-calendar-alt"></i> Ngày nộp:</strong>
-                    <span>${app.formattedApplicationDate}</span>
+                    <strong><i class="fas fa-heart"></i> Ngày lưu:</strong>
+                    <span>${saved.formattedSavedDate}</span>
                 </div>
                 
-                <div class="job-info">
-                    <strong><i class="fas fa-info-circle"></i> Trạng thái:</strong>
-                    <span class="status 
-                        <c:choose>
-                            <c:when test="${app.status eq 'Pending'}">pending</c:when>
-                            <c:when test="${app.status eq 'Accepted'}">accepted</c:when>
-                            <c:when test="${app.status eq 'Rejected'}">rejected</c:when>
-                        </c:choose>">
-                        ${app.status}
-                    </span>
+                <div class="action-buttons">
+                    <a href="job-detail?jobId=${saved.jobID}" class="action-btn">
+                        <i class="fas fa-eye"></i> Xem chi tiết
+                    </a>
+                    <button class="action-btn unsave-btn" onclick="unsaveJob(${saved.jobID})">
+                        <i class="fas fa-heart-broken"></i> Bỏ lưu
+                    </button>
                 </div>
-                
-                <a href="job-detail?jobId=${app.jobID}" class="action-btn">
-                    <i class="fas fa-eye"></i> Xem chi tiết
-                </a>
             </div>
         </c:forEach>
     </div>
@@ -727,21 +674,47 @@
                 card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
                 observer.observe(card);
             });
-
-            // Smooth scroll
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
         });
+
+        // Function to unsave a job
+        function unsaveJob(jobId) {
+            if (!confirm('Bạn có chắc muốn bỏ lưu công việc này?')) {
+                return;
+            }
+
+            fetch('${pageContext.request.contextPath}/saved-jobs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=unsave&jobId=' + jobId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the job card with animation
+                    const jobCard = document.querySelector('[data-job-id="' + jobId + '"]');
+                    if (jobCard) {
+                        jobCard.style.transform = 'translateX(-100%)';
+                        jobCard.style.opacity = '0';
+                        setTimeout(() => {
+                            jobCard.remove();
+                            // Check if there are no more jobs
+                            if (document.querySelectorAll('.job-card').length === 0) {
+                                location.reload();
+                            }
+                        }, 500);
+                    }
+                    alert(data.message);
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra khi bỏ lưu công việc');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi bỏ lưu công việc');
+            });
+        }
     </script>
 
 </body>
