@@ -146,4 +146,13 @@
         <url-pattern>/applied-jobs</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>SavedJobsServlet</servlet-name>
+        <servlet-class>controller.jobseeker.SavedJobsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SavedJobsServlet</servlet-name>
+        <url-pattern>/saved-jobs</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

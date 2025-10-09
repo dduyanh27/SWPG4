@@ -27,6 +27,9 @@ public class JobSeekerJobList extends HttpServlet {
         if (keyword != null && keyword.trim().isEmpty()) {
             keyword = null;
         }
+        if (keyword != null) {
+            keyword = keyword.trim().replaceAll("\\s+", " ");
+        }
 
         String[] categoryIdsParam = request.getParameterValues("categoryIds");
         List<Integer> categoryIds = new ArrayList<>();

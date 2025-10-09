@@ -251,6 +251,19 @@
                 padding: 0.5rem 0.75rem;
                 border-radius: 8px;
                 cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .btn-outline:hover {
+                border-color: #ef4444;
+                color: #ef4444;
+            }
+            .btn-outline.saved {
+                background: #ef4444;
+                border-color: #ef4444;
+                color: #fff;
+            }
+            .btn-outline.saved i {
+                font-weight: 900;
             }
             .btn-primary {
                 background: #0066cc;
@@ -465,7 +478,7 @@
                 </div>
                 <div class="mega-col">
                     <h4>Việc của tôi</h4>
-                    <a href="#">Việc đã lưu</a>
+                    <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
                     <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                     <a href="#">Thông báo việc làm</a>
                     <a href="#">Việc dành cho bạn</a>
@@ -592,7 +605,9 @@
                                 </div>
                                 <div class="actions">
                                     <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="btn-primary">Xem chi tiết</a>
-                                    <button class="btn-outline"><i class="far fa-heart"></i></button>
+                                    <button class="btn-outline save-job-btn" data-job-id="${job.jobID}" title="Lưu công việc">
+                                        <i class="far fa-heart"></i>
+                                    </button>
                                 </div>
                             </div>
                         </c:forEach>
@@ -752,7 +767,96 @@ sortDateBtn.addEventListener('click', () => {
 
 // Set tab "Tất cả" làm active mặc định
 setActiveTab(sortAllBtn);
+
+// --- Save Job Functionality ---
+document.querySelectorAll('.save-job-btn').forEach(btn => {
+    const jobId = btn.getAttribute('data-job-id');
+    
+    // Check if job is already saved
+    checkIfSaved(jobId, btn);
+    
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleSaveJob(jobId, btn);
+    });
+});
+
+function checkIfSaved(jobId, btn) {
+    fetch('${pageContext.request.contextPath}/saved-jobs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=check&jobId=' + jobId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.isSaved) {
+            btn.classList.add('saved');
+            btn.querySelector('i').classList.remove('far');
+            btn.querySelector('i').classList.add('fas');
+            btn.title = 'Bỏ lưu công việc';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function toggleSaveJob(jobId, btn) {
+    const isSaved = btn.classList.contains('saved');
+    const action = isSaved ? 'unsave' : 'save';
+    
+    fetch('${pageContext.request.contextPath}/saved-jobs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=' + action + '&jobId=' + jobId
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (action === 'save') {
+                btn.classList.add('saved');
+                btn.querySelector('i').classList.remove('far');
+                btn.querySelector('i').classList.add('fas');
+                btn.title = 'Bỏ lưu công việc';
+            } else {
+                btn.classList.remove('saved');
+                btn.querySelector('i').classList.remove('fas');
+                btn.querySelector('i').classList.add('far');
+                btn.title = 'Lưu công việc';
+            }
+            
+            // Optional: show a subtle notification
+            const notification = document.createElement('div');
+            notification.textContent = data.message;
+            notification.style.cssText = 'position:fixed;top:80px;right:20px;background:#10b981;color:#fff;padding:12px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;animation:slideIn 0.3s ease;';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        } else {
+            alert(data.message || 'Có lỗi xảy ra');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi lưu công việc');
+    });
+}
 </script>
+<style>
+@keyframes slideIn {
+    from { transform: translateX(400px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(400px); opacity: 0; }
+}
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const toggle = document.getElementById('menuToggle');
