@@ -221,7 +221,7 @@ public class AdminDAO extends DBContext {
     public void updatePassword(int adminId, String newPassword) {
         String sql = "UPDATE Admins SET password=?, updatedAt=GETDATE() WHERE adminId=?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, newPassword);
+            ps.setString(1, MD5Util.getMD5Hash(newPassword));
             ps.setInt(2, adminId);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -491,6 +491,17 @@ public class AdminDAO extends DBContext {
         return roleList;
     }
 
+    public void updateAvatar(int adminId, String avatarFile) {
+        String sql = "UPDATE Admins SET AvatarUrl = ? WHERE AdminID = ?";
+        try (PreparedStatement st = c.prepareStatement(sql)) {
+            st.setString(1, avatarFile);
+            st.setInt(2, adminId);
+            st.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //Minh
     public Admin login(String email, String password) {
         Admin admin = null;
@@ -527,6 +538,36 @@ public class AdminDAO extends DBContext {
         }
 
         return admin;
+    }
+
+    // Lấy role của admin cụ thể
+    public Role getAdminRole(int adminId) {
+        String sql = "SELECT r.RoleId, r.Name as RoleName " +
+                    "FROM Roles r " +
+                    "JOIN Role_Staff rs ON r.RoleId = rs.RoleId " +
+                    "WHERE rs.AdminId = ?";
+        
+        System.out.println("DEBUG: Getting role for adminId: " + adminId);
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, adminId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Role role = new Role(
+                        rs.getInt("RoleId"),
+                        rs.getString("RoleName")
+                    );
+                    System.out.println("DEBUG: Found role: " + role.getName());
+                    return role;
+                } else {
+                    System.out.println("DEBUG: No role found for adminId: " + adminId);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("DEBUG: SQL Error getting role: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Admin getAdminByEmail(String email) {

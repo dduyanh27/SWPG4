@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO,java.util.List,model.Admin" %>
+<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, dal.AdminJobDAO, dal.ApplicationDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker, model.Job, model.Application" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
@@ -10,17 +10,29 @@
         request.setAttribute("adminList", adminList);
     }
     
-    // TODO: Load real statistics from database
-    // Example: UserDAO, JobDAO, ApplicationDAO, PaymentDAO
-    // int totalUsers = userDAO.getTotalUsers();
-    // int totalJobs = jobDAO.getTotalActiveJobs();
-    // int totalApplications = applicationDAO.getTotalApplications();
-    // double totalRevenue = paymentDAO.getTotalRevenue();
+    RecruiterDAO rcDAO = new RecruiterDAO();
+    List<Recruiter> rcList = rcDAO.getAllRecruiters();
+    
+    JobSeekerDAO jsDAO = new JobSeekerDAO();
+    List<JobSeeker> jsList = jsDAO.getAllJobSeekers();
+    
+    AdminJobDAO jobDAO = new AdminJobDAO();
+    List<Job> jobList = jobDAO.getAllJobs();
+    
+    ApplicationDAO appDAO = new ApplicationDAO();
+    List<Application> appList = appDAO.getAllApplications();
+    
+    
+    int totalUsers = rcList.size() + jsList.size();
+    
+    int totalJobs = jobList.size();
+    
+    int totalApplications = appList.size();
     
     // For now, using placeholder values
-    request.setAttribute("totalUsers", 1250);
-    request.setAttribute("totalJobs", 3450);
-    request.setAttribute("totalApplications", 7200);
+    request.setAttribute("totalUsers", totalUsers);
+    request.setAttribute("totalJobs", totalJobs);
+    request.setAttribute("totalApplications", totalApplications);
     request.setAttribute("totalRevenue", 12500);
     
     // User growth trend (positive = up, negative = down)
@@ -29,13 +41,13 @@
     request.setAttribute("applicationTrend", -3.2);
     request.setAttribute("revenueTrend", 15.7);
 %>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Thống kê & Báo cáo - JOBs</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Admin - Bảng thống kê</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/dashboard.css">
     </head>
     <body>
@@ -44,490 +56,304 @@
             ☰
         </button>
 
-        <!-- Unified Sidebar -->
-        <div class="unified-sidebar" id="unifiedSidebar">
-            <!-- Brand Section -->
-            <div class="sidebar-brand">
-                <h1 class="brand-title">JOBs</h1>
-                <p class="brand-subtitle">Admin Dashboard</p>
-            </div>
-
-            <!-- Admin Profile Section -->
-            <div class="sidebar-profile">
-                <div class="sidebar-avatar">
-                    <c:choose>
-                        <c:when test="${not empty adminProfile.avatarURL}">
-                            <img src="${adminProfile.avatarURL}" alt="Avatar">
-                        </c:when>
-                        <c:otherwise>
-                            <div class="sidebar-avatar-placeholder">
-                                ${fn:substring(sessionScope.admin.fullName, 0, 1)}
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-                <div class="sidebar-admin-name">
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.admin}">
-                            ${sessionScope.admin.fullName}
-                        </c:when>
-                        <c:otherwise>
-                            Quản trị viên
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-                <div class="sidebar-admin-role">🛡️ Quản trị viên</div>
-                <span class="sidebar-status">Hoạt động</span>
-            </div>
-
-            <!-- Navigation Section -->
-            <nav class="sidebar-nav">
-                <div class="nav-title">Menu chính</div>
-                <a href="${pageContext.request.contextPath}/Admin/admin-dashboard.jsp" class="nav-item active">📊 Bảng thống kê</a>
-                <a href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp" class="nav-item">💼 Tin tuyển dụng</a>
-                <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
-                <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
-                <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
-                <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
-            </nav>
-
-            <div class="sidebar-actions">
-                <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
-                <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
-            </div>
-        </div>
-
         <div class="container">
-            <!-- Main Content -->
+            <div class="unified-sidebar" id="unifiedSidebar">
+                <div class="sidebar-brand">
+                    <h1 class="brand-title">JOBs</h1>
+                    <p class="brand-subtitle">Admin Dashboard</p>
+                </div>
+
+                <div class="sidebar-profile">
+                    <div class="sidebar-avatar">
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.admin.avatarUrl}">
+                                <img src="${pageContext.request.contextPath}/assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="sidebar-avatar-placeholder">${fn:substring(sessionScope.admin.fullName, 0, 1)}</div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="sidebar-admin-name">${sessionScope.admin.fullName}</div>
+                    <div class="sidebar-admin-role">🛡️ Quản trị viên</div>
+                    <span class="sidebar-status">Hoạt động</span>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-title">Menu chính</div>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-dashboard.jsp" class="nav-item active">📊 Bảng thống kê</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp" class="nav-item">💼 Tin tuyển dụng</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
+                    <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
+                    <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
+                    <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
+                </nav>
+
+                <div class="sidebar-actions">
+                    <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
+                    <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
+                </div>
+            </div>
+
             <div class="main">
-                <!-- Page Header -->
-                <div class="page-header">
-                    <h1 class="page-title">Thống kê & Báo cáo</h1>
-                    <div class="breadcrumb">
-                        <a href="admin-dashboard.jsp">Dashboard</a> / Thống kê
+                <header class="topbar">
+                    <div class="title">Bảng thống kê</div>
+                    <div class="topbar-actions">
+                        <a href="#" class="btn btn-ghost btn-sm">🔄 Làm mới</a>
+                        <button class="btn btn-primary btn-sm" onclick="exportReport()">📊 Xuất báo cáo</button>
                     </div>
-                </div>
+                </header>
 
-                <!-- Statistics Cards -->
-                <div class="stats">
-                    <!-- Users Card -->
-                    <div class="stat-card users">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-value" id="userCount">${totalUsers}</div>
-                        <div class="stat-label">Người dùng</div>
-                        <c:choose>
-                            <c:when test="${userTrend >= 0}">
-                                <span class="stat-trend up">↑ +${userTrend}%</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="stat-trend down">↓ ${userTrend}%</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                <main class="content">
+                    <!-- Thống kê tổng quan -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-trend trend-up">↗️ +${userTrend}%</div>
+                            </div>
+                            <div class="stat-value">${totalUsers}</div>
+                            <div class="stat-label">Tổng người dùng</div>
+                        </div>
 
-                    <!-- Jobs Card -->
-                    <div class="stat-card jobs">
-                        <div class="stat-icon">💼</div>
-                        <div class="stat-value" id="jobCount">${totalJobs}</div>
-                        <div class="stat-label">Tin tuyển dụng</div>
-                        <c:choose>
-                            <c:when test="${jobTrend >= 0}">
-                                <span class="stat-trend up">↑ +${jobTrend}%</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="stat-trend down">↓ ${jobTrend}%</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">💼</div>
+                                <div class="stat-trend trend-up">↗️ +${jobTrend}%</div>
+                            </div>
+                            <div class="stat-value">${totalJobs}</div>
+                            <div class="stat-label">Tin tuyển dụng</div>
+                        </div>
 
-                    <!-- Applications Card -->
-                    <div class="stat-card applications">
-                        <div class="stat-icon">📋</div>
-                        <div class="stat-value" id="applicationCount">${totalApplications}</div>
-                        <div class="stat-label">Ứng tuyển</div>
-                        <c:choose>
-                            <c:when test="${applicationTrend >= 0}">
-                                <span class="stat-trend up">↑ +${applicationTrend}%</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="stat-trend down">↓ ${applicationTrend}%</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">📝</div>
+                                <div class="stat-trend trend-down">↘️ ${applicationTrend}%</div>
+                            </div>
+                            <div class="stat-value">${totalApplications}</div>
+                            <div class="stat-label">Đơn ứng tuyển</div>
+                        </div>
 
-                    <!-- Revenue Card -->
-                    <div class="stat-card revenue">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-value" id="revenueCount">$${totalRevenue}</div>
-                        <div class="stat-label">Doanh thu</div>
-                        <c:choose>
-                            <c:when test="${revenueTrend >= 0}">
-                                <span class="stat-trend up">↑ +${revenueTrend}%</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="stat-trend down">↓ ${revenueTrend}%</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts">
-                    <!-- Users Chart -->
-                    <div class="chart-box">
-                        <div class="chart-title">📈 Tăng trưởng người dùng</div>
-                        <div class="chart-container">
-                            <canvas id="usersChart"></canvas>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <div class="stat-icon">💰</div>
+                                <div class="stat-trend trend-up">↗️ +${revenueTrend}%</div>
+                            </div>
+                            <div class="stat-value">₫${totalRevenue}K</div>
+                            <div class="stat-label">Doanh thu</div>
                         </div>
                     </div>
 
-                    <!-- Jobs Chart -->
-                    <div class="chart-box">
-                        <div class="chart-title">💼 Tin tuyển dụng theo ngành</div>
-                        <div class="chart-container">
-                            <canvas id="jobsChart"></canvas>
+                    <!-- Biểu đồ và báo cáo -->
+                    <div class="dashboard-grid">
+                        <!-- Biểu đồ người dùng -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>📈 Tăng trưởng người dùng</h3>
+                                <div class="chart-controls">
+                                    <select class="chart-select">
+                                        <option value="7">7 ngày qua</option>
+                                        <option value="30" selected>30 ngày qua</option>
+                                        <option value="90">90 ngày qua</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="userGrowthChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Status Chart -->
-                    <div class="chart-box">
-                        <div class="chart-title">📊 Trạng thái ứng tuyển</div>
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
+                        <!-- Biểu đồ doanh thu -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>💰 Doanh thu theo tháng</h3>
+                                <div class="chart-controls">
+                                    <select class="chart-select">
+                                        <option value="6">6 tháng qua</option>
+                                        <option value="12" selected>12 tháng qua</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Revenue Chart -->
-                    <div class="chart-box">
-                        <div class="chart-title">💰 Doanh thu theo quý</div>
-                        <div class="chart-container">
-                            <canvas id="revenueChart"></canvas>
+                        <!-- Top công việc -->
+                        <div class="table-card">
+                            <div class="table-header">
+                                <h3>🔥 Công việc hot nhất</h3>
+                                <a href="admin-jobposting-management.jsp" class="btn btn-ghost btn-sm">Xem tất cả</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Công ty</th>
+                                            <th>Vị trí</th>
+                                            <th>Ứng viên</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="company-info">
+                                                    <div class="company-logo">🏢</div>
+                                                    <div class="company-name">TechCorp</div>
+                                                </div>
+                                            </td>
+                                            <td>Senior Developer</td>
+                                            <td>156</td>
+                                            <td><span class="status-badge status-published">Đã duyệt</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="company-info">
+                                                    <div class="company-logo">🏢</div>
+                                                    <div class="company-name">StartupXYZ</div>
+                                                </div>
+                                            </td>
+                                            <td>Product Manager</td>
+                                            <td>89</td>
+                                            <td><span class="status-badge status-published">Đã duyệt</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="company-info">
+                                                    <div class="company-logo">🏢</div>
+                                                    <div class="company-name">GlobalCorp</div>
+                                                </div>
+                                            </td>
+                                            <td>UX Designer</td>
+                                            <td>67</td>
+                                            <td><span class="status-badge status-pending">Chờ duyệt</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Hoạt động gần đây -->
+                        <div class="activity-card">
+                            <div class="activity-header">
+                                <h3>⚡ Hoạt động gần đây</h3>
+                                <a href="#" class="btn btn-ghost btn-sm">Xem tất cả</a>
+                            </div>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon">👤</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Người dùng mới đăng ký</div>
+                                        <div class="activity-time">5 phút trước</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">💼</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Tin tuyển dụng mới được duyệt</div>
+                                        <div class="activity-time">15 phút trước</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">📝</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Ứng viên nộp đơn mới</div>
+                                        <div class="activity-time">30 phút trước</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">💰</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Giao dịch thanh toán thành công</div>
+                                        <div class="activity-time">1 giờ trước</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </main>
             </div>
         </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // Toggle sidebar for mobile
             function toggleSidebar() {
-            const sidebar = document.getElementById('unifiedSidebar');
-            sidebar.classList.toggle('show');
+                const sidebar = document.getElementById('unifiedSidebar');
+                sidebar.classList.toggle('sidebar-open');
             }
 
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function (e) {
-            const sidebar = document.getElementById('unifiedSidebar');
-            const toggle = document.querySelector('.mobile-menu-toggle');
-            if (window.innerWidth <= 1024 &&
-                    !sidebar.contains(e.target) &&
-                    !toggle.contains(e.target) &&
-                    sidebar.classList.contains('show')) {
-            sidebar.classList.remove('show');
-            }
-            });
-            // Chart configuration for modern look
-            Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
-            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-            Chart.defaults.plugins.legend.labels.padding = 15;
-            Chart.defaults.plugins.legend.labels.font.size = 13;
-            Chart.defaults.plugins.legend.labels.font.weight = '500';
-            // ===== USERS CHART - Line Chart =====
-            // TODO: Replace with real data from backend
-            // Example: Pass data as JSON from JSP
-            // var userGrowthData = ${userGrowthDataJSON};
-            var usersChartData = {
-            labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
-                    datasets: [{
-                    label: 'Người dùng',
-                            data: [200, 350, 600, 800, 1000, 1250],
-                            borderColor: '#4bc0c0',
-                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#4bc0c0',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointHoverRadius: 7
-                    }]
-            };
-            new Chart(document.getElementById('usersChart'), {
-            type: 'line',
-                    data: usersChartData,
-                    options: {
-                    responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                            legend: {
-                            display: true,
-                                    position: 'top'
-                            },
-                                    tooltip: {
-                                    backgroundColor: 'rgba(3, 20, 40, 0.95)',
-                                            padding: 12,
-                                            titleColor: '#00e5ff',
-                                            bodyColor: '#ffffff',
-                                            borderColor: 'rgba(0, 229, 255, 0.3)',
-                                            borderWidth: 1
-                                    }
-                            },
-                            scales: {
-                            y: {
-                            beginAtZero: true,
-                                    grid: {
-                                    color: 'rgba(255, 255, 255, 0.05)'
-                                    },
-                                    ticks: {
-                                    color: 'rgba(255, 255, 255, 0.7)'
-                                    }
-                            },
-                                    x: {
-                                    grid: {
-                                    display: false
-                                    },
-                                            ticks: {
-                                            color: 'rgba(255, 255, 255, 0.7)'
-                                            }
-                                    }
-                            }
-                    }
-            });
-            // ===== JOBS CHART - Bar Chart =====
-            // TODO: Replace with real data
-            // Example: var jobsByCategory = ${jobsByCategoryJSON};
-            var jobsChartData = {
-            labels: ['CNTT', 'Kinh tế', 'Giáo dục', 'Y tế', 'Khác'],
-                    datasets: [{
-                    label: 'Tin tuyển dụng',
-                            data: [1100, 900, 600, 400, 300],
-                            backgroundColor: [
-                                    'rgba(54, 162, 235, 0.8)',
-                                    'rgba(0, 102, 255, 0.8)',
-                                    'rgba(64, 196, 255, 0.8)',
-                                    'rgba(0, 229, 255, 0.8)',
-                                    'rgba(138, 198, 209, 0.8)'
-                            ],
-                            borderColor: [
-                                    '#36a2eb',
-                                    '#0066ff',
-                                    '#40c4ff',
-                                    '#00e5ff',
-                                    '#8ac6d1'
-                            ],
-                            borderWidth: 2,
-                            borderRadius: 8,
-                            borderSkipped: false
-                    }]
-            };
-            new Chart(document.getElementById('jobsChart'), {
-            type: 'bar',
-                    data: jobsChartData,
-                    options: {
-                    responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                            legend: {
-                            display: false
-                            },
-                                    tooltip: {
-                                    backgroundColor: 'rgba(3, 20, 40, 0.95)',
-                                            padding: 12,
-                                            titleColor: '#00e5ff',
-                                            bodyColor: '#ffffff',
-                                            borderColor: 'rgba(0, 229, 255, 0.3)',
-                                            borderWidth: 1
-                                    }
-                            },
-                            scales: {
-                            y: {
-                            beginAtZero: true,
-                                    grid: {
-                                    color: 'rgba(255, 255, 255, 0.05)'
-                                    },
-                                    ticks: {
-                                    color: 'rgba(255, 255, 255, 0.7)'
-                                    }
-                            },
-                                    x: {
-                                    grid: {
-                                    display: false
-                                    },
-                                            ticks: {
-                                            color: 'rgba(255, 255, 255, 0.7)'
-                                            }
-                                    }
-                            }
-                    }
-            });
-            // ===== STATUS CHART - Doughnut Chart =====
-            // TODO: Replace with real data
-            // Example: var applicationStatus = ${applicationStatusJSON};
-            var statusChartData = {
-            labels: ['Chấp nhận', 'Từ chối', 'Đang xử lý'],
-                    datasets: [{
-                    data: [55, 25, 20],
-                            backgroundColor: [
-                                    'rgba(76, 175, 80, 0.8)',
-                                    'rgba(255, 107, 107, 0.8)',
-                                    'rgba(255, 152, 0, 0.8)'
-                            ],
-                            borderColor: [
-                                    '#4caf50',
-                                    '#ff6b6b',
-                                    '#ff9800'
-                            ],
-                            borderWidth: 3,
-                            hoverOffset: 10
-                    }]
-            };
-            new Chart(document.getElementById('statusChart'), {
-            type: 'doughnut',
-                    data: statusChartData,
-                    options: {
-                    responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                            legend: {
-                            position: 'bottom',
-                                    labels: {
-                                    padding: 20,
-                                            usePointStyle: true,
-                                            pointStyle: 'circle'
-                                    }
-                            },
-                                    tooltip: {
-                                    backgroundColor: 'rgba(3, 20, 40, 0.95)',
-                                            padding: 12,
-                                            titleColor: '#00e5ff',
-                                            bodyColor: '#ffffff',
-                                            borderColor: 'rgba(0, 229, 255, 0.3)',
-                                            borderWidth: 1,
-                                            callbacks: {
-                                            label: function(context) {
-                                            var label = context.label || '';
-                                            var value = context.parsed || 0;
-                                            var total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                            var percentage = ((value / total) * 100).toFixed(1);
-                                            return label + ': ' + percentage + '%';
-                                            }
-                                            }
-                                    }
-                            },
-                            cutout: '60%'
-                    }
-            });
-            // ===== REVENUE CHART - Bar Chart =====
-            // TODO: Replace with real data
-            // Example: var revenueByQuarter = ${revenueByQuarterJSON};
-            var revenueChartData = {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                    datasets: [{
-                    label: 'Doanh thu ($)',
-                            data: [2500, 3000, 3300, 3200],
-                            backgroundColor: [
-                                    'rgba(186, 104, 200, 0.8)',
-                                    'rgba(156, 39, 176, 0.8)',
-                                    'rgba(171, 71, 188, 0.8)',
-                                    'rgba(142, 36, 170, 0.8)'
-                            ],
-                            borderColor: [
-                                    '#ba68c8',
-                                    '#9c27b0',
-                                    '#ab47bc',
-                                    '#8e24aa'
-                            ],
-                            borderWidth: 2,
-                            borderRadius: 8,
-                            borderSkipped: false
-                    }]
-            };
-            new Chart(document.getElementById('revenueChart'), {
-            type: 'bar',
-                    data: revenueChartData,
-                    options: {
-                    responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                            legend: {
-                            display: false
-                            },
-                                    tooltip: {
-                                    backgroundColor: 'rgba(3, 20, 40, 0.95)',
-                                            padding: 12,
-                                            titleColor: '#00e5ff',
-                                            bodyColor: '#ffffff',
-                                            borderColor: 'rgba(0, 229, 255, 0.3)',
-                                            borderWidth: 1,
-                                            callbacks: {
-                                            label: function(context) {
-                                            return 'Doanh thu:  + context.parsed.y.toLocaleString();
-                                            }
-                                            }
-                                    }
-                            },
-                            scales: {
-                            y: {
-                            beginAtZero: true,
-                                    grid: {
-                                    color: 'rgba(255, 255, 255, 0.05)'
-                                    },
-                                    ticks: {
-                                    color: 'rgba(255, 255, 255, 0.7)',
-                                            callback: function(value) {
-                                            return ' + value.toLocaleString();
-                                            }
-                                    }
-                            },
-                                    x: {
-                                    grid: {
-                                    display: false
-                                    },
-                                            ticks: {
-                                            color: 'rgba(255, 255, 255, 0.7)'
-                                            }
-                                    }
-                            }
-                    }
-            });
-            // ===== ANIMATION ON LOAD =====
-            // Animate stat numbers on page load
-            function animateValue(id, start, end, duration) {
-            const obj = document.getElementById(id);
-            if (!obj) return;
-            const range = end - start;
-            const increment = end > start ? 1 : - 1;
-            const stepTime = Math.abs(Math.floor(duration / range));
-            let current = start;
-            const timer = setInterval(function() {
-            current += increment;
-            obj.textContent = current.toLocaleString();
-            if (current == end) {
-            clearInterval(timer);
-            }
-            }, stepTime);
+            function exportReport() {
+                alert('Chức năng xuất báo cáo đang được phát triển...');
             }
 
-            // Animate on page load
-            window.addEventListener('load', function() {
-        animateValue('userCount', 0, ${totalUsers}, 1500);
-        animateValue('jobCount', 0, ${totalJobs}, 1500);
-        animateValue('applicationCount', 0, ${totalApplications}, 1500);
-            // For revenue, handle the $ sign separately
-            const revenueElement = document.getElementById('revenueCount');
-            let currentRevenue = 0;
-        const targetRevenue = ${totalRevenue};
-            const duration = 1500;
-            const increment = targetRevenue / (duration / 10);
-            const revenueTimer = setInterval(function() {
-            currentRevenue += increment;
-            if (currentRevenue >= targetRevenue) {
-            currentRevenue = targetRevenue;
-            clearInterval(revenueTimer);
-            }
-            revenueElement.textContent = ' + Math.floor(currentRevenue).toLocaleString();
-            }, 10);
+            // User Growth Chart
+            const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+            new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Người dùng mới',
+                        data: [120, 150, 180, 200, 250, 280, 320, 350, 380, 420, 450, 480],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'],
+                    datasets: [{
+                        label: 'Doanh thu (₫K)',
+                        data: [1200, 1500, 1800, 2000, 2500, 2800, 3200, 3500, 3800, 4200, 4500, 4800],
+                        backgroundColor: 'rgba(67, 233, 123, 0.8)',
+                        borderColor: '#43e97b',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Mobile responsive
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('unifiedSidebar');
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('sidebar-open');
+                }
             });
         </script>
     </body>
