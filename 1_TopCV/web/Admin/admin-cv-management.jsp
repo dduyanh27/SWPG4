@@ -30,8 +30,8 @@
             <div class="sidebar-profile">
                 <div class="sidebar-avatar">
                     <c:choose>
-                        <c:when test="${not empty sessionScope.admin.avatarURL}">
-                            <img src="assets/img/admin/${sessionScope.admin.avatarURL}" alt="Avatar">
+                        <c:when test="${not empty sessionScope.admin.avatarUrl}">
+                            <img src="${pageContext.request.contextPath}/assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar">
                         </c:when>
                         <c:otherwise>
                             <div class="sidebar-avatar-placeholder">

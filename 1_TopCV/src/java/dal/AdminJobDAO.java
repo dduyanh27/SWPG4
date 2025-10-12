@@ -292,7 +292,7 @@ public class AdminJobDAO extends DBContext {
             e.printStackTrace();
         }
     }
-    
+
     //xoa job
     public void closeJobs(int jobId) {
         String sql = "UPDATE Jobs\n"
@@ -309,6 +309,91 @@ public class AdminJobDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<AdminJobDetail> filterJobs(String search, String location, String type, String status, String category, String salary) {
+        List<AdminJobDetail> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT j.JobID, j.JobTitle, r.CompanyName AS RecruiterName, c.CategoryName, "
+                + "       j.SalaryRange, l.LocationName, j.Status, j.Requirements "
+                + "FROM Jobs j "
+                + "LEFT JOIN Recruiter r ON j.RecruiterID = r.RecruiterID "
+                + "LEFT JOIN Categories c ON j.CategoryID = c.CategoryID "
+                + "LEFT JOIN Locations l ON j.LocationID = l.LocationID "
+                + "WHERE 1=1 "
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND (j.JobTitle LIKE ? OR r.CompanyName LIKE ?) ");
+            params.add("%" + search + "%");
+            params.add("%" + search + "%");
+        }
+        if (location != null && !location.isEmpty()) {
+            sql.append("AND l.LocationName LIKE ? ");
+            params.add("%" + location + "%");
+        }
+        if (type != null && !type.isEmpty()) {
+            int typeId = getJobTypeId(type);
+            if (typeId > 0) {
+                sql.append("AND j.JobTypeID = ? ");
+                params.add(typeId);
+            }
+        }
+        if (status != null && !status.isEmpty()) {
+            sql.append("AND j.Status = ? ");
+            params.add(status);
+        }
+        if (category != null && !category.isEmpty()) {
+            sql.append("AND c.CategoryName LIKE ? ");
+            params.add("%" + category + "%");
+        }
+        if (salary != null && !salary.isEmpty()) {
+            // Sử dụng SalaryRange thay vì MinSalary/MaxSalary
+            switch (salary) {
+                case "0-10":
+                    sql.append("AND j.SalaryRange LIKE '%dưới 10%' ");
+                    break;
+                case "10-20":
+                    sql.append("AND (j.SalaryRange LIKE '%10%' OR j.SalaryRange LIKE '%15%' OR j.SalaryRange LIKE '%20%') ");
+                    break;
+                case "20-30":
+                    sql.append("AND (j.SalaryRange LIKE '%20%' OR j.SalaryRange LIKE '%25%' OR j.SalaryRange LIKE '%30%') ");
+                    break;
+                case "30+":
+                    sql.append("AND j.SalaryRange LIKE '%trên 30%' ");
+                    break;
+                default:
+                    // Không thêm điều kiện gì nếu không khớp case nào
+                    break;
+            }
+        }
+
+        try (PreparedStatement st = c.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                st.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                AdminJobDetail job = new AdminJobDetail(
+                    rs.getInt("JobID"),
+                    rs.getString("JobTitle"),
+                    rs.getString("Requirements"),
+                    rs.getString("SalaryRange"),
+                    rs.getString("RecruiterName"),
+                    rs.getString("CategoryName"),
+                    rs.getString("LocationName"),
+                    rs.getString("Status")
+                );
+                list.add(job);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
     public static void main(String[] args) {
@@ -356,5 +441,21 @@ public class AdminJobDAO extends DBContext {
         System.out.println("\n===== Xóa Job có ID = 10 =====");
         boolean deleted = dao.deleteJob(10);
         System.out.println("Kết quả xóa: " + deleted);
+    }
+
+    // Helper method để convert string type thành JobTypeID
+    private int getJobTypeId(String typeString) {
+        switch (typeString.toLowerCase()) {
+            case "fulltime":
+                return 1; // Assuming TypeID 1 is Full-time
+            case "parttime":
+                return 2; // Assuming TypeID 2 is Part-time
+            case "contract":
+                return 3; // Assuming TypeID 3 is Contract
+            case "internship":
+                return 4; // Assuming TypeID 4 is Internship
+            default:
+                return 0; // Invalid type
+        }
     }
 }

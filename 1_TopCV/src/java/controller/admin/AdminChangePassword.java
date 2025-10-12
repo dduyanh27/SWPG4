@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Admin;
+import util.MD5Util;
 
 
 public class AdminChangePassword extends HttpServlet {
@@ -47,14 +48,14 @@ public class AdminChangePassword extends HttpServlet {
         String npass = request.getParameter("newPassword");
         String cfpass = request.getParameter("confirmPassword");
         
-        if (!admin.getPassword().equals(pass)) {
-            request.setAttribute("error", "Mật khẩu hiện tại không đúng!");
+        if (!admin.getPassword().equals(MD5Util.getMD5Hash(pass))) {
+            request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng!");
             request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
         
         if (!npass.equals(cfpass)) {
-            request.setAttribute("error", "Xác nhận mật khẩu không khớp!");
+            request.setAttribute("errorMessage", "Xác nhận mật khẩu không khớp!");
             request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
             return;
         }
@@ -62,10 +63,10 @@ public class AdminChangePassword extends HttpServlet {
         AdminDAO dao = new AdminDAO();
         dao.updatePassword(admin.getAdminId(), npass);
         
-        admin.setPassword(npass);
+        admin.setPassword(MD5Util.getMD5Hash(npass));
         session.setAttribute("admin", admin);
         
-        request.setAttribute("success", "Đổi mật khẩu thành công!");
+        request.setAttribute("successMessage", "Đổi mật khẩu thành công!");
         request.getRequestDispatcher("Admin/admin-profile.jsp").forward(request, response);
     }
 

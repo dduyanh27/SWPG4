@@ -4,8 +4,10 @@ import dal.AdminDAO;
 import dal.JobSeekerDAO;
 import dal.RecruiterDAO;
 import model.Admin;
+import model.AdminWithRole;
 import model.JobSeeker;
 import model.Recruiter;
+import model.Role;
 
 /**
  * Centralized authentication service for all user types
@@ -58,7 +60,10 @@ public class LoginService {
     private LoginResult authenticateAdmin(String email, String password) {
         Admin admin = adminDAO.login(email, password);
         if (admin != null) {
-            return new LoginResult(true, "Admin login successful", "admin", admin);
+            // Get the role for this admin
+            Role role = adminDAO.getAdminRole(admin.getAdminId());
+            AdminWithRole adminWithRole = new AdminWithRole(admin, role);
+            return new LoginResult(true, "Admin login successful", "admin", adminWithRole);
         }
         
         return new LoginResult(false, "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.", null, null);

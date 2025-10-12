@@ -52,12 +52,21 @@ public class LoginServlet extends HttpServlet {
             // Lưu thông tin cụ thể theo loại user
             switch (result.getUserType()) {
                 case "admin":
-                    model.Admin admin = (model.Admin) result.getUser();
+                    model.AdminWithRole adminWithRole = (model.AdminWithRole) result.getUser();
+                    model.Admin admin = adminWithRole.getAdmin();
+                    model.Role role = adminWithRole.getRole();
+                    
                     // Store admin object for JSPs that check sessionScope.admin
                     session.setAttribute("admin", admin);
+                    session.setAttribute("adminRole", role);
                     session.setAttribute("userID", admin.getAdminId());
                     session.setAttribute("userName", admin.getFullName());
-                    response.sendRedirect(request.getContextPath() + "/Admin/admin-dashboard.jsp");
+                    
+                    // Redirect dựa trên role
+                    String roleName = (role != null) ? role.getName() : null;
+                    String redirectPath = getRedirectPathByRole(roleName);
+                    System.out.println("DEBUG: Admin role = " + roleName + ", redirect to = " + redirectPath);
+                    response.sendRedirect(request.getContextPath() + redirectPath);
                     break;
                     
                 case "jobseeker":
@@ -99,6 +108,37 @@ public class LoginServlet extends HttpServlet {
         };
         
         request.getRequestDispatcher(loginPage).forward(request, response);
+    }
+    
+    private String getRedirectPathByRole(String roleName) {
+        if (roleName == null) {
+            System.out.println("DEBUG: Role name is null, using default dashboard");
+            return "/Admin/admin-dashboard.jsp"; // Default fallback
+        }
+        
+        System.out.println("DEBUG: Checking role name: '" + roleName + "'");
+        
+        String lowerRoleName = roleName.toLowerCase().trim();
+        System.out.println("DEBUG: Lowercase role name: '" + lowerRoleName + "'");
+        
+        return switch (lowerRoleName) {
+            case "admin" -> {
+                System.out.println("DEBUG: Matched Admin role");
+                yield "/Admin/admin-dashboard.jsp";
+            }
+            case "marketing staff", "marketing" -> {
+                System.out.println("DEBUG: Matched Marketing Staff role");
+                yield "/Staff/marketinghome.jsp";
+            }
+            case "sale", "sales" -> {
+                System.out.println("DEBUG: Matched Sale role");
+                yield "/Staff/salehome.jsp";
+            }
+            default -> {
+                System.out.println("DEBUG: No match found, using default dashboard");
+                yield "/Admin/admin-dashboard.jsp"; // Default fallback
+            }
+        };
     }
 
     @Override
