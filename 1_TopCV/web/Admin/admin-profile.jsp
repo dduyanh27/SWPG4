@@ -102,22 +102,27 @@
                 <div class="profile-content">
                     <!-- Profile Card -->
                     <div class="profile-card">
-                        <div class="avatar-section">
-                            <div class="avatar" onclick="document.getElementById('avatarFile').click()">
-                                <c:choose>
-                                    <c:when test="${not empty sessionScope.admin.avatarUrl}">
-                                        <img src="assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar" id="avatarImage">
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="assets/img/admin/admin.png" alt="Default Avatar" id="avatarImage">
-                                    </c:otherwise>
-                                </c:choose>
+                        <form action="${pageContext.request.contextPath}/uploadavatar" method="post" enctype="multipart/form-data">
+                            <div class="avatar-section">
+                                <div class="avatar" onclick="document.getElementById('avatarFile').click()">
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.admin.avatarUrl}">
+                                            <img src="${pageContext.request.contextPath}/assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar" id="avatarImage">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="${pageContext.request.contextPath}/assets/img/admin/admin.png" alt="Default Avatar" id="avatarImage">
+                                        </c:otherwise>
+                                    </c:choose> 
+                                </div>
+
+                                <input type="file" name="avatar" id="avatarFile" accept="image/*" onchange="previewAvatar(this)" style="display:none;">
+
+                                <button type="submit" class="avatar-upload">
+                                    📷 Thay đổi avatar
+                                </button>
                             </div>
-                            <input type="file" id="avatarFile" accept="image/*" onchange="previewAvatar(this)">
-                            <button class="avatar-upload" onclick="document.getElementById('avatarFile').click()">
-                                📷 Thay đổi avatar
-                            </button>
-                        </div>
+                        </form>
+
 
                         <div class="profile-info">
                             <div class="profile-name">${sessionScope.admin.fullName}</div>
@@ -206,4 +211,17 @@
             </div>
         </div>
     </body>
+    <script>
+        function previewAvatar(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('avatarImage').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+
 </html>

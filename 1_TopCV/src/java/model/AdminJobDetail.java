@@ -10,6 +10,11 @@ public class AdminJobDetail {
     private String locationName;
     private String status;
 
+    public AdminJobDetail() {
+    }
+    
+    
+
     public AdminJobDetail(int jobId, String jobTitle, String requirements, String salaryRange,
                           String recruiterName, String categoryName, String locationName, String status) {
         this.jobId = jobId;

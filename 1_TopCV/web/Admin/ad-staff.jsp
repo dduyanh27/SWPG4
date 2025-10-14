@@ -69,7 +69,7 @@
                     <div class="sidebar-avatar">
                         <c:choose>
                             <c:when test="${not empty sessionScope.admin.avatarUrl}">
-                                <img src="${sessionScope.admin.avatarUrl}" alt="Avatar">
+                                <img src="${pageContext.request.contextPath}/assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar">
                             </c:when>
                             <c:otherwise>
                                 <div class="sidebar-avatar-placeholder">

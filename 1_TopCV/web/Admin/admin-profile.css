@@ -1,22 +1,26 @@
 /* Modern Admin Profile Stylesheet */
 :root {
-    --primary-blue: #0066ff;
-    --secondary-blue: #00e5ff;
-    --dark-blue: #031428;
-    --medium-blue: #062446;
-    --light-blue: #40c4ff;
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --success-color: #4caf50;
-    --danger-color: #ff6b6b;
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.8);
-    --text-muted: rgba(255, 255, 255, 0.6);
-    --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.15);
-    --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.25);
-    --shadow-heavy: 0 16px 48px rgba(0, 0, 0, 0.35);
-    --border-radius: 16px;
-    --border-radius-sm: 8px;
+    --bg-dark-1: #031428;
+    --bg-dark-2: #062446;
+    --bg-bright: #0a67ff;
+    --card: #071a3a;
+    --muted: rgba(255, 255, 255, 0.75);
+    --muted-2: rgba(255, 255, 255, 0.6);
+    --accent: rgba(255, 255, 255, 0.03);
+    --danger: #ff5a6b;
+    --primary: #2f80ed;
+    --success: #00d68f;
+    --warning: #ff9500;
+    --info: #06b6d4;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-light: rgba(255, 255, 255, 0.05);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -28,9 +32,9 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #031428 0%, #062446 25%, #0a4595 50%, #0066ff 100%);
+    background: linear-gradient(110deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 40%, #083d9a 70%, var(--bg-bright) 100%);
     background-attachment: fixed;
-    color: var(--text-primary);
+    color: var(--muted);
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
@@ -45,7 +49,7 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 80%, rgba(0, 102, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(10, 103, 255, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(3, 20, 40, 0.8) 0%, transparent 50%);
     pointer-events: none;
@@ -64,13 +68,10 @@ body::before {
     top: 0;
     width: 300px;
     height: 100vh;
-    background: linear-gradient(180deg, 
-        rgba(3, 20, 40, 0.95) 0%, 
-        rgba(6, 36, 70, 0.95) 50%, 
-        rgba(10, 69, 149, 0.95) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-right: 1px solid var(--glass-border);
-    box-shadow: 4px 0 40px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(180deg, rgba(3, 18, 40, 0.95), rgba(6, 24, 44, 0.95));
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--border);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     overflow-y: auto;
     overflow-x: hidden;
@@ -87,7 +88,7 @@ body::before {
 }
 
 .unified-sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(180deg, #00e5ff, var(--primary));
     border-radius: 2px;
 }
 
@@ -119,7 +120,7 @@ body::before {
 .brand-title {
     font-size: 28px;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -129,7 +130,7 @@ body::before {
 
 .brand-subtitle {
     font-size: 13px;
-    color: var(--text-muted);
+    color: var(--muted-2);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -137,12 +138,10 @@ body::before {
 
 /* Enhanced Profile Section */
 .sidebar-profile {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.1) 0%, 
-        rgba(0, 102, 255, 0.05) 100%);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: var(--border-radius);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
     margin: 20px;
     padding: 25px;
     text-align: center;
@@ -176,7 +175,7 @@ body::before {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     padding: 3px;
     margin: 0 auto 15px;
     cursor: pointer;
@@ -189,7 +188,7 @@ body::before {
     position: absolute;
     inset: -3px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     z-index: -1;
     opacity: 0;
     transition: var(--transition);
@@ -214,7 +213,7 @@ body::before {
 .sidebar-avatar-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, #0288d1);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -227,14 +226,14 @@ body::before {
 .sidebar-admin-name {
     font-size: 17px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #ffffff;
     margin-bottom: 5px;
     letter-spacing: -0.2px;
 }
 
 .sidebar-admin-role {
     font-size: 13px;
-    color: var(--secondary-blue);
+    color: #00e5ff;
     margin-bottom: 15px;
     font-weight: 500;
 }
@@ -248,8 +247,8 @@ body::before {
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.2));
-    color: var(--success-color);
+    background: rgba(76, 175, 80, 0.2);
+    color: var(--success);
     border: 1px solid rgba(76, 175, 80, 0.3);
     letter-spacing: 0.5px;
 }
@@ -272,7 +271,7 @@ body::before {
 .nav-title {
     font-size: 12px;
     font-weight: 700;
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 20px 0 15px;
@@ -284,8 +283,8 @@ body::before {
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    border-radius: var(--border-radius-sm);
-    color: var(--text-secondary);
+    border-radius: var(--radius);
+    color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
     font-weight: 500;
     font-size: 14px;
@@ -302,15 +301,15 @@ body::before {
     top: 0;
     height: 100%;
     width: 0;
-    background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
-    border-radius: var(--border-radius-sm);
+    background: linear-gradient(90deg, #00e5ff, var(--primary));
+    border-radius: var(--radius);
     transition: var(--transition);
     z-index: -1;
 }
 
 .nav-item:hover,
 .nav-item.active {
-    color: var(--text-primary);
+    color: #ffffff;
     transform: translateX(8px);
 }
 
@@ -320,9 +319,7 @@ body::before {
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.15), 
-        rgba(0, 102, 255, 0.15));
+    background: rgba(0, 229, 255, 0.15);
     border: 1px solid rgba(0, 229, 255, 0.2);
 }
 
@@ -349,19 +346,15 @@ body::before {
 }
 
 .action-btn:first-child {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.1), 
-        rgba(0, 102, 255, 0.1));
+    background: rgba(0, 229, 255, 0.1);
     border: 1px solid rgba(0, 229, 255, 0.2);
-    color: var(--text-primary);
+    color: #ffffff;
 }
 
 .action-btn.logout {
-    background: linear-gradient(135deg, 
-        rgba(255, 107, 107, 0.1), 
-        rgba(244, 67, 54, 0.1));
+    background: rgba(255, 107, 107, 0.1);
     border: 1px solid rgba(255, 107, 107, 0.2);
-    color: var(--danger-color);
+    color: var(--danger);
 }
 
 .action-btn:hover {
@@ -370,15 +363,11 @@ body::before {
 }
 
 .action-btn:first-child:hover {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.2), 
-        rgba(0, 102, 255, 0.2));
+    background: rgba(0, 229, 255, 0.2);
 }
 
 .action-btn.logout:hover {
-    background: linear-gradient(135deg, 
-        rgba(255, 107, 107, 0.2), 
-        rgba(244, 67, 54, 0.2));
+    background: rgba(255, 107, 107, 0.2);
 }
 
 /* Main Content Area */
@@ -398,7 +387,7 @@ body::before {
 .page-title {
     font-size: 32px;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--text-primary), var(--secondary-blue));
+    background: linear-gradient(135deg, #eaf4ff, #00e5ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -408,18 +397,18 @@ body::before {
 
 .breadcrumb {
     font-size: 14px;
-    color: var(--text-muted);
+    color: var(--muted-2);
     font-weight: 500;
 }
 
 .breadcrumb a {
-    color: var(--secondary-blue);
+    color: #00e5ff;
     text-decoration: none;
     transition: var(--transition);
 }
 
 .breadcrumb a:hover {
-    color: var(--light-blue);
+    color: #40c4ff;
 }
 
 /* Enhanced Profile Content Layout */
@@ -432,14 +421,12 @@ body::before {
 
 /* Modern Profile Card */
 .profile-card {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(180deg, var(--card), rgba(6, 24, 44, 0.6));
     backdrop-filter: blur(20px) saturate(180%);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     padding: 35px;
-    box-shadow: var(--shadow-medium);
-    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(2, 10, 30, 0.6);
+    border: 1px solid var(--border-light);
     height: fit-content;
     position: relative;
     overflow: hidden;
@@ -452,7 +439,7 @@ body::before {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--secondary-blue), transparent);
+    background: linear-gradient(90deg, transparent, #00e5ff, transparent);
 }
 
 .avatar-section {
@@ -464,7 +451,7 @@ body::before {
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     padding: 4px;
     margin: 0 auto 20px;
     cursor: pointer;
@@ -477,7 +464,7 @@ body::before {
     position: absolute;
     inset: -4px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     z-index: -1;
     opacity: 0;
     transition: var(--transition);
@@ -502,7 +489,7 @@ body::before {
 .avatar-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, #0288d1);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -513,11 +500,9 @@ body::before {
 }
 
 .avatar-upload {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.15), 
-        rgba(0, 102, 255, 0.15));
+    background: rgba(0, 229, 255, 0.15);
     border: 1px solid rgba(0, 229, 255, 0.3);
-    color: var(--text-primary);
+    color: #ffffff;
     padding: 10px 20px;
     border-radius: 25px;
     font-size: 13px;
@@ -529,11 +514,9 @@ body::before {
 }
 
 .avatar-upload:hover {
-    background: linear-gradient(135deg, 
-        rgba(0, 229, 255, 0.25), 
-        rgba(0, 102, 255, 0.25));
+    background: rgba(0, 229, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-light);
+    box-shadow: var(--shadow);
 }
 
 .profile-info {
@@ -543,13 +526,13 @@ body::before {
 .profile-name {
     font-size: 26px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #eaf4ff;
     margin-bottom: 8px;
     letter-spacing: -0.5px;
 }
 
 .profile-role {
-    color: var(--secondary-blue);
+    color: #00e5ff;
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 20px;
@@ -581,7 +564,7 @@ body::before {
 .stat-number {
     font-size: 24px;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(135deg, #00e5ff, var(--primary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -590,7 +573,7 @@ body::before {
 
 .stat-label {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--muted-2);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -598,14 +581,12 @@ body::before {
 
 /* Enhanced Form Sections */
 .form-section {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.08) 0%, 
-        rgba(255, 255, 255, 0.04) 100%);
+    background: linear-gradient(180deg, var(--card), rgba(6, 24, 44, 0.6));
     backdrop-filter: blur(15px);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius-lg);
     padding: 35px;
-    box-shadow: var(--shadow-light);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(2, 10, 30, 0.6);
+    border: 1px solid var(--border-light);
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
@@ -618,14 +599,14 @@ body::before {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    background: linear-gradient(90deg, #00e5ff, var(--primary));
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .section-title {
     font-size: 22px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #eaf4ff;
     margin-bottom: 25px;
     padding-bottom: 15px;
     border-bottom: 2px solid rgba(0, 229, 255, 0.2);
@@ -639,7 +620,7 @@ body::before {
     left: 0;
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(90deg, #00e5ff, var(--primary));
 }
 
 .form-grid {
@@ -658,7 +639,7 @@ body::before {
 
 .form-label {
     display: block;
-    color: var(--text-primary);
+    color: #eaf4ff;
     font-weight: 600;
     margin-bottom: 10px;
     font-size: 14px;
@@ -670,11 +651,11 @@ body::before {
 .form-textarea {
     width: 100%;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius-sm);
-    color: var(--text-primary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: #ffffff;
     font-size: 15px;
     font-weight: 500;
     transition: var(--transition);
@@ -685,8 +666,8 @@ body::before {
 .form-select:focus,
 .form-textarea:focus {
     outline: none;
-    border-color: var(--secondary-blue);
-    background: rgba(255, 255, 255, 0.12);
+    border-color: #00e5ff;
+    background: rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.15);
     transform: translateY(-2px);
 }
@@ -698,7 +679,7 @@ body::before {
 }
 
 .form-input::placeholder {
-    color: var(--text-muted);
+    color: var(--muted-2);
     font-weight: 400;
 }
 
@@ -711,21 +692,19 @@ body::before {
 
 .form-group label input[type="radio"] {
     margin-right: 8px;
-    accent-color: var(--secondary-blue);
+    accent-color: #00e5ff;
     transform: scale(1.2);
 }
 
 /* Enhanced Security Section */
 .security-section {
-    background: linear-gradient(135deg, 
-        rgba(255, 107, 107, 0.1) 0%, 
-        rgba(244, 67, 54, 0.05) 100%);
+    background: rgba(255, 107, 107, 0.1);
     border: 2px solid rgba(255, 107, 107, 0.2);
     position: relative;
 }
 
 .security-section::before {
-    background: linear-gradient(90deg, var(--danger-color), #f44336);
+    background: linear-gradient(90deg, var(--danger), #f44336);
 }
 
 .security-section .section-title {
@@ -733,7 +712,7 @@ body::before {
 }
 
 .security-section .section-title::after {
-    background: linear-gradient(90deg, var(--danger-color), #f44336);
+    background: linear-gradient(90deg, var(--danger), #f44336);
 }
 
 /* Enhanced Buttons */
@@ -746,7 +725,7 @@ body::before {
 
 .btn {
     padding: 16px 32px;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius);
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
@@ -780,39 +759,39 @@ body::before {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    background: linear-gradient(45deg, var(--primary), #0b63ff);
     color: white;
-    box-shadow: var(--shadow-light);
+    box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--light-blue), #1976d2);
+    background: linear-gradient(45deg, #0b63ff, #1976d2);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    border: 2px solid var(--border);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
     transform: translateY(-2px);
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, var(--danger-color), #f44336);
+    background: linear-gradient(45deg, var(--danger), #e55039);
     color: white;
-    box-shadow: var(--shadow-light);
+    box-shadow: var(--shadow);
 }
 
 .btn-danger:hover {
-    background: linear-gradient(135deg, #ff8a80, #e53935);
+    background: linear-gradient(45deg, #ff8a80, #e53935);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-md);
 }
 
 /* Enhanced Status Badges */
@@ -829,9 +808,9 @@ body::before {
 }
 
 .status-active {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.2));
-    color: var(--success-color);
-    border: 1px solid rgba(76, 175, 80, 0.3);
+    background: rgba(0, 214, 143, 0.15);
+    color: var(--success);
+    border: 1px solid rgba(0, 214, 143, 0.3);
 }
 
 .status-active::before {
@@ -853,15 +832,15 @@ body::before {
 }
 
 .message-success {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.1));
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    color: var(--success-color);
+    background: rgba(0, 214, 143, 0.15);
+    border: 1px solid rgba(0, 214, 143, 0.3);
+    color: var(--success);
 }
 
 .message-error {
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(244, 67, 54, 0.1));
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    color: var(--danger-color);
+    background: rgba(255, 90, 107, 0.15);
+    border: 1px solid rgba(255, 90, 107, 0.3);
+    color: var(--danger);
 }
 
 /* Hidden Elements */
@@ -903,9 +882,9 @@ body::before {
         top: 20px;
         left: 20px;
         z-index: 1001;
-        background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+        background: rgba(0, 229, 255, 0.9);
         border: none;
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--radius);
         width: 50px;
         height: 50px;
         cursor: pointer;
@@ -914,7 +893,7 @@ body::before {
         justify-content: center;
         font-size: 20px;
         color: white;
-        box-shadow: var(--shadow-medium);
+        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
         transition: var(--transition);
     }
 

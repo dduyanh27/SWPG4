@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker" %>
+<%@ page import="dal.AdminDAO, dal.ApplicationDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Application, model.Recruiter, model.JobSeeker" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="java.util.List" %>
@@ -19,6 +19,11 @@
     AdminJobDAO dao = new AdminJobDAO();
     List<AdminJobDetail> jobDetails = dao.getAllDetailJob();
     request.setAttribute("jobDetails", jobDetails);
+    
+    ApplicationDAO appDAO = new ApplicationDAO();
+    List<Application> appList = appDAO.getAllApplications();
+    int totalApplications = appList.size();
+    request.setAttribute("totalApplications",totalApplications);
 
     String view = request.getParameter("view");
     boolean showingPending = "pending".equalsIgnoreCase(view);
@@ -50,7 +55,14 @@
 
                 <div class="sidebar-profile">
                     <div class="sidebar-avatar">
-                        <div class="sidebar-avatar-placeholder">A</div>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.admin.avatarUrl}">
+                                <img src="${pageContext.request.contextPath}/assets/img/admin/${sessionScope.admin.avatarUrl}" alt="Avatar">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="sidebar-avatar-placeholder">${fn:substring(sessionScope.admin.fullName, 0, 1)}</div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <div class="sidebar-admin-name">${sessionScope.admin.fullName}</div>
                     <div class="sidebar-admin-role">🛡️ Quản trị viên</div>
@@ -76,14 +88,10 @@
             <div class="main">
                 <header class="topbar">
                     <div class="title">Quản lý công việc</div>
-                    <div class="topbar-actions">
-                        <button class="btn btn-ghost btn-sm">🔄 Làm mới</button>
-                        <button class="btn btn-primary btn-sm" onclick="showCreateJobModal()">➕ Tạo tin mới</button>
-                    </div>
                 </header>
 
                 <main class="content">
-                    <!-- Statistics Cards -->
+                    <!-- Thống kê -->
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-header">
@@ -117,114 +125,125 @@
                                 <div class="stat-icon">📊</div>
                                 <div class="stat-trend trend-up">↗️ +23%</div>
                             </div>
-                            <div class="stat-value">15,439</div>
+                            <div class="stat-value">${totalApplications}</div>
                             <div class="stat-label">Lượt ứng tuyển</div>
                         </div>
                     </div>
 
-                    <!-- Controls Section -->
+                    <!-- Bộ lọc -->
                     <div class="controls-section">
                         <div class="controls-header">
                             <div class="section-title">🔍 Tìm kiếm & Bộ lọc</div>
-                            <button class="btn btn-ghost btn-sm" onclick="resetFilters()">↺ Đặt lại</button>
-                        </div>
-
-                        <div class="filters-grid">
-                            <div class="filter-group">
-                                <label class="filter-label">Tìm kiếm</label>
-                                <input type="text" class="filter-input" placeholder="Tên công việc, công ty..." id="searchInput">
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Địa điểm</label>
-                                <select class="filter-input" id="locationFilter">
-                                    <option value="">Tất cả địa điểm</option>
-                                    <option value="hanoi">Hà Nội</option>
-                                    <option value="hcm">TP. Hồ Chí Minh</option>
-                                    <option value="danang">Đà Nẵng</option>
-                                    <option value="other">Khác</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Loại hình</label>
-                                <select class="filter-input" id="typeFilter">
-                                    <option value="">Tất cả loại hình</option>
-                                    <option value="fulltime">Toàn thời gian</option>
-                                    <option value="parttime">Bán thời gian</option>
-                                    <option value="contract">Hợp đồng</option>
-                                    <option value="internship">Thực tập</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Trạng thái</label>
-                                <select class="filter-input" id="statusFilter">
-                                    <option value="">Tất cả trạng thái</option>
-                                    <option value="active">Đang hoạt động</option>
-                                    <option value="pending">Chờ duyệt</option>
-                                    <option value="expired">Đã hết hạn</option>
-                                    <option value="draft">Bản nháp</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Danh mục</label>
-                                <select class="filter-input" id="categoryFilter">
-                                    <option value="">Tất cả danh mục</option>
-                                    <option value="it">Công nghệ thông tin</option>
-                                    <option value="marketing">Marketing</option>
-                                    <option value="sales">Kinh doanh</option>
-                                    <option value="hr">Nhân sự</option>
-                                    <option value="finance">Tài chính</option>
-                                </select>
-                            </div>
-
-                            <div class="filter-group">
-                                <label class="filter-label">Mức lương</label>
-                                <select class="filter-input" id="salaryFilter">
-                                    <option value="">Tất cả mức lương</option>
-                                    <option value="0-10">Dưới 10 triệu</option>
-                                    <option value="10-20">10-20 triệu</option>
-                                    <option value="20-30">20-30 triệu</option>
-                                    <option value="30+">Trên 30 triệu</option>
-                                </select>
+                            <div class="filter-actions">
+                                <button type="button" class="btn btn-ghost btn-sm" onclick="resetFilters()">↺ Đặt lại</button>
+                                <button type="button" class="btn btn-ghost btn-sm" onclick="toggleFilterCollapse()">
+                                    <span id="filterToggleText">Thu gọn</span> <span id="filterToggleIcon">▲</span>
+                                </button>
                             </div>
                         </div>
+
+                        <form action="${pageContext.request.contextPath}/adminjobfilter" method="post" id="filterForm" class="filters-container">
+                            <div class="filters-row">
+                                <div class="filter-group filter-search">
+                                    <label class="filter-label">🔍 Tìm kiếm</label>
+                                    <input type="text" class="filter-input" name="search"
+                                           placeholder="Tên công việc, công ty..."
+                                           value="${search != null ? search : ''}">
+                                </div>
+                                
+                                <div class="filter-group">
+                                    <label class="filter-label">📍 Địa điểm</label>
+                                    <select class="filter-input" name="location">
+                                        <option value="" ${empty location ? "selected" : ""}>Tất cả địa điểm</option>
+                                        <option value="hanoi" ${location eq 'hanoi' ? "selected" : ""}>Hà Nội</option>
+                                        <option value="hcm" ${location eq 'hcm' ? "selected" : ""}>TP. Hồ Chí Minh</option>
+                                        <option value="danang" ${location eq 'danang' ? "selected" : ""}>Đà Nẵng</option>
+                                        <option value="other" ${location eq 'other' ? "selected" : ""}>Khác</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">💼 Loại hình</label>
+                                    <select class="filter-input" name="type">
+                                        <option value="" ${empty type ? "selected" : ""}>Tất cả loại hình</option>
+                                        <option value="fulltime" ${type eq 'fulltime' ? "selected" : ""}>Toàn thời gian</option>
+                                        <option value="parttime" ${type eq 'parttime' ? "selected" : ""}>Bán thời gian</option>
+                                        <option value="contract" ${type eq 'contract' ? "selected" : ""}>Hợp đồng</option>
+                                        <option value="internship" ${type eq 'internship' ? "selected" : ""}>Thực tập</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">📊 Trạng thái</label>
+                                    <select class="filter-input" name="status">
+                                        <option value="" ${empty status ? "selected" : ""}>Tất cả trạng thái</option>
+                                        <option value="Published" ${status eq 'Published' ? "selected" : ""}>Đã xuất bản</option>
+                                        <option value="Pending" ${status eq 'Pending' ? "selected" : ""}>Chờ duyệt</option>
+                                        <option value="Closed" ${status eq 'Closed' ? "selected" : ""}>Đã đóng</option>
+                                        <option value="Draft" ${status eq 'Draft' ? "selected" : ""}>Bản nháp</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="filters-row filters-row-collapsible" id="collapsibleFilters">
+                                <div class="filter-group">
+                                    <label class="filter-label">📂 Danh mục</label>
+                                    <select class="filter-input" name="category">
+                                        <option value="" ${empty category ? "selected" : ""}>Tất cả danh mục</option>
+                                        <option value="it" ${category eq 'it' ? "selected" : ""}>Công nghệ thông tin</option>
+                                        <option value="marketing" ${category eq 'marketing' ? "selected" : ""}>Marketing</option>
+                                        <option value="sales" ${category eq 'sales' ? "selected" : ""}>Kinh doanh</option>
+                                        <option value="hr" ${category eq 'hr' ? "selected" : ""}>Nhân sự</option>
+                                        <option value="finance" ${category eq 'finance' ? "selected" : ""}>Tài chính</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="filter-label">💰 Mức lương</label>
+                                    <select class="filter-input" name="salary">
+                                        <option value="" ${empty salary ? "selected" : ""}>Tất cả mức lương</option>
+                                        <option value="0-10" ${salary eq '0-10' ? "selected" : ""}>Dưới 10 triệu</option>
+                                        <option value="10-20" ${salary eq '10-20' ? "selected" : ""}>10-20 triệu</option>
+                                        <option value="20-30" ${salary eq '20-30' ? "selected" : ""}>20-30 triệu</option>
+                                        <option value="30+" ${salary eq '30+' ? "selected" : ""}>Trên 30 triệu</option>
+                                    </select>
+                                </div>
+
+                                <div class="filter-group filter-actions-group">
+                                    <label class="filter-label">&nbsp;</label>
+                                    <div class="filter-buttons">
+                                        <button type="submit" class="btn btn-primary">🔍 Lọc</button>
+                                        <button type="button" class="btn btn-ghost" onclick="resetFilters()">↺ Đặt lại</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- Job Listings Table -->
+                    <!-- Bảng danh sách công việc -->
                     <div class="data-table-container">
                         <div class="table-header">
                             <div class="table-title">📋 Danh sách công việc</div>
                             <div class="table-actions">
-                                <c:choose>
-                                    <c:when test="${showingPending}">
-                                        <a class="btn btn-ghost btn-sm" href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp">📋 Tất cả</a>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a class="btn btn-ghost btn-sm" href="${pageContext.request.contextPath}/Admin/admin-jobposting-management.jsp?view=pending">📤 Danh sách chờ duyệt</a>
-                                    </c:otherwise>
-                                </c:choose>
+                                <a class="btn btn-ghost btn-sm" href="adminjobfilter">📋 Tất cả</a>
+                                <a class="btn btn-ghost btn-sm" href="adminjobfilter?status=pending">📤 Chờ duyệt</a>
                                 <button class="btn btn-success btn-sm" onclick="bulkApprove()">✅ Duyệt hàng loạt</button>
                             </div>
                         </div>
 
-
-                        <!-- Bang -->
                         <div class="table-wrapper">
                             <table id="jobsTable">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="selectAll"></th>
-                                        <th class="sortable" onclick="sortTable(1)">Công việc</th>
-                                        <th class="sortable" onclick="sortTable(2)">Công ty</th>
-                                        <th class="sortable" onclick="sortTable(3)">Danh mục</th>
-                                        <th class="sortable" onclick="sortTable(4)">Mức lương</th>
-                                        <th class="sortable" onclick="sortTable(5)">Địa điểm</th>
-                                        <th class="sortable" onclick="sortTable(6)">Ứng viên</th>
-                                        <th class="sortable" onclick="sortTable(7)">Trạng thái</th>
-                                        <th class="sortable" onclick="sortTable(8)">Ngày tạo</th>
+                                        <th>Công việc</th>
+                                        <th>Công ty</th>
+                                        <th>Danh mục</th>
+                                        <th>Mức lương</th>
+                                        <th>Địa điểm</th>
+                                        <th>Ứng viên</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
                                         <th>Hành động</th>
                                     </tr>
                                 </thead>
@@ -233,66 +252,56 @@
                                         <c:when test="${empty jobDetails}">
                                             <tr>
                                                 <td colspan="10" style="text-align: center; padding: 20px;">
-                                                    <div style="color: #666;">
-                                                        <p>Không có dữ liệu job nào được tìm thấy.</p>
-                                                        <p>Debug: jobList size = ${fn:length(jobList)}</p>
-                                                    </div>
+                                                    <div style="color: #666;">Không có dữ liệu công việc phù hợp.</div>
                                                 </td>
                                             </tr>
                                         </c:when>
                                         <c:otherwise>
                                             <c:forEach var="jobDetail" items="${jobDetails}">
-                                                <c:if test="${( !showingPending || jobDetail.status eq 'Pending') && jobDetail.status ne 'Closed'}">
                                                 <tr>
                                                     <td><input type="checkbox" class="row-select" value="${jobDetail.jobId}"></td>
                                                     <td>
                                                         <div class="job-info">
                                                             <div class="job-title">${jobDetail.jobTitle}</div>
-                                                            <div class="job-meta">
-                                                                <span>${jobDetail.requirements}</span>
-                                                            </div>
+                                                            <div class="job-meta">${jobDetail.requirements}</div>
                                                         </div>
                                                     </td>
                                                     <td>${jobDetail.recruiterName}</td>
                                                     <td>${jobDetail.categoryName}</td>
-                                                    <td><div class="salary-range">${jobDetail.salaryRange}</div></td>
+                                                    <td>${jobDetail.salaryRange}</td>
                                                     <td>${jobDetail.locationName}</td>
                                                     <td>-</td>
                                                     <td>${jobDetail.status}</td>
-                                                    <td><div>-</div></td>
+                                                    <td>-</td>
                                                     <td>
                                                         <div class="action-buttons">
                                                             <button class="btn btn-ghost btn-sm" onclick="viewJob('${jobDetail.jobId}')">👁️</button>
                                                             <button class="btn btn-primary btn-sm" onclick="editJob('${jobDetail.jobId}')">✏️</button>
                                                             <button class="btn btn-danger btn-sm" onclick="deleteJob('${jobDetail.jobId}')">🗑️</button>
                                                             <c:if test="${jobDetail.status eq 'Pending'}">
-                                                                 <form action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:inline-block;">
-                                                                     <input type="hidden" name="jobId" value="${jobDetail.jobId}" />
+                                                                <form action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:inline-block;">
+                                                                    <input type="hidden" name="jobId" value="${jobDetail.jobId}">
                                                                     <button type="submit" class="btn btn-success btn-sm">✅ Duyệt</button>
                                                                 </form>
                                                             </c:if>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                </c:if>
                                             </c:forEach>
                                         </c:otherwise>
                                     </c:choose>
                                 </tbody>
-
-
                             </table>
                         </div>
-
-
                     </div>
-                    <form id="bulkApproveForm" action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:none;">
-                    </form>
+
+                    <form id="bulkApproveForm" action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:none;"></form>
                     <form id="deleteJobForm" action="${pageContext.request.contextPath}/adminclosejobpost" method="post" style="display:none;">
-                        <input type="hidden" name="jobId" id="deleteJobId" />
+                        <input type="hidden" name="jobId" id="deleteJobId">
                     </form>
                 </main>
             </div>
+
         </div>
 
         <!-- Job Detail Modal -->
@@ -434,14 +443,42 @@
         }
 
         function deleteJob(jobId) {
-            if (!jobId) return;
+            if (!jobId)
+                return;
             var confirmMsg = 'Bạn có chắc chắn muốn xóa/đóng tin tuyển dụng này?';
-            if (!confirm(confirmMsg)) return;
+            if (!confirm(confirmMsg))
+                return;
             var input = document.getElementById('deleteJobId');
-            if (!input) return;
+            if (!input)
+                return;
             input.value = jobId;
             var form = document.getElementById('deleteJobForm');
-            if (form) form.submit();
+            if (form)
+                form.submit();
+        }
+
+
+
+        function resetFilters() {
+            document.querySelectorAll('input[name="search"], select').forEach(el => el.value = '');
+            // Submit form để reset
+            document.getElementById('filterForm').submit();
+        }
+
+        function toggleFilterCollapse() {
+            const collapsibleFilters = document.getElementById('collapsibleFilters');
+            const toggleText = document.getElementById('filterToggleText');
+            const toggleIcon = document.getElementById('filterToggleIcon');
+            
+            if (collapsibleFilters.style.display === 'none') {
+                collapsibleFilters.style.display = 'flex';
+                toggleText.textContent = 'Thu gọn';
+                toggleIcon.textContent = '▲';
+            } else {
+                collapsibleFilters.style.display = 'none';
+                toggleText.textContent = 'Mở rộng';
+                toggleIcon.textContent = '▼';
+            }
         }
     </script>
 </html>
