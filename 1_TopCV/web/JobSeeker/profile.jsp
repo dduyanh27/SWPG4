@@ -522,6 +522,18 @@
         color: var(--primary-dark);
     }
 
+    /* File selected state for upload button */
+    .upload-area.file-selected .upload-btn i {
+        font-size: 32px;
+        color: var(--success);
+        transform: scale(1);
+    }
+
+    .upload-area.file-selected .upload-btn:hover i {
+        transform: scale(1.05);
+        color: var(--success);
+    }
+
     .upload-btn span {
         font-size: 16px;
         font-weight: 600;
@@ -543,6 +555,15 @@
         color: var(--primary);
     }
 
+    /* File selected state for upload note */
+    .upload-area.file-selected .upload-note {
+        font-weight: 600;
+    }
+
+    .upload-area.file-selected .upload-note i {
+        color: var(--success);
+    }
+
     .btn-submit {
         background: linear-gradient(135deg, var(--primary-dark), var(--primary));
         color: white;
@@ -554,9 +575,64 @@
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(10,103,255,0.3);
-        display: inline-flex;
+        display: none; /* Ban đầu ẩn nút submit */
         align-items: center;
         gap: 8px;
+        margin-top: 16px;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    .btn-submit.show {
+        display: inline-flex !important;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Clear file button */
+    .btn-clear {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        margin-left: 12px;
+    }
+
+    .btn-clear:hover {
+        background: #4b5563;
+    }
+
+    .btn-clear.show {
+        display: inline-flex;
+    }
+
+    /* File selected state styling */
+    .upload-area.file-selected {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+        border-color: #10b981 !important;
+    }
+
+    .file-selected-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    .upload-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
     }
 
     .btn-submit::before {
@@ -855,6 +931,25 @@
         .file-dropdown {
             right: 0;
         }
+
+        .upload-actions {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-submit,
+        .btn-clear {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .upload-btn i {
+            font-size: 36px;
+        }
+
+        .upload-area.file-selected .upload-btn i {
+            font-size: 24px;
+        }
     }
 
     /* ========== LOADING STATE ========== */
@@ -1130,12 +1225,19 @@
         </label>
         
         <p class="upload-note" id="uploadNote">
+            <i class="fas fa-info-circle"></i>
             Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB
         </p>
         
-        <button type="submit" class="btn-submit" id="submitBtn">
-            Tải lên
-        </button>
+        <div class="upload-actions">
+            <button type="submit" class="btn-submit" id="submitBtn">
+                Tải lên
+            </button>
+            <button type="button" class="btn-clear" id="clearBtn" onclick="clearSelectedFile()">
+                <i class="fas fa-times"></i>
+                Bỏ chọn
+            </button>
+        </div>
     </form>
 
     <!-- Danh sách CV đã upload -->
@@ -1366,7 +1468,6 @@
     </script>
     
     <script>
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const uploadForm = document.getElementById('uploadForm');
             const uploadArea = document.querySelector('.upload-area');
@@ -1375,24 +1476,68 @@
             const uploadIcon = document.getElementById('uploadIcon');
             const uploadNote = document.getElementById('uploadNote');
             const submitBtn = document.getElementById('submitBtn');
+            const clearBtn = document.getElementById('clearBtn');
 
             // ========== File Input Change ==========
             fileInput.addEventListener('change', function() {
+                console.log('File input changed, files:', this.files);
+                
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
                     const fileName = file.name;
+                    const fileNameLower = fileName.toLowerCase();
                     const fileSize = (file.size / 1024).toFixed(2);
+                    
+                    console.log('File details:', fileName, fileSize + 'KB');
+
+                    // Kiểm tra loại file
+                    const allowedTypes = ['.doc', '.docx', '.pdf'];
+                    const isValidType = allowedTypes.some(type => fileNameLower.includes(type));
+                    
+                    if (!isValidType) {
+                        showNotification('Chỉ hỗ trợ file .doc, .docx, .pdf', 'error');
+                        this.value = ''; // Clear input
+                        resetUploadArea();
+                        return;
+                    }
+                    
+                    // Kiểm tra kích thước file (5MB = 5 * 1024 * 1024 bytes)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showNotification('File không được vượt quá 5MB', 'error');
+                        this.value = ''; // Clear input
+                        resetUploadArea();
+                        return;
+                    }
+
+                    // Xác định icon theo loại file
+                    let iconClass = 'fas fa-file';
+                    if (fileNameLower.includes('.pdf')) {
+                        iconClass = 'fas fa-file-pdf';
+                    } else if (fileNameLower.includes('.doc')) {
+                        iconClass = 'fas fa-file-word';
+                    }
 
                     // Cập nhật giao diện
-                    uploadIcon.className = 'fas fa-file-pdf';
+                    uploadIcon.className = iconClass;
                     uploadText.innerHTML = '<strong>' + fileName + '</strong><br><small>(' + fileSize + ' KB)</small>';
                     uploadNote.style.color = '#10b981';
                     uploadNote.innerHTML = '<i class="fas fa-check-circle"></i> File đã sẵn sàng để tải lên';
                     uploadArea.style.borderColor = '#10b981';
                     uploadArea.style.background = 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)';
+                    uploadArea.classList.add('file-selected');
+                    
+                    // Hiển thị nút submit và clear với hiệu ứng
+                    submitBtn.style.display = 'inline-flex';
+                    clearBtn.style.display = 'inline-flex';
+                    setTimeout(() => {
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.transform = 'translateY(0)';
+                        clearBtn.classList.add('show');
+                    }, 100);
 
-                    console.log('File selected:', fileName, fileSize + 'KB');
+                    console.log('UI updated for file:', fileName);
                 } else {
+                    console.log('No file selected, resetting upload area');
                     // Reset về trạng thái ban đầu
                     resetUploadArea();
                 }
@@ -1421,15 +1566,35 @@
             });
 
             uploadArea.addEventListener('drop', function(e) {
+                console.log('File dropped');
                 const dt = e.dataTransfer;
                 const files = dt.files;
 
                 if (files.length > 0) {
+                    // Kiểm tra loại file
+                    const file = files[0];
+                    const fileName = file.name.toLowerCase();
+                    const allowedTypes = ['.doc', '.docx', '.pdf'];
+                    const isValidType = allowedTypes.some(type => fileName.includes(type));
+                    
+                    if (!isValidType) {
+                        showNotification('Chỉ hỗ trợ file .doc, .docx, .pdf', 'error');
+                        return;
+                    }
+                    
+                    // Kiểm tra kích thước file (5MB = 5 * 1024 * 1024 bytes)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showNotification('File không được vượt quá 5MB', 'error');
+                        return;
+                    }
+                    
                     fileInput.files = files;
 
                     // Trigger change event manually
                     const event = new Event('change', { bubbles: true });
                     fileInput.dispatchEvent(event);
+                    
+                    console.log('File dropped and processed:', file.name);
                 }
             });
 
@@ -1441,6 +1606,25 @@
                 uploadNote.innerHTML = '<i class="fas fa-info-circle"></i> Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB';
                 uploadArea.style.borderColor = '';
                 uploadArea.style.background = '';
+                uploadArea.classList.remove('file-selected');
+                
+                // Ẩn nút submit và clear với hiệu ứng
+                if (submitBtn) {
+                    submitBtn.style.opacity = '0';
+                    submitBtn.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        submitBtn.style.display = 'none';
+                    }, 200);
+                }
+                
+                if (clearBtn) {
+                    clearBtn.classList.remove('show');
+                    setTimeout(() => {
+                        clearBtn.style.display = 'none';
+                    }, 200);
+                }
+                
+                console.log('Upload area reset to default state');
             }
 
             // ========== Form Submit ==========
@@ -1513,6 +1697,23 @@
                 console.error('Error:', error);
                 showNotification('Có lỗi xảy ra', 'error');
             });
+        }
+
+        // ========== Clear Selected File Function ==========        
+        function clearSelectedFile() {
+            const fileInput = document.getElementById('cvFileInput');
+            const uploadArea = document.querySelector('.upload-area');
+            
+            if (fileInput) {
+                fileInput.value = ''; // Clear file input
+                
+                // Trigger change event to reset UI
+                const event = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(event);
+                
+                console.log('File selection cleared');
+                showNotification('Đã bỏ chọn file', 'success');
+            }
         }
 
         // ========== Show Notification ==========        

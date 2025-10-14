@@ -204,9 +204,10 @@ public class ApplicationDAO extends DBContext {
         ApplicationStatistics stats = new ApplicationStatistics();
         String sql = "SELECT " +
                     "COUNT(*) as total, " +
-                    "SUM(CASE WHEN a.Status = 'pending' THEN 1 ELSE 0 END) as pending, " +
-                    "SUM(CASE WHEN a.Status = 'approved' THEN 1 ELSE 0 END) as approved, " +
-                    "SUM(CASE WHEN a.Status = 'interviewed' THEN 1 ELSE 0 END) as interviewed " +
+                    "SUM(CASE WHEN a.Status = 'Pending' THEN 1 ELSE 0 END) as pending, " +
+                    "SUM(CASE WHEN a.Status = 'Accepted' THEN 1 ELSE 0 END) as accepted, " +
+                    "SUM(CASE WHEN a.Status = 'Rejected' THEN 1 ELSE 0 END) as rejected, " +
+                    "SUM(CASE WHEN a.Status = 'Interviewed' THEN 1 ELSE 0 END) as interviewed " +
                     "FROM Applications a " +
                     "JOIN CVs cv ON a.CVID = cv.CVID " +
                     "WHERE cv.JobSeekerID = ?";
@@ -218,7 +219,8 @@ public class ApplicationDAO extends DBContext {
             if (rs.next()) {
                 stats.setTotalApplications(rs.getInt("total"));
                 stats.setPendingApplications(rs.getInt("pending"));
-                stats.setApprovedApplications(rs.getInt("approved"));
+                stats.setAcceptedApplications(rs.getInt("accepted"));
+                stats.setRejectedApplications(rs.getInt("rejected"));
                 stats.setInterviewedApplications(rs.getInt("interviewed"));
             }
         } catch (SQLException e) {
@@ -229,12 +231,68 @@ public class ApplicationDAO extends DBContext {
     }
     
     /**
+     * Delete application by ID with JobSeeker verification and Pending status check
+     * @param applicationId The application ID to delete
+     * @param jobSeekerId The JobSeeker ID for verification
+     * @return true if deletion was successful, false otherwise
+     */
+    public boolean deleteApplication(int applicationId, int jobSeekerId) {
+        // First check if the application exists, belongs to the user, and has Pending status
+        String checkSql = "SELECT a.Status FROM Applications a " +
+                         "JOIN CVs cv ON a.CVID = cv.CVID " +
+                         "WHERE a.ApplicationID = ? AND cv.JobSeekerID = ?";
+        
+        try (PreparedStatement checkPs = c.prepareStatement(checkSql)) {
+            checkPs.setInt(1, applicationId);
+            checkPs.setInt(2, jobSeekerId);
+            ResultSet rs = checkPs.executeQuery();
+            
+            if (!rs.next()) {
+                System.out.println("ApplicationDAO: Application not found or doesn't belong to user");
+                return false;
+            }
+            
+            String status = rs.getString("Status");
+            if (!"Pending".equals(status)) {
+                System.out.println("ApplicationDAO: Cannot delete application with status: " + status);
+                return false;
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("ApplicationDAO: Error checking application status - " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        
+        // If checks pass, proceed with deletion
+        String deleteSql = "DELETE FROM Applications " +
+                          "WHERE ApplicationID = ? AND Status = 'Pending' AND CVID IN (" +
+                          "SELECT CVID FROM CVs WHERE JobSeekerID = ?)";
+        
+        try (PreparedStatement deletePs = c.prepareStatement(deleteSql)) {
+            deletePs.setInt(1, applicationId);
+            deletePs.setInt(2, jobSeekerId);
+            
+            int rowsAffected = deletePs.executeUpdate();
+            System.out.println("ApplicationDAO: Deleted application ID " + applicationId + 
+                             " for JobSeeker " + jobSeekerId + ". Rows affected: " + rowsAffected);
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("ApplicationDAO: Error deleting application - " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
      * Inner class for application statistics
      */
     public static class ApplicationStatistics {
         private int totalApplications;
         private int pendingApplications;
-        private int approvedApplications;
+        private int acceptedApplications;
+        private int rejectedApplications;
         private int interviewedApplications;
         
         public ApplicationStatistics() {}
@@ -256,12 +314,20 @@ public class ApplicationDAO extends DBContext {
             this.pendingApplications = pendingApplications;
         }
         
-        public int getApprovedApplications() {
-            return approvedApplications;
+        public int getAcceptedApplications() {
+            return acceptedApplications;
         }
         
-        public void setApprovedApplications(int approvedApplications) {
-            this.approvedApplications = approvedApplications;
+        public void setAcceptedApplications(int acceptedApplications) {
+            this.acceptedApplications = acceptedApplications;
+        }
+        
+        public int getRejectedApplications() {
+            return rejectedApplications;
+        }
+        
+        public void setRejectedApplications(int rejectedApplications) {
+            this.rejectedApplications = rejectedApplications;
         }
         
         public int getInterviewedApplications() {

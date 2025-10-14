@@ -56,8 +56,8 @@ public class JobDetailServlet extends HttpServlet {
                 return;
             }
 
-            // Tăng số lượt xem (nếu cần)
-            // Có thể implement sau: jobDetailDAO.incrementViewCount(jobId);
+            // Tăng số lượt xem
+            // jobDetailDAO.incrementViewCount(jobId);
             
             // Check JobSeeker có trong session và load CV list
             JobSeeker currentJobSeeker = SessionHelper.getCurrentJobSeeker(request);
