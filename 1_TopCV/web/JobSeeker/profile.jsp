@@ -1049,7 +1049,7 @@
             </div>
             <div class="mega-col">
                 <h4>Việc của tôi</h4>
-                <a href="#">Việc đã lưu</a>
+                <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
                 <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                 <a href="#">Thông báo việc làm</a>
                 <a href="#">Việc dành cho bạn</a>
@@ -1438,33 +1438,44 @@
     </script>
     
     <script>
-        // Ajax bật/tắt searchable - Phải ở global scope để HTML có thể gọi
-        function toggleSearchable(cvId, isChecked) {
-            console.log('toggleSearchable called:', cvId, isChecked);
-            
-            fetch(contextPath + "/ToggleSearchableServlet?cvId=" + cvId + "&searchable=" + isChecked, {
-                method: "POST"
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error('HTTP error! status: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                } else {
-                    showNotification(data.message || 'Không thể cập nhật trạng thái hồ sơ!', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Có lỗi xảy ra khi cập nhật trạng thái hồ sơ!', 'error');
-            });
+// Xóa function toggleSearchable thứ hai (ở cuối file) và chỉ giữ lại function này:
+
+function toggleSearchable(cvId, isChecked) {
+    console.log('toggleSearchable called:', cvId, isChecked);
+    
+    fetch(contextPath + "/ToggleSearchableServlet", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `cvId=${cvId}&searchable=${isChecked}`
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('HTTP error! status: ' + response.status);
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
+            showNotification(message, 'success');
+        } else {
+            showNotification(data.message || 'Không thể cập nhật trạng thái hồ sơ!', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Có lỗi xảy ra khi cập nhật trạng thái hồ sơ!', 'error');
+        // Revert checkbox state nếu có lỗi
+        const checkbox = document.querySelector(`input[onchange*="${cvId}"]`);
+        if (checkbox) {
+            checkbox.checked = !isChecked;
+        }
+    });
+}
     </script>
     
     <script>
@@ -1673,30 +1684,6 @@
             // Toggle current dropdown
             const dropdown = button.nextElementSibling;
             dropdown.classList.toggle('active');
-        }
-
-        // ========== Toggle Searchable ==========        
-        function toggleSearchable(cvId, isChecked) {
-            fetch('${pageContext.request.contextPath}/ToggleSearchableServlet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `cvId=${cvId}&searchable=${isChecked}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
-                    showNotification(message, 'success');
-                } else {
-                    showNotification('Có lỗi xảy ra', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Có lỗi xảy ra', 'error');
-            });
         }
 
         // ========== Clear Selected File Function ==========        
