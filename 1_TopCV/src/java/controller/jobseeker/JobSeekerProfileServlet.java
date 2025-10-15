@@ -4,6 +4,8 @@ import dal.JobSeekerDAO;
 import dal.LocationDAO;
 import dal.TypeDAO;
 import dal.CVDAO;
+import dal.ApplicationDAO;
+import dal.SavedJobDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,8 @@ import model.JobSeeker;
 import model.Location;
 import model.Type;
 import model.CV;
+import model.ApplicationView;
+import model.SavedJob;
 import util.SessionHelper;
 import jakarta.servlet.annotation.WebServlet;
 
@@ -24,6 +28,8 @@ public class JobSeekerProfileServlet extends HttpServlet {
     private LocationDAO locDao;
     private TypeDAO typeDao;
     private CVDAO cvDAO;
+    private ApplicationDAO appDAO;
+    private SavedJobDAO savedJobDAO;
     
     public JobSeekerProfileServlet() {
         try {
@@ -31,6 +37,8 @@ public class JobSeekerProfileServlet extends HttpServlet {
             this.locDao = new LocationDAO();
             this.typeDao = new TypeDAO();
             this.cvDAO = new CVDAO();
+            this.appDAO = new ApplicationDAO();
+            this.savedJobDAO = new SavedJobDAO();
         } catch (Exception e) {
             System.err.println("Error initializing DAOs in JobSeekerProfileServlet: " + e.getMessage());
             e.printStackTrace();
@@ -68,11 +76,80 @@ public class JobSeekerProfileServlet extends HttpServlet {
             // Lấy danh sách CV của người dùng
             List<CV> uploadedCVs = cvDAO.getCVsByJobSeekerId(id);
             
+            // Lấy thống kê dashboard
+            List<ApplicationView> applications = appDAO.getApplicationsByJobSeeker(id);
+            List<SavedJob> savedJobs = savedJobDAO.getSavedJobsByJobSeeker(id);
+            
+            // Đếm số lượng
+            int cvCount = uploadedCVs != null ? uploadedCVs.size() : 0;
+            int totalApplications = applications != null ? applications.size() : 0;
+            int savedJobsCount = savedJobs != null ? savedJobs.size() : 0;
+            
+            // Đếm theo trạng thái ứng tuyển
+            int pendingCount = 0;
+            int acceptedCount = 0;
+            int interviewCount = 0;
+            int rejectedCount = 0;
+            
+            if (applications != null) {
+                for (ApplicationView app : applications) {
+                    String status = app.getStatus();
+                    if (status != null) {
+                        switch (status.toLowerCase()) {
+                            case "pending":
+                            case "đang chờ":
+                                pendingCount++;
+                                break;
+                            case "accepted":
+                            case "chấp thuận":
+                                acceptedCount++;
+                                break;
+                            case "interview":
+                            case "phỏng vấn":
+                                interviewCount++;
+                                break;
+                            case "rejected":
+                            case "từ chối":
+                                rejectedCount++;
+                                break;
+                        }
+                    }
+                }
+            }
+            
+            // Lấy hoạt động gần đây (top 5)
+            List<ApplicationView> recentApplications = null;
+            if (applications != null && !applications.isEmpty()) {
+                int endIndex = Math.min(5, applications.size());
+                recentApplications = applications.subList(0, endIndex);
+            }
+            
+            List<SavedJob> recentSavedJobs = null;
+            if (savedJobs != null && !savedJobs.isEmpty()) {
+                int endIndex = Math.min(3, savedJobs.size());
+                recentSavedJobs = savedJobs.subList(0, endIndex);
+            }
+            
+            // Set các attribute cho JSP
             request.setAttribute("jobSeeker", js);
             request.setAttribute("locations", locations);
             request.setAttribute("types", types);
             request.setAttribute("uploadedCVs", uploadedCVs);
             request.setAttribute("typeName", typeName);
+            
+            // Dashboard statistics
+            request.setAttribute("cvCount", cvCount);
+            request.setAttribute("totalApplications", totalApplications);
+            request.setAttribute("savedJobsCount", savedJobsCount);
+            request.setAttribute("profileViews", 0); // Mock data, có thể implement sau
+            
+            request.setAttribute("pendingCount", pendingCount);
+            request.setAttribute("acceptedCount", acceptedCount);
+            request.setAttribute("interviewCount", interviewCount);
+            request.setAttribute("rejectedCount", rejectedCount);
+            
+            request.setAttribute("recentApplications", recentApplications);
+            request.setAttribute("recentSavedJobs", recentSavedJobs);
             
             request.getRequestDispatcher("JobSeeker/profile.jsp").forward(request, response);
         } catch (Exception e) {

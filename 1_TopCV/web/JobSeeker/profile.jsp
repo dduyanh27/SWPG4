@@ -8,11 +8,643 @@
     <title>VietnamWorks - Hồ Sơ Của Tôi</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/JobSeeker/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <style>
+    /* ========== GLOBAL STYLES ========== */
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    /* ========== TWO COLUMN LAYOUT ========== */
+    .main-container.full-width {
+        max-width: 95%;
+        margin: 0 auto;
+        padding: 30px 3%;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 35px;
+        align-items: start;
+    }
+
+    .main-container.full-width .main-content {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .content-header {
+        text-align: left;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .content-header h1 {
+        font-size: 2.75rem;
+        color: #1f2937;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .content-header .subtitle {
+        font-size: 1.25rem;
+        color: #6b7280;
+    }
+
+    /* ========== DASHBOARD SECTION ========== */
+    .dashboard-section {
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+        font-size: 2rem;
+        color: #1f2937;
+        margin-bottom: 26px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+    }
+
+    .section-title i {
+        color: #0a67ff;
+        font-size: 1.85rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 14px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border-color: #0a67ff;
+    }
+
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        flex-shrink: 0;
+    }
+
+    .stat-icon.cv-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-icon.applied-icon {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .stat-icon.saved-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+    }
+
+    .stat-icon.view-icon {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+    }
+
+    .stat-info h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 4px 0;
+    }
+
+    .stat-info p {
+        font-size: 1.15rem;
+        color: #6b7280;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Recent Activities */
+    .recent-activities {
+        background: #f9fafb;
+        border-radius: 14px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .recent-activities h3 {
+        font-size: 1.65rem;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+    .recent-activities h3 i {
+        color: #0a67ff;
+        font-size: 1.5rem;
+    }
+
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        background: white;
+        border-radius: 12px;
+        transition: all 0.2s;
+        border: 1px solid #e5e7eb;
+    }
+
+    .activity-item:hover {
+        background: #f8f9fa;
+        border-color: #d1d5db;
+    }
+
+    .activity-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .activity-icon.apply {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .activity-icon.save {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .activity-icon.upload {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .activity-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .activity-title {
+        font-size: 1.15rem;
+        color: #1f2937;
+        margin: 0 0 6px 0;
+        font-weight: 500;
+    }
+
+    .activity-title strong {
+        color: #0a67ff;
+        font-weight: 600;
+    }
+
+    .activity-meta {
+        font-size: 1rem;
+        color: #6b7280;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .activity-meta .separator {
+        color: #d1d5db;
+    }
+
+    .activity-status {
+        padding: 8px 14px;
+        border-radius: 18px;
+        font-size: 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+    .activity-status.pending {
+        background: #fef3c7;
+        color: #f59e0b;
+    }
+
+    .activity-status.accepted {
+        background: #d1fae5;
+        color: #10b981;
+    }
+
+    .activity-status.interview {
+        background: #dbeafe;
+        color: #3b82f6;
+    }
+
+    .activity-status.rejected {
+        background: #fee2e2;
+        color: #ef4444;
+    }
+
+    /* Profile Completion */
+    .profile-completion {
+        background: #f9fafb;
+        border-radius: 14px;
+        padding: 26px;
+        border: 1px solid #e5e7eb;
+        margin-top: 20px;
+    }
+
+    .profile-completion h3 {
+        font-size: 1.65rem;
+        color: #1f2937;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+    .profile-completion h3 i {
+        color: #0a67ff;
+        font-size: 1.5rem;
+    }
+
+    .completion-bar {
+        width: 100%;
+        height: 36px;
+        background: #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 22px;
+    }
+
+    .completion-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #0a67ff 0%, #667eea 100%);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 14px;
+        transition: width 0.5s ease;
+    }
+
+    .completion-progress span {
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .completion-checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        color: #6b7280;
+    }
+
+    .checklist-item.completed {
+        color: #10b981;
+    }
+
+    .checklist-item i {
+        font-size: 1.35rem;
+    }
+
+    .checklist-item.completed i {
+        color: #10b981;
+    }
+
+    .checklist-item:not(.completed) i {
+        color: #d1d5db;
+    }
+
+    /* ========== RIGHT SIDEBAR ========== */
+    .right-sidebar {
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+        background: white;
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .right-sidebar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .right-sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .right-sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .right-sidebar h2 {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 24px 0;
+        padding-bottom: 16px;
+        border-bottom: 3px solid #e5e7eb;
+    }
+
+    .job-listings,
+    .company-listings {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-bottom: 36px;
+    }
+
+    .job-card,
+    .company-card {
+        display: flex;
+        gap: 18px;
+        padding: 20px;
+        background: #f9fafb;
+        border-radius: 14px;
+        transition: all 0.3s;
+        cursor: pointer;
+        border: 2px solid #e5e7eb;
+    }
+
+    .job-card:hover,
+    .company-card:hover {
+        background: white;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        transform: translateY(-3px);
+        border-color: #0a67ff;
+    }
+
+    .company-logo {
+        flex-shrink: 0;
+    }
+
+    .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.9rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+    }
+
+    .job-info,
+    .company-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .job-info h4,
+    .company-info h4 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 10px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        white-space: normal;
+        line-height: 1.4;
+    }
+
+    .job-info p,
+    .company-info p {
+        font-size: 1.15rem;
+        color: #6b7280;
+        margin: 6px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.5;
+    }
+
+    .job-info .company {
+        color: #4b5563;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .job-info .salary {
+        color: #059669;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+    .job-info .location {
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    .company-info .followers,
+    .company-info .jobs {
+        color: #6b7280;
+    }
+
+    .zalo-chat {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #0084ff 0%, #0063d1 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+        box-shadow: 0 4px 20px rgba(0,132,255,0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .zalo-chat:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 24px rgba(0,132,255,0.6);
+    }
+
+    /* ========== PROFILE INFO CARD OVERRIDE ========== */
+    .profile-info-card {
+        background: white !important;
+        border-radius: 16px !important;
+        padding: 2.5rem !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1) !important;
+        margin-bottom: 2rem !important;
+        position: relative !important;
+    }
+
+    .profile-header {
+        display: flex !important;
+        gap: 2rem !important;
+        align-items: flex-start !important;
+    }
+
+    .profile-avatar-large {
+        width: 110px !important;
+        height: 110px !important;
+        background: #0066cc !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-size: 3rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    .profile-details h2 {
+        color: #333 !important;
+        font-size: 2.2rem !important;
+        margin-bottom: 0.5rem !important;
+        font-weight: 700 !important;
+        line-height: 1.3 !important;
+    }
+
+    .profile-details .job-title {
+        color: #666 !important;
+        font-size: 1.4rem !important;
+        margin-bottom: 1.2rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .profile-meta {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.8rem !important;
+    }
+
+    .profile-meta .meta-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
+        color: #555 !important;
+        font-size: 1.2rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .profile-meta .meta-item i {
+        color: #0066cc !important;
+        width: 24px !important;
+        text-align: center !important;
+        font-size: 1.3rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    .edit-profile-btn {
+        position: absolute !important;
+        top: 1.5rem !important;
+        right: 1.5rem !important;
+        background: #f8f9fa !important;
+        border: 1px solid #e9ecef !important;
+        color: #666 !important;
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+        font-size: 1.2rem !important;
+    }
+
+    .edit-profile-btn:hover {
+        background: #0066cc !important;
+        color: white !important;
+        border-color: #0066cc !important;
+        transform: scale(1.08) !important;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .content-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .activity-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .activity-status {
+            align-self: flex-start;
+        }
+
+        .completion-checklist {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* Profile Modal Styles - Responsive Fixed Version */
 .main-content {
     position: relative;
+    overflow: visible;
 }
 .profile-modal {
     position: absolute;
@@ -50,16 +682,16 @@
 .profile-modal .modal-content {
     position: relative;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     display: flex;
     flex-direction: column;
     /* Sử dụng calc để tính toán chiều cao dựa trên viewport */
-    height: calc(50vh); /* 40px = padding top + bottom */
-    max-height: 700px; /* Giới hạn chiều cao tối đa */
-    min-height: 500px; /* Chiều cao tối thiểu */
+    height: calc(70vh); /* 40px = padding top + bottom */
+    max-height: 850px; /* Giới hạn chiều cao tối đa */
+    min-height: 600px; /* Chiều cao tối thiểu */
     overflow: hidden;
     transform: scale(0.9);
     transition: transform 0.3s ease-in-out;
@@ -73,16 +705,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
+    padding: 1.5rem 2rem;
     border-bottom: 1px solid #e9ecef;
     background: white;
-    border-radius: 12px 12px 0 0;
+    border-radius: 16px 16px 0 0;
     flex-shrink: 0; /* Không cho phép co lại */
 }
 
 .profile-modal .modal-header h2 {
     color: #333;
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     margin: 0;
     font-weight: 600;
 }
@@ -90,14 +722,14 @@
 .profile-modal .modal-close {
     background: none;
     border: none;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: #666;
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
     transition: background-color 0.2s;
-    width: 36px;
-    height: 36px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -110,16 +742,16 @@
 .profile-modal .modal-body {
     flex: 1; /* Chiếm hết không gian còn lại */
     overflow-y: auto; /* Cho phép cuộn */
-    padding: 1.5rem;
+    padding: 2rem;
     /* Đảm bảo có thể cuộn được */
     min-height: 0;
 }
 
 .profile-modal .modal-footer {
-    padding: 1rem 1.5rem;
+    padding: 1.25rem 2rem;
     border-top: 1px solid #e9ecef;
     background: white;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -130,8 +762,8 @@
 .profile-modal .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .profile-modal .form-group {
@@ -145,18 +777,18 @@
 
 .profile-modal .form-group label {
     color: #333;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
 }
 
 .profile-modal .form-group input,
 .profile-modal .form-group select,
 .profile-modal .form-group textarea {
-    padding: 0.75rem;
+    padding: 0.9rem 1rem;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    font-size: 1.05rem;
     transition: border-color 0.2s;
     font-family: inherit;
 }
@@ -170,13 +802,13 @@
 }
 
 .profile-modal .form-group textarea {
-    min-height: 80px;
+    min-height: 100px;
     resize: vertical;
 }
 
 .required-note {
     color: #666;
-    font-size: 0.8rem;
+    font-size: 1rem;
     margin-top: 1rem;
     font-style: italic;
 }
@@ -190,12 +822,13 @@
     background: #ff6b35;
     color: white;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
     font-weight: 500;
+    font-size: 1.05rem;
     cursor: pointer;
     transition: background-color 0.2s;
-    min-width: 80px;
+    min-width: 100px;
 }
 
 .save-btn:hover {
@@ -206,12 +839,13 @@
     background: #f8f9fa;
     color: #333;
     border: 1px solid #ddd;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
+    padding: 0.9rem 2rem;
+    border-radius: 8px;
     font-weight: 500;
+    font-size: 1.05rem;
     cursor: pointer;
     transition: all 0.2s;
-    min-width: 80px;
+    min-width: 100px;
 }
 
 .cancel-btn:hover {
@@ -239,14 +873,92 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1400px) {
+    .main-container.full-width {
+        max-width: 100%;
+        padding: 30px 30px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-container.full-width {
+        padding: 25px 25px;
+        grid-template-columns: 1fr 320px;
+        gap: 25px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-container.full-width {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+    
+    .right-sidebar {
+        display: none;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .main-container.full-width {
+        padding: 20px;
+    }
+    
+    .content-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .content-header .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-section {
+        padding: 20px;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .stat-card {
+        padding: 16px;
+    }
+    
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+    
+    .stat-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .recent-activities,
+    .profile-completion {
+        padding: 20px;
+    }
+    
     .profile-modal.show {
-        padding: 10px; /* Giảm padding trên mobile */
+        padding: 10px;
     }
     
     .profile-modal .modal-content {
-        height: calc(100vh - 20px); /* Điều chỉnh cho mobile */
-        max-height: none; /* Bỏ giới hạn max-height trên mobile */
+        height: calc(100vh - 20px);
+        max-height: none;
         min-height: 300px;
     }
     
@@ -458,16 +1170,17 @@
         padding: 32px;
         box-shadow: var(--shadow-sm);
         margin: 24px 0;
+        overflow: visible;
     }
 
     .profile-documents-section h3 {
-        font-size: 24px;
+        font-size: 1.85rem;
         font-weight: 700;
         color: var(--text-dark);
-        margin: 0 0 24px 0;
+        margin: 0 0 26px 0;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
     }
 
     .profile-documents-section h3::before {
@@ -475,7 +1188,7 @@
         font-family: 'Font Awesome 6 Free';
         font-weight: 900;
         color: var(--primary);
-        font-size: 28px;
+        font-size: 2rem;
     }
 
     /* ========== UPLOAD AREA ========== */
@@ -535,19 +1248,19 @@
     }
 
     .upload-btn span {
-        font-size: 16px;
+        font-size: 1.15rem;
         font-weight: 600;
         color: var(--text-dark);
     }
 
     .upload-note {
         color: var(--text-muted);
-        font-size: 14px;
+        font-size: 1.05rem;
         margin: 16px 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         transition: all 0.3s ease;
     }
 
@@ -568,16 +1281,16 @@
         background: linear-gradient(135deg, var(--primary-dark), var(--primary));
         color: white;
         border: none;
-        padding: 14px 32px;
+        padding: 16px 36px;
         border-radius: 30px;
-        font-size: 16px;
+        font-size: 1.15rem;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(10,103,255,0.3);
         display: none; /* Ban đầu ẩn nút submit */
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         margin-top: 16px;
         opacity: 0;
         transform: translateY(10px);
@@ -594,15 +1307,15 @@
         background: #6b7280;
         color: white;
         border: none;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
+        padding: 10px 20px;
+        border-radius: 22px;
+        font-size: 1.05rem;
         font-weight: 500;
         cursor: pointer;
         transition: all 0.2s ease;
         display: none;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         margin-left: 12px;
     }
 
@@ -654,19 +1367,27 @@
     .uploaded-files {
         display: grid;
         gap: 16px;
+        position: relative;
+        z-index: 1;
+        padding-bottom: 20px; /* Khoảng trống nhỏ ở dưới cùng */
     }
 
     .file-item {
         background: white;
         border: 2px solid var(--border);
         border-radius: var(--radius-md);
-        padding: 20px;
+        padding: 26px;
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 20px;
+        gap: 24px;
         transition: all 0.3s ease;
         position: relative;
+        z-index: 1;
+    }
+
+    .file-item:has(.file-dropdown.active) {
+        z-index: 20;
     }
 
     .file-item:hover {
@@ -697,13 +1418,13 @@
     }
 
     .file-info h4 {
-        font-size: 18px;
+        font-size: 1.35rem;
         font-weight: 700;
         color: var(--text-dark);
-        margin: 0 0 12px 0;
+        margin: 0 0 14px 0;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
 
     .file-info h4::before {
@@ -711,32 +1432,33 @@
         font-family: 'Font Awesome 6 Free';
         font-weight: 900;
         color: var(--primary);
-        font-size: 20px;
+        font-size: 1.5rem;
     }
 
     .file-meta {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         color: var(--text-muted);
-        font-size: 14px;
-        margin-bottom: 12px;
+        font-size: 1.1rem;
+        margin-bottom: 14px;
     }
 
     .file-meta i {
         color: var(--primary);
+        font-size: 1.15rem;
     }
 
     .view-as-recruiter {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         color: var(--primary);
         text-decoration: none;
-        font-size: 14px;
+        font-size: 1.05rem;
         font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
         transition: all 0.2s;
     }
 
@@ -754,13 +1476,14 @@
     /* ========== FILE ACTIONS ========== */
     .file-actions {
         position: relative;
+        z-index: 10;
     }
 
     .file-menu-btn {
         background: var(--bg-light);
         border: 2px solid var(--border);
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -768,6 +1491,7 @@
         cursor: pointer;
         transition: all 0.3s ease;
         color: var(--text-muted);
+        font-size: 1.15rem;
     }
 
     .file-menu-btn:hover {
@@ -784,11 +1508,29 @@
         background: white;
         border-radius: var(--radius-md);
         box-shadow: var(--shadow-lg);
-        min-width: 240px;
-        padding: 8px;
+        min-width: 280px;
+        padding: 10px;
         display: none;
-        z-index: 100;
+        z-index: 9999;
         animation: slideDown 0.3s ease;
+    }
+
+    /* Dropdown mở lên trên cho item cuối */
+    .file-item:last-child .file-dropdown {
+        top: auto;
+        bottom: calc(100% + 8px);
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @keyframes slideDown {
@@ -810,11 +1552,11 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
-        padding: 12px 16px;
+        gap: 14px;
+        padding: 14px 18px;
         color: var(--text-dark);
         text-decoration: none;
-        border-radius: 8px;
+        border-radius: 10px;
         transition: all 0.2s;
         cursor: pointer;
     }
@@ -825,14 +1567,42 @@
 
     .dropdown-item i {
         color: var(--primary);
-        width: 20px;
+        width: 22px;
         text-align: center;
+        font-size: 1.1rem;
     }
 
     .dropdown-item span:first-child {
         flex: 1;
-        font-size: 14px;
+        font-size: 1.05rem;
         font-weight: 500;
+    }
+
+    .dropdown-item.toggle-item {
+        padding: 14px 18px;
+        cursor: default;
+    }
+
+    .dropdown-item.toggle-item:hover {
+        background: transparent;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 4px 0;
+    }
+
+    .dropdown-item.delete-item {
+        color: var(--danger);
+    }
+
+    .dropdown-item.delete-item i {
+        color: var(--danger);
+    }
+
+    .dropdown-item.delete-item:hover {
+        background: rgba(239, 68, 68, 0.1);
     }
 
     /* ========== TOGGLE SWITCH ========== */
@@ -1060,96 +1830,15 @@
             </div>
         </div>
     </div>
-    <div class="main-container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar">
-            <!-- User Profile Card -->
-            <div class="profile-card">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-info">
-                    <h3>${jobSeeker.fullName}</h3>
-                    <p>${jobSeeker.headline != null ? jobSeeker.headline : 'Chưa cập nhật'}</p>
-                </div>
-                <div class="profile-edit">
-                    <i class="fas fa-plus"></i>
-                </div>
-            </div>
-            
-            <div class="resume-status">
-                <h4>Cho phép tìm kiếm hồ sơ</h4>
-                <div class="resume-toggle">
-                    <label class="toggle-switch">
-                        <input type="checkbox" 
-                               data-field="search-enabled" 
-                               ${jobSeeker.status == 'Active' ? 'checked' : ''}>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="nav-menu">
-                <ul>
-                    <li>
-                        <a href="index.html" class="nav-item">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Tổng Quan</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="profile.html" class="nav-item active">
-                            <i class="fas fa-file-alt"></i>
-                            <span>Hồ Sơ Của Tôi</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.html" class="nav-item">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Việc Làm Của Tôi</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/applied-jobs" class="nav-item">
-                            <i class="fas fa-history"></i>
-                            <span>Lịch Sử Ứng Tuyển</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-item">
-                            <i class="fas fa-bell"></i>
-                            <span>Thông Báo Việc Làm</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-item">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Quản Lý Đơn Hàng</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="account-management.html" class="nav-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Quản Lý Tài Khoản</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Call to Action Button -->
-            <button class="cta-button">
-                <i class="fas fa-bell"></i>
-                <span>Tạo Thông Báo Việc Làm</span>
-            </button>
-        </aside>
-
-        <!-- Main Content -->
+    
+    <!-- Main Content (Full Width - No Sidebar) -->
+    <div class="main-container full-width">
         <main class="main-content">
             <div class="content-header">
-                <h1>Hồ Sơ Của Tôi</h1>
+                <h1>Hồ Sơ & Tổng Quan</h1>
+                <p class="subtitle">Quản lý thông tin cá nhân và theo dõi hoạt động tìm việc của bạn</p>
             </div>
-            
+
             <!-- Personal Information Card -->
             <div class="profile-info-card">
                 <div class="profile-header">
@@ -1204,94 +1893,391 @@
                         </div>-->
             <!-- Profile Documents Section -->
             <div class="profile-documents-section">
-    <h3>Hồ sơ đã tải lên</h3>
-    
-    <!-- Upload Form -->
-    <form action="${pageContext.request.contextPath}/UploadCVServlet"
-          method="post"
-          enctype="multipart/form-data"
-          class="upload-area"
-          id="uploadForm">
-        
-        <label class="upload-btn" id="uploadLabel" for="cvFileInput">
-            <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
-            <span id="uploadText">Chọn hoặc kéo thả hồ sơ từ máy của bạn</span>
-            <input type="file" 
-                   name="cvFile" 
-                   id="cvFileInput"
-                   hidden 
-                   required 
-                   accept=".doc,.docx,.pdf">
-        </label>
-        
-        <p class="upload-note" id="uploadNote">
-            <i class="fas fa-info-circle"></i>
-            Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB
-        </p>
-        
-        <div class="upload-actions">
-            <button type="submit" class="btn-submit" id="submitBtn">
-                Tải lên
-            </button>
-            <button type="button" class="btn-clear" id="clearBtn" onclick="clearSelectedFile()">
-                <i class="fas fa-times"></i>
-                Bỏ chọn
-            </button>
-        </div>
-    </form>
+                <h3>Hồ sơ đã tải lên</h3>
 
-    <!-- Danh sách CV đã upload -->
-    <div class="uploaded-files">
-        <c:forEach var="cv" items="${uploadedCVs}">
-            <div class="file-item">
-                <div class="file-info">
-                    <h4>${cv.cvTitle}</h4>
-                    <div class="file-meta">
-                        <i class="fas fa-clock"></i>
-                        <span>Ngày tải lên: ${cv.creationDate}</span>
+                <!-- Upload Form -->
+                <form action="${pageContext.request.contextPath}/UploadCVServlet"
+                      method="post"
+                      enctype="multipart/form-data"
+                      class="upload-area"
+                      id="uploadForm">
+
+                    <label class="upload-btn" id="uploadLabel" for="cvFileInput">
+                        <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+                        <span id="uploadText">Chọn hoặc kéo thả hồ sơ từ máy của bạn</span>
+                        <input type="file" 
+                               name="cvFile" 
+                               id="cvFileInput"
+                               hidden 
+                               required 
+                               accept=".doc,.docx,.pdf">
+                    </label>
+
+                    <p class="upload-note" id="uploadNote">
+                        <i class="fas fa-info-circle"></i>
+                        Hỗ trợ định dạng .doc, .docx, .pdf có kích thước dưới 5MB
+                    </p>
+
+                    <div class="upload-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            Tải lên
+                        </button>
+                        <button type="button" class="btn-clear" id="clearBtn" onclick="clearSelectedFile()">
+                            <i class="fas fa-times"></i>
+                            Bỏ chọn
+                        </button>
                     </div>
-                    <a href="${pageContext.request.contextPath}${cv.cvURL}" 
-                       target="_blank"
-                       class="view-as-recruiter">
-                        Xem hồ sơ
-                    </a>
+                </form>
+
+                <!-- Danh sách CV đã upload -->
+                <div class="uploaded-files">
+                    <c:forEach var="cv" items="${uploadedCVs}">
+                        <div class="file-item">
+                            <div class="file-info">
+                                <h4>${cv.cvTitle}</h4>
+                                <div class="file-meta">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Ngày tải lên: ${cv.creationDate}</span>
+                                </div>
+                                <a href="${pageContext.request.contextPath}${cv.cvURL}" 
+                                   target="_blank"
+                                   class="view-as-recruiter">
+                                    Xem hồ sơ
+                                </a>
+                            </div>
+
+                            <div class="file-actions">
+                                <button class="file-menu-btn" onclick="toggleDropdown(event, this)">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <div class="file-dropdown">
+                                    <a href="${pageContext.request.contextPath}${cv.cvURL}" 
+                                       download="${cv.cvTitle}"
+                                       class="dropdown-item">
+                                        <i class="fas fa-download"></i>
+                                        <span>Tải xuống</span>
+                                    </a>
+                                    <div class="dropdown-item toggle-item">
+                                        <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                            <i class="fas fa-search"></i>
+                                            <span style="flex: 1;">Cho phép NTD tìm kiếm</span>
+                                            <label class="toggle-switch" onclick="event.stopPropagation();">
+                                                <input type="checkbox" 
+                                                       data-cv-id="${cv.cvId}" 
+                                                       ${cv.active ? 'checked' : ''}
+                                                       onchange="toggleCVSearch(this, ${cv.cvId})">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="#" 
+                                       class="dropdown-item delete-item"
+                                       onclick="confirmDeleteCV(event, ${cv.cvId}, '${cv.cvTitle}')">
+                                        <i class="fas fa-trash-alt"></i>
+                                        <span>Xóa hồ sơ</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+
+                    <!-- Empty State -->
+                    <c:if test="${empty uploadedCVs}">
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <i class="fas fa-folder-open" style="font-size: 48px; color: #ddd; margin-bottom: 16px;"></i>
+                            <p style="font-size: 16px;">Chưa có hồ sơ nào được tải lên</p>
+                            <p style="font-size: 14px; color: #999;">Hãy tải lên hồ sơ đầu tiên của bạn</p>
+                        </div>
+                    </c:if>
                 </div>
+            </div>
+
+            <!-- Dashboard / Statistics Section -->
+            <div class="dashboard-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Thống kê hoạt động
+                </h2>
                 
-                <div class="file-actions">
-                    <button class="file-menu-btn" onclick="toggleDropdown(event, this)">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                    <div class="file-dropdown">
-                        <a href="${pageContext.request.contextPath}${cv.cvURL}" 
-                           download="${cv.cvTitle}"
-                           class="dropdown-item">
-                            <i class="fas fa-download"></i>
-                            <span>Tải xuống</span>
-                        </a>
-                        <div class="dropdown-item">
-                            <span>Cho phép tìm kiếm</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox"
-                                       ${cv.active ? "checked" : ""}
-                                       onchange="toggleSearchable(${cv.cvId}, this.checked)">
-                                <span class="slider"></span>
-                            </label>
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon cv-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${cvCount != null ? cvCount : 0}</h3>
+                            <p>CV đã tải lên</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon applied-icon">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${totalApplications != null ? totalApplications : 0}</h3>
+                            <p>Đơn đã ứng tuyển</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon saved-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${savedJobsCount != null ? savedJobsCount : 0}</h3>
+                            <p>Việc đã lưu</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon view-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>${profileViews != null ? profileViews : 0}</h3>
+                            <p>Lượt xem hồ sơ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Status Chart -->
+                <div class="chart-container" style="margin-bottom: 30px;">
+                    <h3 style="font-size: 1.3rem; color: #1f2937; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chart-pie"></i> Trạng thái ứng tuyển
+                    </h3>
+                    <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+                        <div style="width: 250px; height: 250px;">
+                            <canvas id="applicationStatusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-legend" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 16px; height: 16px; background: #FFA500; border-radius: 4px;"></span>
+                            <span style="font-size: 14px; color: #6b7280;">Đang chờ: <strong>${pendingCount != null ? pendingCount : 0}</strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 16px; height: 16px; background: #4CAF50; border-radius: 4px;"></span>
+                            <span style="font-size: 14px; color: #6b7280;">Chấp thuận: <strong>${acceptedCount != null ? acceptedCount : 0}</strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 16px; height: 16px; background: #2196F3; border-radius: 4px;"></span>
+                            <span style="font-size: 14px; color: #6b7280;">Phỏng vấn: <strong>${interviewCount != null ? interviewCount : 0}</strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="width: 16px; height: 16px; background: #F44336; border-radius: 4px;"></span>
+                            <span style="font-size: 14px; color: #6b7280;">Từ chối: <strong>${rejectedCount != null ? rejectedCount : 0}</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="recent-activities">
+                    <h3><i class="fas fa-clock"></i> Hoạt động gần đây</h3>
+                    <div class="activity-list">
+                        <!-- Recent Applications -->
+                        <c:if test="${not empty recentApplications}">
+                            <c:forEach var="app" items="${recentApplications}" varStatus="status">
+                                <c:if test="${status.index < 3}">
+                                    <div class="activity-item">
+                                        <div class="activity-icon apply">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <p class="activity-title">Ứng tuyển <strong>${app.jobTitle}</strong></p>
+                                            <p class="activity-meta">
+                                                <i class="fas fa-building"></i> ${app.companyName}
+                                                <span class="separator">•</span>
+                                                <i class="fas fa-map-marker-alt"></i> ${app.locationName}
+                                            </p>
+                                        </div>
+                                        <c:choose>
+                                            <c:when test="${app.status eq 'Pending' or app.status eq 'pending'}">
+                                                <div class="activity-status pending">
+                                                    <i class="fas fa-hourglass-half"></i> Đang chờ
+                                                </div>
+                                            </c:when>
+                                            <c:when test="${app.status eq 'Accepted' or app.status eq 'accepted'}">
+                                                <div class="activity-status accepted">
+                                                    <i class="fas fa-check-circle"></i> Chấp thuận
+                                                </div>
+                                            </c:when>
+                                            <c:when test="${app.status eq 'Interview' or app.status eq 'interview'}">
+                                                <div class="activity-status interview">
+                                                    <i class="fas fa-calendar-check"></i> Phỏng vấn
+                                                </div>
+                                            </c:when>
+                                            <c:when test="${app.status eq 'Rejected' or app.status eq 'rejected'}">
+                                                <div class="activity-status rejected">
+                                                    <i class="fas fa-times-circle"></i> Từ chối
+                                                </div>
+                                            </c:when>
+                                        </c:choose>
+                                    </div>
+                                </c:if>
+                            </c:forEach>
+                        </c:if>
+                        
+                        <!-- Recent Saved Jobs (limited to 2) -->
+                        <c:if test="${not empty recentSavedJobs}">
+                            <c:forEach var="saved" items="${recentSavedJobs}" varStatus="status">
+                                <c:if test="${status.index < 2}">
+                                    <div class="activity-item">
+                                        <div class="activity-icon save">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <p class="activity-title">Lưu <strong>${saved.jobTitle}</strong></p>
+                                            <p class="activity-meta">
+                                                <i class="fas fa-building"></i> ${saved.companyName}
+                                                <span class="separator">•</span>
+                                                <i class="fas fa-map-marker-alt"></i> ${saved.locationName}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </c:if>
+                            </c:forEach>
+                        </c:if>
+                        
+                        <!-- No Activities Message -->
+                        <c:if test="${empty recentApplications and empty recentSavedJobs}">
+                            <div style="text-align: center; padding: 30px; color: #6b7280;">
+                                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                                <p>Chưa có hoạt động nào gần đây</p>
+                                <p style="font-size: 0.9rem; margin-top: 10px;">Hãy bắt đầu ứng tuyển hoặc lưu các công việc bạn quan tâm!</p>
+                            </div>
+                        </c:if>
+                    </div>
+                </div>
+
+                <!-- Profile Completion -->
+                <div class="profile-completion">
+                    <h3><i class="fas fa-tasks"></i> Hoàn thiện hồ sơ</h3>
+                    <div class="completion-bar">
+                        <div class="completion-progress" style="width: 75%">
+                            <span>75%</span>
+                        </div>
+                    </div>
+                    <div class="completion-checklist">
+                        <div class="checklist-item completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Xác thực email</span>
+                        </div>
+                        <div class="checklist-item completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Tải lên CV</span>
+                        </div>
+                        <div class="checklist-item completed">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Thêm số điện thoại</span>
+                        </div>
+                        <div class="checklist-item">
+                            <i class="fas fa-circle"></i>
+                            <span>Thêm ảnh đại diện</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </c:forEach>
+        </main>
 
-        <!-- Empty State -->
-        <c:if test="${empty uploadedCVs}">
-            <div style="text-align: center; padding: 40px; color: #666;">
-                <i class="fas fa-folder-open" style="font-size: 48px; color: #ddd; margin-bottom: 16px;"></i>
-                <p style="font-size: 16px;">Chưa có hồ sơ nào được tải lên</p>
-                <p style="font-size: 14px; color: #999;">Hãy tải lên hồ sơ đầu tiên của bạn</p>
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <h2>Việc Làm Bạn Sẽ Thích</h2>
+            
+            <div class="job-listings">
+                <div class="job-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">N</div>
+                    </div>
+                    <div class="job-info">
+                        <h4>Account Exec...</h4>
+                        <p class="company">Tập Đoàn Novaon</p>
+                        <p class="salary">15tr-40tr đ/tháng</p>
+                        <p class="location">Hà Nội, Hồ Chí Minh</p>
+                    </div>
+                </div>
+
+                <div class="job-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">D</div>
+                    </div>
+                    <div class="job-info">
+                        <h4>Trade Marketing</h4>
+                        <p class="company">CÔNG TY TNHH T...</p>
+                        <p class="salary">Từ 10tr đ/tháng</p>
+                        <p class="location">Hà Nội</p>
+                    </div>
+                </div>
+
+                <div class="job-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">S</div>
+                    </div>
+                    <div class="job-info">
+                        <h4>Phát Triển Kin...</h4>
+                        <p class="company">Công Ty TNHH SPE...</p>
+                        <p class="salary">$ 500-1,500 /tháng</p>
+                        <p class="location">Hà Nội</p>
+                    </div>
+                </div>
+
+                <div class="job-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">V</div>
+                    </div>
+                    <div class="job-info">
+                        <h4>Trưởng Ban N...</h4>
+                        <p class="company">Công Ty Cổ Phần S...</p>
+                        <p class="salary">Thương lượng</p>
+                        <p class="location">Hà Nội</p>
+                    </div>
+                </div>
             </div>
-        </c:if>
-    </div>
-</div>
+
+            <h2>Công Ty Bạn Sẽ Thích</h2>
+            
+            <div class="company-listings">
+                <div class="company-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">H</div>
+                    </div>
+                    <div class="company-info">
+                        <h4>HEINEKEN Vietnam</h4>
+                        <p class="followers">2458 lượt theo dõi</p>
+                        <p class="jobs">14 việc làm</p>
+                    </div>
+                </div>
+
+                <div class="company-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">G</div>
+                    </div>
+                    <div class="company-info">
+                        <h4>Công ty Cổ phần Tập đoà...</h4>
+                        <p class="followers">787 lượt theo dõi</p>
+                        <p class="jobs">24 việc làm</p>
+                    </div>
+                </div>
+
+                <div class="company-card">
+                    <div class="company-logo">
+                        <div class="logo-placeholder">T</div>
+                    </div>
+                    <div class="company-info">
+                        <h4>Techcombank</h4>
+                        <p class="followers">4901 lượt theo dõi</p>
+                        <p class="jobs">44 việc làm</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zalo Chat Icon -->
+            <div class="zalo-chat">
+                <i class="fab fa-facebook-messenger"></i>
+            </div>
+        </aside>
     </div>
 
 
@@ -1398,7 +2384,8 @@
                 </div>
         </div>
     </div>
-    </main>
+
+    </div><!-- Close main-container -->
 
     <script>
         // Định nghĩa contextPath để sử dụng trong JavaScript
@@ -1435,47 +2422,6 @@
                 }
             });
 
-    </script>
-    
-    <script>
-// Xóa function toggleSearchable thứ hai (ở cuối file) và chỉ giữ lại function này:
-
-function toggleSearchable(cvId, isChecked) {
-    console.log('toggleSearchable called:', cvId, isChecked);
-    
-    fetch(contextPath + "/ToggleSearchableServlet", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `cvId=${cvId}&searchable=${isChecked}`
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-            throw new Error('HTTP error! status: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
-        if (data.success) {
-            const message = isChecked ? 'Đã bật tìm kiếm hồ sơ' : 'Đã tắt tìm kiếm hồ sơ';
-            showNotification(message, 'success');
-        } else {
-            showNotification(data.message || 'Không thể cập nhật trạng thái hồ sơ!', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Có lỗi xảy ra khi cập nhật trạng thái hồ sơ!', 'error');
-        // Revert checkbox state nếu có lỗi
-        const checkbox = document.querySelector(`input[onchange*="${cvId}"]`);
-        if (checkbox) {
-            checkbox.checked = !isChecked;
-        }
-    });
-}
     </script>
     
     <script>
@@ -1701,6 +2647,86 @@ function toggleSearchable(cvId, isChecked) {
                 console.log('File selection cleared');
                 showNotification('Đã bỏ chọn file', 'success');
             }
+        }
+
+        // ========== Toggle CV Search Function ==========
+        function toggleCVSearch(checkbox, cvID) {
+            const isActive = checkbox.checked ? 1 : 0;
+            
+            console.log('Toggling CV search for CV ID:', cvID, 'New isActive:', isActive);
+            
+            // Gửi request đến servlet
+            fetch(contextPath + '/ToggleCVSearchServlet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'cvID=' + cvID + '&isActive=' + isActive
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const statusText = isActive === 1 ? 'cho phép' : 'không cho phép';
+                    showNotification('Đã ' + statusText + ' nhà tuyển dụng tìm kiếm CV này', 'success');
+                    console.log('Toggle successful:', data);
+                } else {
+                    // Revert checkbox nếu có lỗi
+                    checkbox.checked = !checkbox.checked;
+                    showNotification('Có lỗi xảy ra: ' + (data.message || 'Vui lòng thử lại'), 'error');
+                    console.error('Toggle failed:', data);
+                }
+            })
+            .catch(error => {
+                // Revert checkbox nếu có lỗi
+                checkbox.checked = !checkbox.checked;
+                showNotification('Không thể kết nối đến server', 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        // ========== Confirm Delete CV Function ==========
+        function confirmDeleteCV(event, cvID, cvTitle) {
+            event.preventDefault();
+            
+            // Tạo modal xác nhận xóa
+            const confirmed = confirm('Bạn có chắc chắn muốn xóa CV "' + cvTitle + '"?\n\nHành động này không thể hoàn tác!');
+            
+            if (confirmed) {
+                deleteCV(cvID);
+            }
+        }
+
+        // ========== Delete CV Function ==========
+        function deleteCV(cvID) {
+            console.log('Deleting CV ID:', cvID);
+            
+            // Gửi request đến servlet
+            fetch(contextPath + '/DeleteCVServlet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'cvID=' + cvID
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Đã xóa CV thành công', 'success');
+                    console.log('Delete successful:', data);
+                    
+                    // Reload trang sau 1 giây để cập nhật danh sách CV
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showNotification('Có lỗi xảy ra: ' + (data.message || 'Không thể xóa CV'), 'error');
+                    console.error('Delete failed:', data);
+                }
+            })
+            .catch(error => {
+                showNotification('Không thể kết nối đến server', 'error');
+                console.error('Error:', error);
+            });
         }
 
         // ========== Show Notification ==========        
@@ -1981,6 +3007,64 @@ function toggleSearchable(cvId, isChecked) {
                     e.preventDefault();
                     showNotification('Vui lòng kiểm tra lại thông tin nhập vào', 'error');
                     return false;
+                }
+            });
+        }
+
+        // ========== Application Status Pie Chart ==========
+        const ctx = document.getElementById('applicationStatusChart');
+        if (ctx) {
+            // Get data from JSP variables
+            const pendingCount = ${pendingCount != null ? pendingCount : 0};
+            const acceptedCount = ${acceptedCount != null ? acceptedCount : 0};
+            const interviewCount = ${interviewCount != null ? interviewCount : 0};
+            const rejectedCount = ${rejectedCount != null ? rejectedCount : 0};
+            
+            const applicationChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Đang chờ', 'Chấp thuận', 'Phỏng vấn', 'Từ chối'],
+                    datasets: [{
+                        label: 'Trạng thái ứng tuyển',
+                        data: [pendingCount, acceptedCount, interviewCount, rejectedCount],
+                        backgroundColor: [
+                            '#FFA500',  // Orange - Đang chờ
+                            '#4CAF50',  // Green - Chấp thuận
+                            '#2196F3',  // Blue - Phỏng vấn
+                            '#F44336'   // Red - Từ chối
+                        ],
+                        borderColor: [
+                            '#fff',
+                            '#fff',
+                            '#fff',
+                            '#fff'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed + ' đơn';
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    label += ' (' + percentage + '%)';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }

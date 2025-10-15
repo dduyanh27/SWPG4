@@ -79,19 +79,56 @@ public class CVDAO extends DBContext {
             e.printStackTrace();
         }
         return 0;
+    } 
+    /**
+     * Cập nhật trạng thái IsActive của CV (sử dụng int: 0 hoặc 1)
+     * @param cvId ID của CV cần cập nhật
+     * @param isActive 1 = Cho phép tìm kiếm, 0 = Không cho phép tìm kiếm
+     * @return true nếu cập nhật thành công, false nếu thất bại
+     */
+    public boolean updateCVIsActive(int cvId, int isActive) {
+        String sql = "UPDATE CVs SET IsActive = ? WHERE CVID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, isActive);
+            ps.setInt(2, cvId);
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     
     /**
-     * Cập nhật trạng thái IsActive của CV
-     * @param cvId ID của CV cần cập nhật
-     * @param isActive true = Cho phép tìm kiếm (1), false = Không cho phép tìm kiếm (0)
-     * @return true nếu cập nhật thành công, false nếu thất bại
+     * Kiểm tra CV có thuộc về JobSeeker hay không
+     * @param cvId ID của CV
+     * @param jobSeekerId ID của JobSeeker
+     * @return true nếu CV thuộc về JobSeeker, false nếu không
      */
-    public boolean updateIsActive(int cvId, boolean isActive) {
-        String sql = "UPDATE CVs SET IsActive = ? WHERE CVID = ?";
+    public boolean checkCVBelongsToJobSeeker(int cvId, int jobSeekerId) {
+        String sql = "SELECT COUNT(*) FROM CVs WHERE CVID = ? AND JobSeekerID = ?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setBoolean(1, isActive);
-            ps.setInt(2, cvId);
+            ps.setInt(1, cvId);
+            ps.setInt(2, jobSeekerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
+     * Xóa CV theo ID
+     * @param cvId ID của CV cần xóa
+     * @return true nếu xóa thành công, false nếu thất bại
+     */
+    public boolean deleteCV(int cvId) {
+        String sql = "DELETE FROM CVs WHERE CVID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, cvId);
             int affected = ps.executeUpdate();
             return affected > 0;
         } catch (SQLException e) {
