@@ -14,7 +14,7 @@ import util.LoginService.LoginResult;
  * Servlet for handling user authentication
  * @author ADMIN
  */
-@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
+//@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
    
     /** 

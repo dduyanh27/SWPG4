@@ -410,21 +410,185 @@
             background: var(--white);
         }
 
-        /* ========== ACTION BUTTON ========== */
-        .action-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 13px 28px;
+        /* ========== FILTER SECTION ========== */
+        .filter-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .filter-form {
+            display: flex;
+            align-items: end;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .filter-group select {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            font-size: 14px;
+            min-width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .filter-group select option {
+            background: var(--bg-left);
+            color: var(--white);
+        }
+
+        .filter-btn, .reset-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn {
             background: linear-gradient(135deg, var(--blue-dark), var(--blue));
             color: var(--white);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(10,103,255,0.4);
+        }
+
+        .reset-btn {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+        }
+
+        /* ========== STATISTICS SECTION ========== */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        /* Different colors for each stat */
+        .stat-item:nth-child(1) .stat-number { color: #0ea5e9; } /* Total - Blue */
+        .stat-item:nth-child(2) .stat-number { color: #f59e0b; } /* Pending - Orange */
+        .stat-item:nth-child(3) .stat-number { color: #10b981; } /* Accepted - Green */
+        .stat-item:nth-child(4) .stat-number { color: #ef4444; } /* Rejected - Red */
+        .stat-item:nth-child(5) .stat-number { color: #8b5cf6; } /* Interviewed - Purple */
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== ACTION BUTTONS ========== */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
             border-radius: 30px;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(10,103,255,0.3);
             position: relative;
             overflow: hidden;
+            border: none;
+            cursor: pointer;
+            gap: 8px;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(10,103,255,0.3);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(239,68,68,0.3);
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
         }
 
         .action-btn::before {
@@ -445,9 +609,129 @@
             height: 300px;
         }
 
-        .action-btn:hover {
+        .view-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(10,103,255,0.5);
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239,68,68,0.5);
+        }
+
+        /* ========== MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--bg-left), var(--bg-right));
+            color: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            color: #ef4444;
+            font-size: 24px;
+        }
+
+        .modal p {
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--text-light-muted);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: var(--white);
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
+        }
+
+        .cancel-modal-btn {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-light);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .cancel-modal-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ========== CANCEL DISABLED STATE ========== */
+        .cancel-disabled {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light-muted);
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            gap: 8px;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .cancel-disabled i {
+            font-size: 16px;
         }
 
         /* ========== EMPTY STATE ========== */
@@ -510,6 +794,24 @@
                 font-size: 26px;
             }
 
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group select {
+                min-width: 100%;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
             .job-card {
                 padding: 20px;
             }
@@ -539,6 +841,35 @@
                 width: 38px;
                 height: 38px;
                 font-size: 16px;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .stat-item {
+                padding: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .action-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .cancel-disabled {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
             }
         }
     </style>
@@ -619,6 +950,63 @@
     <div class="container">
         <h2>Danh sách công việc đã ứng tuyển</h2>
 
+        <!-- Filter Form -->
+        <div class="filter-section">
+            <form method="get" action="${pageContext.request.contextPath}/applied-jobs" class="filter-form">
+                <div class="filter-group">
+                    <label for="statusFilter">Trạng thái:</label>
+                    <select id="statusFilter" name="status">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="Pending" ${selectedStatus eq 'Pending' ? 'selected' : ''}>Đang chờ</option>
+                        <option value="Accepted" ${selectedStatus eq 'Accepted' ? 'selected' : ''}>Đã chấp nhận</option>
+                        <option value="Rejected" ${selectedStatus eq 'Rejected' ? 'selected' : ''}>Đã từ chối</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="dateRangeFilter">Thời gian:</label>
+                    <select id="dateRangeFilter" name="dateRange">
+                        <option value="">Tất cả thời gian</option>
+                        <option value="7" ${selectedDateRange eq '7' ? 'selected' : ''}>7 ngày qua</option>
+                        <option value="30" ${selectedDateRange eq '30' ? 'selected' : ''}>30 ngày qua</option>
+                        <option value="90" ${selectedDateRange eq '90' ? 'selected' : ''}>3 tháng qua</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="filter-btn">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+                
+                <a href="${pageContext.request.contextPath}/applied-jobs" class="reset-btn">
+                    <i class="fas fa-undo"></i> Đặt lại
+                </a>
+            </form>
+        </div>
+
+        <!-- Statistics Summary -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <span class="stat-number">${totalApplications}</span>
+                <span class="stat-label">Tổng ứng tuyển</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${pendingApplications}</span>
+                <span class="stat-label">Đang chờ</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${acceptedApplications}</span>
+                <span class="stat-label">Đã chấp nhận</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${rejectedApplications}</span>
+                <span class="stat-label">Bị từ chối</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">${interviewedApplications}</span>
+                <span class="stat-label">Đã phỏng vấn</span>
+            </div>
+        </div>
+
         <!-- Empty State -->
         <c:if test="${empty applications}">
             <div class="empty-state">
@@ -676,11 +1064,54 @@
                     </span>
                 </div>
                 
-                <a href="job-detail?jobId=${app.jobID}" class="action-btn">
-                    <i class="fas fa-eye"></i> Xem chi tiết
-                </a>
+                <div class="action-buttons">
+                    <a href="job-detail?jobId=${app.jobID}" class="action-btn view-btn">
+                        <i class="fas fa-eye"></i> Xem chi tiết
+                    </a>
+                    <!-- Chỉ hiển thị nút hủy khi status = Pending -->
+                    <c:if test="${app.status eq 'Pending'}">
+                        <button onclick="cancelApplication(${app.applicationID}, '${app.jobTitle}')" class="action-btn cancel-btn">
+                            <i class="fas fa-times"></i> Hủy nộp đơn
+                        </button>
+                    </c:if>
+                    <!-- Hiển thị thông báo cho các status khác -->
+                    <c:if test="${app.status ne 'Pending'}">
+                        <span class="cancel-disabled">
+                            <c:choose>
+                                <c:when test="${app.status eq 'Accepted'}">
+                                    <i class="fas fa-check-circle"></i> Đã được chấp nhận
+                                </c:when>
+                                <c:when test="${app.status eq 'Rejected'}">
+                                    <i class="fas fa-times-circle"></i> Đã bị từ chối
+                                </c:when>
+                                <c:otherwise>
+                                    <i class="fas fa-info-circle"></i> Không thể hủy
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
+                    </c:if>
+                </div>
             </div>
         </c:forEach>
+    </div>
+
+    <!-- ========== CANCEL MODAL ========== -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Xác nhận hủy nộp đơn</h3>
+            <p id="cancelMessage">Bạn có chắc chắn muốn hủy nộp đơn cho vị trí này không?</p>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.6);">
+                Hành động này không thể hoàn tác!
+            </p>
+            <div class="modal-buttons">
+                <button id="confirmCancel" class="modal-btn confirm-btn">
+                    <i class="fas fa-trash"></i> Xác nhận hủy
+                </button>
+                <button id="cancelCancel" class="modal-btn cancel-modal-btn">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- ========== JAVASCRIPT ========== -->
@@ -741,7 +1172,107 @@
                     }
                 });
             });
+
+            // Modal handlers
+            const modal = document.getElementById('cancelModal');
+            const confirmBtn = document.getElementById('confirmCancel');
+            const cancelBtn = document.getElementById('cancelCancel');
+
+            cancelBtn.addEventListener('click', function() {
+                closeModal();
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // ESC key to close modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
         });
+
+        // Global variables for cancel operation
+        let currentApplicationId = null;
+        let currentJobTitle = null;
+
+        // Show cancel confirmation modal
+        function cancelApplication(applicationId, jobTitle) {
+            currentApplicationId = applicationId;
+            currentJobTitle = jobTitle;
+            
+            const message = document.getElementById('cancelMessage');
+            message.textContent = `Bạn có chắc chắn muốn hủy nộp đơn cho vị trí "${jobTitle}" không?`;
+            
+            const modal = document.getElementById('cancelModal');
+            modal.classList.add('show');
+            
+            // Set up confirm button click handler
+            const confirmBtn = document.getElementById('confirmCancel');
+            confirmBtn.onclick = function() {
+                performCancelApplication();
+            };
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('cancelModal');
+            modal.classList.remove('show');
+            currentApplicationId = null;
+            currentJobTitle = null;
+        }
+
+        // Perform the actual cancellation
+        function performCancelApplication() {
+            if (!currentApplicationId) return;
+
+            // Show loading state
+            const confirmBtn = document.getElementById('confirmCancel');
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            confirmBtn.disabled = true;
+
+            // Send DELETE request
+            fetch('${pageContext.request.contextPath}/cancel-application', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'applicationId=' + encodeURIComponent(currentApplicationId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message and reload page
+                    alert('✅ Đã hủy nộp đơn thành công!');
+                    window.location.reload();
+                } else {
+                    // Show specific error message
+                    const errorMsg = data.message || 'Không thể hủy nộp đơn';
+                    if (errorMsg.includes('Pending')) {
+                        alert('⚠️ Không thể hủy nộp đơn!\n\nChỉ có thể hủy các đơn ứng tuyển đang ở trạng thái "Đang chờ" (Pending).');
+                    } else {
+                        alert('❌ ' + errorMsg);
+                    }
+                    // Restore button
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
+                    closeModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi hủy nộp đơn');
+                // Restore button
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+            });
+        }
     </script>
 
 </body>

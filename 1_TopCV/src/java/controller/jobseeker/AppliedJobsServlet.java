@@ -58,13 +58,17 @@ public class AppliedJobsServlet extends HttpServlet {
             
             // Get applications with filters
             List<ApplicationView> applications;
-            if (statusFilter != null || dateRange != null) {
-                System.out.println("Getting applications with filters");
+            
+            // Hiển thị tất cả trạng thái mặc định, cho phép filter theo status và dateRange
+            System.out.println("Getting applications with filters - Status: " + statusFilter + ", DateRange: " + dateRange);
+            
+            if ((statusFilter == null || statusFilter.trim().isEmpty()) && dateRange == null) {
+                // Không có filter nào - lấy tất cả applications
+                applications = applicationDAO.getApplicationsByJobSeeker(jobSeekerId);
+            } else {
+                // Có ít nhất một filter - sử dụng method với filters
                 applications = applicationDAO.getApplicationsByJobSeekerWithFilters(
                     jobSeekerId, statusFilter, dateRange);
-            } else {
-                System.out.println("Getting all applications");
-                applications = applicationDAO.getApplicationsByJobSeeker(jobSeekerId);
             }
             
             System.out.println("Found " + applications.size() + " applications");
@@ -75,18 +79,22 @@ public class AppliedJobsServlet extends HttpServlet {
             
             System.out.println("Statistics - Total: " + stats.getTotalApplications() + 
                              ", Pending: " + stats.getPendingApplications() +
-                             ", Approved: " + stats.getApprovedApplications() +
+                             ", Accepted: " + stats.getAcceptedApplications() +
+                             ", Rejected: " + stats.getRejectedApplications() +
                              ", Interviewed: " + stats.getInterviewedApplications());
             
             // Set attributes for JSP
             request.setAttribute("applications", applications);
             request.setAttribute("totalApplications", stats.getTotalApplications());
             request.setAttribute("pendingApplications", stats.getPendingApplications());
-            request.setAttribute("approvedApplications", stats.getApprovedApplications());
+            request.setAttribute("acceptedApplications", stats.getAcceptedApplications());
+            request.setAttribute("rejectedApplications", stats.getRejectedApplications());
             request.setAttribute("interviewedApplications", stats.getInterviewedApplications());
             
             // Set filter parameters back for form
-            request.setAttribute("selectedStatus", statusFilter);
+            // Chỉ set lại selectedStatus nếu user đã chọn filter, không set "Pending" mặc định
+            String originalStatusFilter = request.getParameter("status");
+            request.setAttribute("selectedStatus", originalStatusFilter);
             request.setAttribute("selectedDateRange", dateRangeParam);
             
             System.out.println("Forwarding to JSP");
