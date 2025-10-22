@@ -8,17 +8,20 @@
 <%@ page import="model.AdminJobDetail" %>
 
 <%
-    AdminJobDAO ajd = new AdminJobDAO();
-    List<Job> jobList = ajd.getAllJobs();
-    request.setAttribute("jobList", jobList);
-    List<Job> pendingJobs = ajd.getJobsByStatus("Pending");
-    request.setAttribute("pendingJobs", pendingJobs);
-    List<Job> publishedJobs = ajd.getJobsByStatus("Published");
-    request.setAttribute("publishedJobs", publishedJobs);
-    
-    AdminJobDAO dao = new AdminJobDAO();
-    List<AdminJobDetail> jobDetails = dao.getAllDetailJob();
-    request.setAttribute("jobDetails", jobDetails);
+    // Only load data if not already loaded by controller
+    if (request.getAttribute("jobList") == null) {
+        AdminJobDAO ajd = new AdminJobDAO();
+        List<Job> jobList = ajd.getAllJobs();
+        request.setAttribute("jobList", jobList);
+        List<Job> pendingJobs = ajd.getJobsByStatus("Pending");
+        request.setAttribute("pendingJobs", pendingJobs);
+        List<Job> publishedJobs = ajd.getJobsByStatus("Published");
+        request.setAttribute("publishedJobs", publishedJobs);
+        
+        AdminJobDAO dao = new AdminJobDAO();
+        List<AdminJobDetail> jobDetails = dao.getAllDetailJob();
+        request.setAttribute("jobDetails", jobDetails);
+    }
     
     ApplicationDAO appDAO = new ApplicationDAO();
     List<Application> appList = appDAO.getAllApplications();
@@ -28,8 +31,8 @@
     String view = request.getParameter("view");
     boolean showingPending = "pending".equalsIgnoreCase(view);
     request.setAttribute("showingPending", showingPending);
-    if (showingPending) {
-        request.setAttribute("jobList", pendingJobs);
+    if (showingPending && request.getAttribute("pendingJobs") != null) {
+        request.setAttribute("jobList", request.getAttribute("pendingJobs"));
     }
 %>
 <!doctype html>
@@ -226,7 +229,7 @@
                             <div class="table-title">📋 Danh sách công việc</div>
                             <div class="table-actions">
                                 <a class="btn btn-ghost btn-sm" href="adminjobfilter">📋 Tất cả</a>
-                                <a class="btn btn-ghost btn-sm" href="adminjobfilter?status=pending">📤 Chờ duyệt</a>
+                                <a class="btn btn-ghost btn-sm" href="adminjobfilter?status=Pending">📤 Chờ duyệt</a>
                                 <button class="btn btn-success btn-sm" onclick="bulkApprove()">✅ Duyệt hàng loạt</button>
                             </div>
                         </div>
@@ -464,6 +467,17 @@
             // Submit form để reset
             document.getElementById('filterForm').submit();
         }
+
+        // Auto-submit form when filter values change
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInputs = document.querySelectorAll('#filterForm input, #filterForm select');
+            filterInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    // Auto-submit form when filter changes
+                    document.getElementById('filterForm').submit();
+                });
+            });
+        });
 
         function toggleFilterCollapse() {
             const collapsibleFilters = document.getElementById('collapsibleFilters');

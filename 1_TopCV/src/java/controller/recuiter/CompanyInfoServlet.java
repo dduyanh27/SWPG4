@@ -1,4 +1,4 @@
-package controller.recuiter;
+package controller.recruiter;
 
 import dal.RecruiterDAO;
 import jakarta.servlet.ServletException;
@@ -16,62 +16,62 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "CompanyInfoServlet", urlPatterns = {"/CompanyInfoServlet"})
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 2, // 2MB
     maxFileSize = 1024 * 1024 * 10,      // 10MB
-    maxRequestSize = 1024 * 1024 * 50     // 50MB
+    maxRequestSize = 1024 * 1024 * 50    // 50MB
 )
 public class CompanyInfoServlet extends HttpServlet {
+
+    private static final int MAX_IMAGES = 5;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
         Recruiter recruiter = (Recruiter) session.getAttribute("user");
-        
+
         if (recruiter == null) {
             response.sendRedirect(request.getContextPath() + "/Recruiter/recruiter-login.jsp");
             return;
         }
-        
-        // Load company info from database
+
         RecruiterDAO recruiterDAO = new RecruiterDAO();
         Recruiter fullRecruiter = recruiterDAO.getRecruiterById(recruiter.getRecruiterID());
-        
-        
+
         if (fullRecruiter != null) {
-            // Clean up company images - remove any logo paths that might be mixed in
-            if (fullRecruiter.getImg() != null && !fullRecruiter.getImg().isEmpty()) {
-                String cleanedImages = cleanCompanyImages(fullRecruiter.getImg());
-                if (!cleanedImages.equals(fullRecruiter.getImg())) {
-                    // Update database if cleanup was needed
-                    recruiterDAO.updateCompanyImages(fullRecruiter.getRecruiterID(), cleanedImages);
-                    fullRecruiter.setImg(cleanedImages);
-                }
+            // Clean company images if there are logo paths mixed in
+            String cleanedImages = cleanCompanyImages(fullRecruiter.getImg());
+            if (cleanedImages != null && !cleanedImages.equals(fullRecruiter.getImg())) {
+                fullRecruiter.setImg(cleanedImages);
+                // update via DAO: use updateCompanyInfo(Recruiter)
+                fullRecruiter.setCompanyLogoURL(fullRecruiter.getCompanyLogoURL()); // keep existing
+                recruiterDAO.updateCompanyInfo(fullRecruiter);
             }
-            
             request.setAttribute("recruiter", fullRecruiter);
         }
-        
+
         request.getRequestDispatcher("/Recruiter/company-info.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
-        Recruiter recruiter = (Recruiter) session.getAttribute("user");
-        if (recruiter == null) {
+        Recruiter sessionRecruiter = (Recruiter) session.getAttribute("user");
+        if (sessionRecruiter == null) {
             response.sendRedirect(request.getContextPath() + "/Recruiter/recruiter-login.jsp");
             return;
         }
-        
+
         try {
-            // Get form data
+            // form params
             String companyName = request.getParameter("companyName");
             String phone = request.getParameter("phone");
             String companyAddress = request.getParameter("companyAddress");
@@ -81,293 +81,227 @@ public class CompanyInfoServlet extends HttpServlet {
             String companyDescription = request.getParameter("companyDescription");
             String companyVideoURL = request.getParameter("companyVideoURL");
             String website = request.getParameter("website");
-            
-            // Get removal flags
-            String removedLogo = request.getParameter("removedLogo");
-            String removedImages = request.getParameter("removedImages");
-            
-            // Handle logo upload (single file)
-            String logoPath = handleLogoUpload(request, recruiter.getRecruiterID());
-            
-            // Handle company images upload (multiple files)
-            String companyImagesPath = handleCompanyImagesUpload(request, recruiter.getRecruiterID());
-            
-            // Handle image removal
-            handleImageRemoval(request, removedLogo, removedImages);
-            
-            // Determine final logo and images paths
-            String finalLogoPath = logoPath;
-            String finalImagesPath = companyImagesPath;
-            
-            // If no new logo uploaded but logo was removed, set to null
-            if (logoPath == null && "true".equals(removedLogo)) {
-                finalLogoPath = null;
-            }
-            // If no new logo uploaded and logo not removed, keep existing
-            else if (logoPath == null && !"true".equals(removedLogo)) {
-                finalLogoPath = recruiter.getCompanyLogoURL();
-            }
-            
-            // Handle company images - merge existing and new images
-            if (companyImagesPath != null) {
-                // If new images uploaded, merge with existing images
-                String existingImages = recruiter.getImg();
-                if (existingImages != null && !existingImages.isEmpty()) {
-                    // Remove images that were marked for deletion
-                    if (removedImages != null && !removedImages.isEmpty()) {
-                        existingImages = removeImagesFromExisting(existingImages, removedImages);
-                    }
-                    // Merge existing and new images
-                    finalImagesPath = existingImages + "," + companyImagesPath;
-                } else {
-                    // No existing images, use only new images
-                    finalImagesPath = companyImagesPath;
-                }
-            } else if (removedImages != null && !removedImages.isEmpty()) {
-                // Only removal, no new uploads
-                finalImagesPath = removeImagesFromExisting(recruiter.getImg(), removedImages);
-            } else {
-                // No changes to images
-                finalImagesPath = recruiter.getImg();
-            }
-            
-            // Validate path length before saving to database
-            if (finalImagesPath != null && finalImagesPath.length() > 500) {
-                // Keep only first 5 images if path is too long
-                String[] images = finalImagesPath.split(",");
-                if (images.length > 5) {
-                    StringBuilder truncated = new StringBuilder();
-                    for (int i = 0; i < 5 && i < images.length; i++) {
-                        if (truncated.length() > 0) {
-                            truncated.append(",");
-                        }
-                        truncated.append(images[i].trim());
-                    }
-                    finalImagesPath = truncated.toString();
-                }
-            }
-            
-            // Update recruiter info
+
+            String removedLogo = request.getParameter("removedLogo");       // expected "true" or null
+            String removedImages = request.getParameter("removedImages");   // expected comma-separated full paths
+
+            int recruiterId = sessionRecruiter.getRecruiterID();
+
+            // handle uploads
+            String newLogoPath = handleLogoUpload(request, recruiterId);
+            String newImagesCsv = handleCompanyImagesUpload(request, recruiterId);
+
+            // fetch fresh recruiter from DB
             RecruiterDAO recruiterDAO = new RecruiterDAO();
-            
-            boolean success = recruiterDAO.updateCompanyInfo(
-                recruiter.getRecruiterID(),
-                companyName,
-                phone,
-                companyAddress,
-                companySize,
-                contactPerson,
-                companyBenefits,
-                companyDescription,
-                companyVideoURL,
-                website,
-                finalLogoPath,
-                finalImagesPath
-            );
-            
-            if (success) {
-                // Update session with new data
-                Recruiter updatedRecruiter = recruiterDAO.getRecruiterById(recruiter.getRecruiterID());
-                if (updatedRecruiter != null) {
-                    session.setAttribute("user", updatedRecruiter);
+            Recruiter current = recruiterDAO.getRecruiterById(recruiterId);
+            if (current == null) {
+                response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=not_found");
+                return;
+            }
+
+            // decide final logo
+            String finalLogoPath;
+            if (newLogoPath != null) {
+                // new uploaded logo -> delete old logo file (if exists) and use new
+                deleteFileIfExists(current.getCompanyLogoURL());
+                finalLogoPath = newLogoPath;
+            } else if ("true".equals(removedLogo)) {
+                // removed logo
+                deleteFileIfExists(current.getCompanyLogoURL());
+                finalLogoPath = null;
+            } else {
+                finalLogoPath = current.getCompanyLogoURL(); // keep existing
+            }
+
+            // decide final images list (CSV of paths)
+            String finalImages;
+            // start from existing images (could be null)
+            String existingImages = current.getImg();
+            // remove images marked for deletion
+            if (removedImages != null && !removedImages.trim().isEmpty()) {
+                existingImages = removeImagesFromExisting(existingImages, removedImages);
+                // also delete files physically
+                String[] rem = removedImages.split(",");
+                for (String p : rem) {
+                    deleteFileIfExists(p.trim());
                 }
-                
+            }
+            // merge new images if any
+            if (newImagesCsv != null && !newImagesCsv.isEmpty()) {
+                List<String> merged = new ArrayList<>();
+                if (existingImages != null && !existingImages.isEmpty()) {
+                    for (String s : existingImages.split(",")) {
+                        if (!s.trim().isEmpty()) merged.add(s.trim());
+                    }
+                }
+                for (String s : newImagesCsv.split(",")) {
+                    if (!s.trim().isEmpty()) merged.add(s.trim());
+                }
+                // limit to MAX_IMAGES
+                if (merged.size() > MAX_IMAGES) merged = merged.subList(0, MAX_IMAGES);
+                finalImages = String.join(",", merged);
+            } else {
+                finalImages = existingImages;
+            }
+
+            // final length check
+            if (finalImages != null && finalImages.length() > 1000) {
+                // defensive truncate keeping first MAX_IMAGES
+                String[] arr = finalImages.split(",");
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < arr.length && i < MAX_IMAGES; i++) {
+                    if (sb.length() > 0) sb.append(",");
+                    sb.append(arr[i].trim());
+                }
+                finalImages = sb.toString();
+            }
+
+            // build Recruiter object to update (use current to keep other fields)
+            Recruiter updated = current;
+            updated.setCompanyName(companyName);
+            updated.setPhone(phone);
+            updated.setCompanyAddress(companyAddress);
+            updated.setCompanySize(companySize);
+            updated.setContactPerson(contactPerson);
+            updated.setCompanyBenefits(companyBenefits);
+            updated.setCompanyDescription(companyDescription);
+            updated.setCompanyVideoURL(companyVideoURL);
+            updated.setWebsite(website);
+            updated.setCompanyLogoURL(finalLogoPath);
+            updated.setImg(finalImages);
+
+            boolean success = recruiterDAO.updateCompanyInfo(updated);
+
+            if (success) {
+                // refresh session user
+                Recruiter refreshed = recruiterDAO.getRecruiterById(recruiterId);
+                if (refreshed != null) session.setAttribute("user", refreshed);
                 response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?success=updated");
             } else {
                 response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=update_failed");
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=system_error");
         }
     }
-    
+
+    // Save single logo part, return relative path like "/uploads/logos/..."
     private String handleLogoUpload(HttpServletRequest request, int recruiterId) throws IOException, ServletException {
         Part logoPart = request.getPart("companyLogo");
-        
-        if (logoPart != null && logoPart.getSize() > 0) {
-            String fileName = getFileName(logoPart);
-            if (fileName != null && !fileName.isEmpty()) {
-                // Create upload directory if not exists
-                String uploadDir = getServletContext().getRealPath("/uploads/logos");
-                File uploadDirFile = new File(uploadDir);
-                if (!uploadDirFile.exists()) {
-                    uploadDirFile.mkdirs();
-                }
-                
-                // Generate shorter unique filename
-                String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-                String uniqueFileName = "l" + recruiterId + "_" + System.currentTimeMillis() + fileExtension;
-                
-                // Save file
-                File file = new File(uploadDir, uniqueFileName);
-                try (InputStream input = logoPart.getInputStream()) {
-                    Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                }
-                
-                String logoPath = "/uploads/logos/" + uniqueFileName;
-                
-                return logoPath;
-            }
+        if (logoPart == null || logoPart.getSize() == 0) return null;
+
+        String fileName = getFileName(logoPart);
+        if (fileName == null || fileName.isEmpty()) return null;
+
+        String uploadDir = getServletContext().getRealPath("/uploads/logos");
+        File uploadDirFile = new File(uploadDir);
+        if (!uploadDirFile.exists()) uploadDirFile.mkdirs();
+
+        String ext = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
+        String unique = "l" + recruiterId + "_" + System.currentTimeMillis() + ext;
+        File out = new File(uploadDirFile, unique);
+
+        try (InputStream in = logoPart.getInputStream()) {
+            Files.copy(in, out.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
-        
-        return null;
+
+        return "/uploads/logos/" + unique;
     }
-    
+
+    // Save multiple images, return CSV of relative paths or null
     private String handleCompanyImagesUpload(HttpServletRequest request, int recruiterId) throws IOException, ServletException {
-        StringBuilder imagePaths = new StringBuilder();
-        int maxImages = 5; // Limit to 5 images
-        int imageCount = 0;
-        
+        List<String> saved = new ArrayList<>();
+        int count = 0;
         for (Part part : request.getParts()) {
-            if (part.getName().equals("companyImages") && part.getSize() > 0 && imageCount < maxImages) {
-                String fileName = getFileName(part);
-                if (fileName != null && !fileName.isEmpty()) {
-                    // Create upload directory if not exists
-                    String uploadDir = getServletContext().getRealPath("/uploads/company-images");
-                    File uploadDirFile = new File(uploadDir);
-                    if (!uploadDirFile.exists()) {
-                        uploadDirFile.mkdirs();
-                    }
-                    
-                    // Generate shorter unique filename to save space
-                    String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-                    String uniqueFileName = "c" + recruiterId + "_" + System.currentTimeMillis() + "_" + (imageCount + 1) + fileExtension;
-                    
-                    // Save file
-                    File file = new File(uploadDir, uniqueFileName);
-                    try (InputStream input = part.getInputStream()) {
-                        Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    }
-                    
-                    String imagePath = "/uploads/company-images/" + uniqueFileName;
-                    
-                    if (imagePaths.length() > 0) {
-                        imagePaths.append(",");
-                    }
-                    imagePaths.append(imagePath);
-                    imageCount++;
-                }
+            if (!"companyImages".equals(part.getName())) continue;
+            if (part.getSize() == 0) continue;
+            if (count >= MAX_IMAGES) break;
+
+            String fileName = getFileName(part);
+            if (fileName == null || fileName.isEmpty()) continue;
+
+            String uploadDir = getServletContext().getRealPath("/uploads/company-images");
+            File uploadDirFile = new File(uploadDir);
+            if (!uploadDirFile.exists()) uploadDirFile.mkdirs();
+
+            String ext = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
+            String unique = "c" + recruiterId + "_" + System.currentTimeMillis() + "_" + (count + 1) + ext;
+            File out = new File(uploadDirFile, unique);
+            try (InputStream in = part.getInputStream()) {
+                Files.copy(in, out.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
+
+            saved.add("/uploads/company-images/" + unique);
+            count++;
         }
-        
-        String result = imagePaths.length() > 0 ? imagePaths.toString() : null;
-        return result;
+        return saved.isEmpty() ? null : String.join(",", saved);
     }
-    
+
+    // robust filename extraction (handles IE full path)
     private String getFileName(Part part) {
-        String contentDisposition = part.getHeader("content-disposition");
-        if (contentDisposition != null) {
-            String[] tokens = contentDisposition.split(";");
-            for (String token : tokens) {
-                if (token.trim().startsWith("filename")) {
-                    return token.substring(token.indexOf("=") + 2, token.length() - 1);
-                }
+        String cd = part.getHeader("content-disposition");
+        if (cd == null) return null;
+        for (String token : cd.split(";")) {
+            token = token.trim();
+            if (token.startsWith("filename")) {
+                String name = token.substring(token.indexOf('=') + 1).trim().replace("\"", "");
+                // IE may send full path, keep only filename
+                int idx = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
+                if (idx >= 0) name = name.substring(idx + 1);
+                return name;
             }
         }
         return null;
     }
-    
-    private void handleImageRemoval(HttpServletRequest request, String removedLogo, String removedImages) {
-        // Handle logo removal
-        if ("true".equals(removedLogo)) {
-            // Remove logo file from server
-            try {
-                String logoPath = getServletContext().getRealPath("/uploads/logos");
-                File logoDir = new File(logoPath);
-                if (logoDir.exists()) {
-                    File[] logoFiles = logoDir.listFiles((dir, name) -> name.startsWith("logo_"));
-                    if (logoFiles != null) {
-                        for (File logoFile : logoFiles) {
-                            logoFile.delete();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // Error removing logo
-            }
-        }
-        
-        // Handle company images removal
-        if (removedImages != null && !removedImages.isEmpty()) {
-            String[] imagesToRemove = removedImages.split(",");
-            for (String imagePath : imagesToRemove) {
-                if (!imagePath.trim().isEmpty()) {
-                    try {
-                        String fullPath = getServletContext().getRealPath(imagePath.trim());
-                        File file = new File(fullPath);
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                    } catch (Exception e) {
-                        // Error removing image
-                    }
-                }
-            }
+
+    // delete a file on disk given a relative path like "/uploads/..."
+    private void deleteFileIfExists(String relativePath) {
+        if (relativePath == null || relativePath.trim().isEmpty()) return;
+        try {
+            String real = getServletContext().getRealPath(relativePath.trim());
+            if (real == null) return;
+            File f = new File(real);
+            if (f.exists()) f.delete();
+        } catch (Exception ignored) {
         }
     }
-    
-    private String removeImagesFromExisting(String existingImages, String removedImages) {
-        if (existingImages == null || existingImages.isEmpty()) {
-            return null;
-        }
-        
-        if (removedImages == null || removedImages.isEmpty()) {
-            return existingImages;
-        }
-        
-        String[] existingArray = existingImages.split(",");
-        String[] removedArray = removedImages.split(",");
-        
-        StringBuilder result = new StringBuilder();
-        
-        for (String existing : existingArray) {
-            String trimmedExisting = existing.trim();
-            boolean shouldRemove = false;
-            
-            // Check if this image should be removed
-            for (String removed : removedArray) {
-                if (trimmedExisting.equals(removed.trim())) {
-                    shouldRemove = true;
-                    break;
+
+    // remove images listed in removedCsv from existingCsv (both CSV of relative paths)
+    private String removeImagesFromExisting(String existingCsv, String removedCsv) {
+        if (existingCsv == null || existingCsv.trim().isEmpty()) return null;
+        if (removedCsv == null || removedCsv.trim().isEmpty()) return existingCsv;
+
+        String[] existing = existingCsv.split(",");
+        String[] removed = removedCsv.split(",");
+
+        List<String> keep = new ArrayList<>();
+        outer:
+        for (String e : existing) {
+            String te = e.trim();
+            if (te.isEmpty()) continue;
+            for (String r : removed) {
+                if (te.equals(r.trim())) {
+                    continue outer; // skip this existing
                 }
             }
-            
-            // Also filter out logo images from company images
-            if (!shouldRemove && trimmedExisting.contains("/logos/")) {
-                shouldRemove = true;
-            }
-            
-            if (!shouldRemove) {
-                if (result.length() > 0) {
-                    result.append(",");
-                }
-                result.append(trimmedExisting);
-            }
+            keep.add(te);
         }
-        
-        return result.length() > 0 ? result.toString() : null;
+        return keep.isEmpty() ? null : String.join(",", keep);
     }
-    
+
+    // remove any paths that contain "/logos/" from the images CSV
     private String cleanCompanyImages(String companyImages) {
-        if (companyImages == null || companyImages.isEmpty()) {
-            return null;
+        if (companyImages == null || companyImages.trim().isEmpty()) return null;
+        String[] arr = companyImages.split(",");
+        List<String> keep = new ArrayList<>();
+        for (String s : arr) {
+            String t = s.trim();
+            if (t.isEmpty()) continue;
+            if (t.contains("/logos/")) continue; // drop logos from images
+            keep.add(t);
         }
-        
-        String[] imagePaths = companyImages.split(",");
-        StringBuilder result = new StringBuilder();
-        
-        for (String imagePath : imagePaths) {
-            String trimmedPath = imagePath.trim();
-            if (!trimmedPath.isEmpty() && !trimmedPath.contains("/logos/")) {
-                if (result.length() > 0) {
-                    result.append(",");
-                }
-                result.append(trimmedPath);
-            }
-        }
-        
-        return result.length() > 0 ? result.toString() : null;
+        return keep.isEmpty() ? null : String.join(",", keep);
     }
 }
