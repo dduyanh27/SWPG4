@@ -1,11 +1,11 @@
 package model;
 
 public class Recruiter {
+
     private int recruiterID;
     private String email;
     private String password;
     private String phone;
-    private String gender;
     private String companyName;
     private String companyDescription;
     private String companyLogoURL;
@@ -18,27 +18,19 @@ public class Recruiter {
     private String contactPerson;
     private String companyBenefits;
     private String companyVideoURL;
+    private String taxcode;
+    private String registrationCert;
 
+    // Constructor không tham số
     public Recruiter() {
     }
 
-    public Recruiter(int recruiterID, String companyName) {
-        this.recruiterID = recruiterID;
-        this.companyName = companyName;
-    }
-    
-    
-
-    public Recruiter(int recruiterID, String email, String password, String phone, 
-                     String gender, String companyName, String companyDescription, 
-                     String companyLogoURL, String website, String img, int categoryID, 
-                     String status, String companyAddress, String companySize, 
-                     String contactPerson, String companyBenefits, String companyVideoURL) {
+    // Constructor đầy đủ tham số
+    public Recruiter(int recruiterID, String email, String password, String phone, String companyName, String companyDescription, String companyLogoURL, String website, String img, int categoryID, String status, String companyAddress, String companySize, String contactPerson, String companyBenefits, String companyVideoURL, String taxcode, String registrationCert) {
         this.recruiterID = recruiterID;
         this.email = email;
         this.password = password;
         this.phone = phone;
-        this.gender = gender;
         this.companyName = companyName;
         this.companyDescription = companyDescription;
         this.companyLogoURL = companyLogoURL;
@@ -51,8 +43,11 @@ public class Recruiter {
         this.contactPerson = contactPerson;
         this.companyBenefits = companyBenefits;
         this.companyVideoURL = companyVideoURL;
+        this.taxcode = taxcode;
+        this.registrationCert = registrationCert;
     }
 
+    // --- Getters and Setters ---
     public int getRecruiterID() {
         return recruiterID;
     }
@@ -77,28 +72,12 @@ public class Recruiter {
         this.password = password;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public String getCompanyName() {
@@ -149,6 +128,14 @@ public class Recruiter {
         this.categoryID = categoryID;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getCompanyAddress() {
         return companyAddress;
     }
@@ -189,25 +176,19 @@ public class Recruiter {
         this.companyVideoURL = companyVideoURL;
     }
 
-    @Override
-    public String toString() {
-        return "Recruiter{" +
-                "recruiterID=" + recruiterID +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", gender='" + gender + '\'' +
-                ", companyName='" + companyName + '\'' +
-                ", companyDescription='" + companyDescription + '\'' +
-                ", companyLogoURL='" + companyLogoURL + '\'' +
-                ", website='" + website + '\'' +
-                ", img='" + img + '\'' +
-                ", categoryID=" + categoryID +
-                ", status='" + status + '\'' +
-                ", companyAddress='" + companyAddress + '\'' +
-                ", companySize='" + companySize + '\'' +
-                ", contactPerson='" + contactPerson + '\'' +
-                ", companyBenefits='" + companyBenefits + '\'' +
-                ", companyVideoURL='" + companyVideoURL + '\'' +
-                '}';
+    public String getTaxcode() {
+        return taxcode;
+    }
+
+    public void setTaxcode(String taxcode) {
+        this.taxcode = taxcode;
+    }
+
+    public String getRegistrationCert() {
+        return registrationCert;
+    }
+
+    public void setRegistrationCert(String registrationCert) {
+        this.registrationCert = registrationCert;
     }
 }

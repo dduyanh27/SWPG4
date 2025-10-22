@@ -73,7 +73,6 @@ public class AdminAddAccountServlet extends HttpServlet {
                     re.setPassword(password);
                     re.setCompanyName(fullName);
                     re.setPhone(phone);
-                    re.setGender(gender);
                     re.setStatus(status);
                     dao.addRecruiter(re);
                     break;
