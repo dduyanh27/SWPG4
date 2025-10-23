@@ -67,8 +67,6 @@ public class PaymentsDAO extends DBContext {
                     Payments payment = new Payments();
                     payment.setPaymentID(rs.getInt("PaymentID"));
                     payment.setRecruiterID(rs.getInt("RecruiterID"));
-                    try { payment.setPackageID((Integer)rs.getObject("PackageID")); } catch (SQLException ignore) {}
-                    try { payment.setRecruiterPackageID((Integer)rs.getObject("RecruiterPackageID")); } catch (SQLException ignore) {}
                     payment.setAmount(rs.getBigDecimal("Amount"));
                     payment.setPaymentMethod(rs.getString("PaymentMethod"));
                     payment.setPaymentStatus(rs.getString("PaymentStatus"));
@@ -97,8 +95,6 @@ public class PaymentsDAO extends DBContext {
                     Payments payment = new Payments();
                     payment.setPaymentID(rs.getInt("PaymentID"));
                     payment.setRecruiterID(rs.getInt("RecruiterID"));
-                    try { payment.setPackageID((Integer)rs.getObject("PackageID")); } catch (SQLException ignore) {}
-                    try { payment.setRecruiterPackageID((Integer)rs.getObject("RecruiterPackageID")); } catch (SQLException ignore) {}
                     payment.setAmount(rs.getBigDecimal("Amount"));
                     payment.setPaymentMethod(rs.getString("PaymentMethod"));
                     payment.setPaymentStatus(rs.getString("PaymentStatus"));

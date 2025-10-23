@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 public class Payments {
     private int paymentID;
     private int recruiterID;
-    private Integer packageID;           // nullable
-    private Integer recruiterPackageID;  // nullable
     private BigDecimal amount;
     private String paymentMethod;
     private String paymentStatus;
@@ -17,13 +15,11 @@ public class Payments {
 
     public Payments() {}
 
-    public Payments(int paymentID, int recruiterID, Integer packageID, Integer recruiterPackageID,
+    public Payments(int paymentID, int recruiterID, 
                    BigDecimal amount, String paymentMethod,
                    String paymentStatus, String transactionCode, LocalDateTime paymentDate, String notes) {
         this.paymentID = paymentID;
         this.recruiterID = recruiterID;
-        this.packageID = packageID;
-        this.recruiterPackageID = recruiterPackageID;
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
@@ -47,22 +43,6 @@ public class Payments {
 
     public void setRecruiterID(int recruiterID) {
         this.recruiterID = recruiterID;
-    }
-
-    public Integer getPackageID() {
-        return packageID;
-    }
-
-    public void setPackageID(Integer packageID) {
-        this.packageID = packageID;
-    }
-
-    public Integer getRecruiterPackageID() {
-        return recruiterPackageID;
-    }
-
-    public void setRecruiterPackageID(Integer recruiterPackageID) {
-        this.recruiterPackageID = recruiterPackageID;
     }
 
     public BigDecimal getAmount() {
@@ -118,8 +98,6 @@ public class Payments {
         return "Payments{" +
                 "paymentID=" + paymentID +
                 ", recruiterID=" + recruiterID +
-                ", packageID=" + packageID +
-                ", recruiterPackageID=" + recruiterPackageID +
                 ", amount=" + amount +
                 ", paymentMethod='" + paymentMethod + '\'' +
                 ", paymentStatus='" + paymentStatus + '\'' +
