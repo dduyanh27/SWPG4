@@ -8,3 +8,5 @@ config.properties
 *.orig
 *.iml
 .idea/
+/1_TopCV_ite2/nbproject/private/
+/1_TopCV_ite2/build/
