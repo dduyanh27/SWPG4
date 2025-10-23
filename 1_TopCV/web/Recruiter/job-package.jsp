@@ -1,6 +1,6 @@
 <%-- 
     Document   : job-package
-    Created on : Oct 15, 2025, 7:22:26 PM
+    Created on : Oct 23, 2025, 1:03:48 PM
     Author     : ADMIN
 --%>
 
@@ -993,6 +993,59 @@
                 color: #1f2937;
             }
 
+            /* Quantity Spinner Styles */
+            .quantity-spinner {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                background: white;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                padding: 2px;
+                min-width: 100px;
+            }
+
+            .quantity-spinner button {
+                width: 24px;
+                height: 24px;
+                border: none;
+                background: #f3f4f6;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                color: #374151;
+                transition: all 0.2s ease;
+            }
+
+            .quantity-spinner button:hover {
+                background: #e5e7eb;
+                color: #1f2937;
+            }
+
+            .quantity-spinner button:active {
+                background: #d1d5db;
+                transform: scale(0.95);
+            }
+
+            .quantity-display {
+                width: 40px;
+                height: 24px;
+                border: none;
+                text-align: center;
+                font-weight: 600;
+                color: #1f2937;
+                background: transparent;
+                font-size: 14px;
+            }
+
+            .quantity-display:focus {
+                outline: none;
+            }
+
             .remove-btn {
                 background: #fef2f2;
                 border: 1px solid #fecaca;
@@ -1214,7 +1267,7 @@
                         <span>RecruitPro</span>
                     </div>
                     <ul class="nav-menu">
-                        <li><a href="<%= request.getContextPath() %>/Recruiter/index.jsp">Dashboard</a></li>
+                        <li><a href="index.html">Dashboard</a></li>
                         <li><a href="#">Việc Làm</a></li>
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
@@ -1239,7 +1292,7 @@
                         </li>
                         <li><a href="#">Báo cáo</a></li>
                         <li><a href="job-packages.html" class="active">Đăng Tuyển Dụng</a></li>
-                        <li><a href="${pageContext.request.contextPath}/candidate-search">Tìm Ứng Viên</a></li>
+                        <li><a href="candidate-search.html">Tìm Ứng Viên</a></li>
                         <li><a href="shopping-cart.html" class="btn btn-red">Mua</a></li>
                     </ul>
                 </div>
@@ -1259,26 +1312,18 @@
 
         <!-- Main Content -->
         <main class="packages-main">
-            <% if (Boolean.TRUE.equals(request.getAttribute("debug"))) { %>
-            <div style="max-width:1400px;margin:10px auto 0; padding:10px 15px; background:#FFF7ED; border:1px solid #FDBA74; color:#9A3412; border-radius:8px;">
-                <strong>DEBUG:</strong>
-                type=<%= request.getAttribute("debug_selected_type") %> |
-                <%= request.getAttribute("debug_counts") %>
-            </div>
-            <% } %>
             <!-- Navigation Tabs -->
             <div class="tab-navigation">
                 <div class="tab-container">
-                    <% String selectedType = (String) request.getAttribute("selectedType"); if (selectedType == null || selectedType.isEmpty()) { selectedType = "DANG_TUYEN"; } String ctx = request.getContextPath(); %>
-                    <a class="tab-item <%= "DANG_TUYEN".equals(selectedType) ? "active" : "" %>" href="<%= ctx %>/recruiter/job-packages?type=DANG_TUYEN">
+                    <div class="tab-item active" data-tab="dang-tuyen">
                         <span>ĐĂNG TUYỂN</span>
-                    </a>
-                    <a class="tab-item <%= "TIM_HO_SO".equals(selectedType) ? "active" : "" %>" href="<%= ctx %>/recruiter/job-packages?type=TIM_HO_SO">
+                    </div>
+                    <div class="tab-item" data-tab="tim-ho-so">
                         <span>TÌM HỒ SƠ</span>
-                    </a>
-                    <a class="tab-item <%= "AI_PREMIUM".equals(selectedType) ? "active" : "" %>" href="<%= ctx %>/recruiter/job-packages?type=AI_PREMIUM">
+                    </div>
+                    <div class="tab-item" data-tab="ai-premium">
                         <span>AI PREMIUM</span>
-                    </a>
+                    </div>
                 </div>
             </div>
 
@@ -1286,133 +1331,33 @@
                 <!-- Left Sidebar -->
                 <div class="packages-sidebar">
                     <!-- ĐĂNG TUYỂN Tab Content -->
-                    <div class="tab-content <%= "DANG_TUYEN".equals(selectedType) ? "active" : "" %>" id="dang-tuyen">
+                    <div class="tab-content active" id="dang-tuyen">
                         <div class="sidebar-section">
                             <h3>ĐĂNG TUYỂN</h3>
-                            <% java.util.List<model.JobPackage> dangTuyen = (java.util.List<model.JobPackage>) request.getAttribute("dangTuyen"); %>
-                            <% if (dangTuyen != null && !dangTuyen.isEmpty()) { for (int i = 0; i < dangTuyen.size(); i++) { model.JobPackage p = dangTuyen.get(i); %>
-                            <div class="package-item <%= i==0 ? "selected" : "" %>" data-price-raw="<%= p.getPrice()==null?"0":p.getPrice().toPlainString() %>" data-package-id="<%= p.getPackageID() %>">
-                                <div class="package-info">
-                                    <h4><%= p.getPackageName() %></h4>
-                                    <div class="package-price"><%
-                                        String priceStr1 = (p.getPrice() == null) ? "0" : java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi","VN")).format(p.getPrice());
-                                        out.print(priceStr1 + " VND");
-                                    %></div>
-                                    <span class="hidden-desc" style="display:none;"><%= p.getDescription()==null?"":p.getDescription() %></span>
-                                    <span class="hidden-features" style="display:none;"><%= p.getFeatures()==null?"":p.getFeatures() %></span>
+                            <div class="loading-message">
+                                <p>Đang tải dữ liệu...</p>
                                 </div>
-                                <button class="add-to-cart-btn">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </div>
-                            <% } %>
-                            <% } else { %>
-                            <div class="package-item">
-                                <div class="package-info">
-                                    <h4>Không có gói nào</h4>
-                                    <div class="package-price">0 VND</div>
-                                </div>
-                            </div>
-                            <% } %>
-                        </div>
-
-                        <div class="sidebar-section">
-                            <h3>DỊCH VỤ HỖ TRỢ</h3>
-                            <div class="support-services">
-                                <% java.util.List<model.JobPackage> supportServices = (java.util.List<model.JobPackage>) request.getAttribute("supportServices"); %>
-                                <% if (supportServices != null && !supportServices.isEmpty()) { for (model.JobPackage p : supportServices) { %>
-                                <div class="package-item" data-price-raw="<%= p.getPrice()==null?"0":p.getPrice().toPlainString() %>" data-package-id="<%= p.getPackageID() %>">
-                                    <div class="package-info">
-                                        <h4><%= p.getPackageName() %></h4>
-                                        <div class="package-price"><%
-                                            String priceStr2 = (p.getPrice() == null) ? "0" : java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi","VN")).format(p.getPrice());
-                                            out.print(priceStr2 + " VND");
-                                        %></div>
-                                        <span class="hidden-desc" style="display:none;"><%= p.getDescription()==null?"":p.getDescription() %></span>
-                                        <span class="hidden-features" style="display:none;"><%= p.getFeatures()==null?"":p.getFeatures() %></span>
-                                    </div>
-                                    <button class="add-to-cart-btn">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                </div>
-                                <% } %>
-                                <% } else { %>
-                                <div class="package-item">
-                                    <div class="package-info">
-                                        <h4>Không có dịch vụ hỗ trợ</h4>
-                                        <div class="package-price">0 VND</div>
-                                    </div>
-                                </div>
-                                <% } %>
-                                    </div>
                         </div>
                     </div>
 
                     <!-- TÌM HỒ SƠ Tab Content -->
-                    <div class="tab-content <%= "TIM_HO_SO".equals(selectedType) ? "active" : "" %>" id="tim-ho-so">
+                    <div class="tab-content" id="tim-ho-so">
                         <div class="sidebar-section">
                             <h3>TÌM HỒ SƠ</h3>
-                            <% java.util.List<model.JobPackage> timHoSo = (java.util.List<model.JobPackage>) request.getAttribute("timHoSo"); %>
-                            <% if (timHoSo != null && !timHoSo.isEmpty()) { for (model.JobPackage p : timHoSo) { %>
-                            <div class="package-item" data-price-raw="<%= p.getPrice()==null?"0":p.getPrice().toPlainString() %>" data-package-id="<%= p.getPackageID() %>">
-                                <div class="package-info">
-                                    <h4><%= p.getPackageName() %></h4>
-                                    <% if (p.getPoints() != null) { %>
-                                    <div class="package-badge"><%= p.getPoints() %> điểm</div>
-                                    <% } %>
-                                    <div class="package-price"><%
-                                        String priceStr3 = (p.getPrice() == null) ? "0" : java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi","VN")).format(p.getPrice());
-                                        out.print(priceStr3 + " VND");
-                                    %></div>
-                                    <span class="hidden-desc" style="display:none;"><%= p.getDescription()==null?"":p.getDescription() %></span>
-                                    <span class="hidden-features" style="display:none;"><%= p.getFeatures()==null?"":p.getFeatures() %></span>
+                            <div class="loading-message">
+                                <p>Đang tải dữ liệu...</p>
                                 </div>
-                                <button class="add-to-cart-btn">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </div>
-                            <% } %>
-                            <% } else { %>
-                            <div class="package-item">
-                                <div class="package-info">
-                                    <h4>Không có gói Tìm Hồ Sơ</h4>
-                                    <div class="package-price">0 VND</div>
-                                </div>
-                            </div>
-                            <% } %>
                         </div>
                     </div>
 
                     <!-- AI PREMIUM Tab Content -->
-                    <div class="tab-content <%= "AI_PREMIUM".equals(selectedType) ? "active" : "" %>" id="ai-premium">
+                    <div class="tab-content" id="ai-premium">
                         <div class="sidebar-section">
                             <h3>AI PREMIUM</h3>
-                            <% java.util.List<model.JobPackage> aiPremium = (java.util.List<model.JobPackage>) request.getAttribute("aiPremium"); %>
-                            <% if (aiPremium != null && !aiPremium.isEmpty()) { for (model.JobPackage p : aiPremium) { %>
-                            <div class="package-item" data-price-raw="<%= p.getPrice()==null?"0":p.getPrice().toPlainString() %>" data-package-id="<%= p.getPackageID() %>">
-                                <div class="package-info">
-                                    <h4><%= p.getPackageName() %></h4>
-                                    <div class="package-price"><%
-                                        String priceStr4 = (p.getPrice() == null) ? "0" : java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi","VN")).format(p.getPrice());
-                                        out.print(priceStr4 + " VND");
-                                    %></div>
-                                    <span class="hidden-desc" style="display:none;"><%= p.getDescription()==null?"":p.getDescription() %></span>
-                                    <span class="hidden-features" style="display:none;"><%= p.getFeatures()==null?"":p.getFeatures() %></span>
-                                </div>
-                                <button class="add-to-cart-btn">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </div>
-                            <% } %>
-                            <% } else { %>
-                            <div class="package-item">
-                                <div class="package-info">
-                                    <h4>Không có gói AI Premium</h4>
-                                    <div class="package-price">0 VND</div>
+                            <div class="loading-message">
+                                <p>Đang tải dữ liệu...</p>
                                 </div>
                             </div>
-                            <% } %>
-                        </div>
                     </div>
                 </div>
 
@@ -1421,25 +1366,119 @@
                     <!-- Product Details -->
                     <div class="product-details">
                         <div class="product-header">
-                            <h2 id="pd-title">Chọn gói để xem chi tiết</h2>
-                            <div class="product-price" id="pd-price">0 VND</div>
+                            <h2>Chọn gói dịch vụ</h2>
+                            <div class="product-price">0 VND</div>
                         </div>
 
                         <div class="product-description">
                             <h3>Mô tả sản phẩm</h3>
-                            <p id="pd-desc">Hãy chọn một gói ở cột trái để xem mô tả và quyền lợi.</p>
+                            <p>Vui lòng chọn một gói dịch vụ từ danh sách bên trái để xem thông tin chi tiết.</p>
                         </div>
 
                         <div class="product-includes">
                             <h3>Bao gồm</h3>
                             <ul>
-                                <li><i class="fas fa-check"></i> Nhận ngay hồ sơ ứng tuyển chất lượng.</li>
-                                <li><i class="fas fa-check"></i> Dễ dàng đăng tuyển chỉ trong vài phút.</li>
-                                <li><i class="fas fa-check"></i> Tăng khả năng nhận diện trên ứng dụng di động.</li>
+                                <li><i class="fas fa-check"></i> Chọn gói dịch vụ để xem thông tin chi tiết</li>
                             </ul>
                         </div>
 
-                        <!-- Bỏ phần hiển thị VietnamWorks preview theo yêu cầu -->
+                        <div class="product-preview">
+                            <h3>Hiển thị trên VietnamWorks cho Người tìm việc</h3>
+                            <div class="preview-container">
+                                <div class="search-bar">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <div class="search-input">
+                                        <i class="fas fa-search"></i>
+                                        <span>admin</span>
+                                    </div>
+                                </div>
+                                <div class="preview-tabs">
+                                    <div class="tab active">Jobs</div>
+                                    <div class="tab">Interview</div>
+                                    <div class="tab">Salary</div>
+                                </div>
+                                <div class="job-listings">
+                                    <div class="job-item">
+                                        <div class="company-logo">N</div>
+                                        <div class="job-info">
+                                            <div class="job-title">
+                                                <span>Admin Executive</span>
+                                                <span class="hot-tag">HOT</span>
+                                            </div>
+                                            <div class="company-name">Novus Vision</div>
+                                            <div class="job-location">Ho Chi Minh</div>
+                                            <div class="job-salary">From $500 to $900</div>
+                                        </div>
+                                        <div class="job-actions">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </div>
+                                    <div class="job-item">
+                                        <div class="company-logo">I</div>
+                                        <div class="job-info">
+                                            <div class="job-title">
+                                                <span>Admin & HR Department | Hành Chính Nhân Sự</span>
+                                                <span class="hot-tag">HOT</span>
+                                            </div>
+                                            <div class="company-name">Indefol Solar</div>
+                                            <div class="job-location">Ho Chi Minh</div>
+                                            <div class="job-salary">Negotiable</div>
+                                        </div>
+                                        <div class="job-actions">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </div>
+                                    <div class="job-item">
+                                        <div class="company-logo">IS</div>
+                                        <div class="job-info">
+                                            <div class="job-title">
+                                                <span>International School</span>
+                                                <span class="hot-tag">HOT</span>
+                                            </div>
+                                            <div class="company-name">International School</div>
+                                            <div class="job-location">Ho Chi Minh</div>
+                                            <div class="job-salary">Negotiable</div>
+                                        </div>
+                                        <div class="job-actions">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </div>
+                                    <div class="job-item">
+                                        <div class="company-logo">U</div>
+                                        <div class="job-info">
+                                            <div class="job-title">
+                                                <span>Unique Furniture</span>
+                                                <span class="hot-tag">HOT</span>
+                                            </div>
+                                            <div class="company-name">Unique Furniture</div>
+                                            <div class="job-location">Ho Chi Minh</div>
+                                            <div class="job-salary">Negotiable</div>
+                                        </div>
+                                        <div class="job-actions">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </div>
+                                    <div class="job-item">
+                                        <div class="company-logo">K</div>
+                                        <div class="job-info">
+                                            <div class="job-title">
+                                                <span>Korchina Logistics</span>
+                                                <span class="hot-tag">HOT</span>
+                                            </div>
+                                            <div class="company-name">Korchina Logistics</div>
+                                            <div class="job-location">Ho Chi Minh</div>
+                                            <div class="job-salary">Negotiable</div>
+                                        </div>
+                                        <div class="job-actions">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="discount-link">
+                                    <a href="#">Chương trình giảm giá</a>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="add-to-cart-section">
                             <button class="add-to-cart-main-btn">
@@ -1460,190 +1499,307 @@
                 </div>
                 <div class="footer-actions">
                     <button class="clear-btn">Xoá hết</button>
-                    <form id="vnpayForm" action="<%= request.getContextPath() %>/payment" method="post" style="display:inline;">
-                        <input type="hidden" name="amount" id="vnp_amount" value="">
-                        <input type="hidden" name="orderInfo" id="vnp_orderInfo" value="">
-                        <button type="button" class="checkout-btn" id="btnCheckout">Thanh toán</button>
-                    </form>
+                    <button class="checkout-btn">Thanh toán</button>
                 </div>
             </div>
         </footer>
 
         <script>
-            // Dữ liệu tham khảo (hiển thị demo UI)
-            const packages = {
-                'dang-tuyen-30-ngay-m': {
-                    title: 'Đăng Tuyển 30-ngày - M',
-                    price: '2.160.000 VND',
-                    description: 'Là sự kết hợp của các dịch vụ đăng tuyển cơ bản trên trang web vietnamworks.com và ứng dụng di động VietnamWorks. Trên trang web, tin đăng tuyển được hiển thị dưới dạng cơ bản, trong khi trên ứng dụng di động, tin đăng tuyển được đính kèm tag "HOT" và được hiển thị ở khu vực nổi bật trong suốt 30 ngày.',
-                    includes: [
-                        'Nhận ngay hồ sơ ứng tuyển chất lượng.',
-                        'Dễ dàng đăng tuyển chỉ trong vài phút.',
-                        'Tăng khả năng nhận diện trên ứng dụng di động.'
-                    ]
-                },
-                'dang-tuyen-30-ngay-co-ban': {
-                    title: 'Đăng Tuyển 30-ngày - Cơ Bản',
-                    price: '1.953.000 VND',
-                    description: 'Tiếp cận gần 5 triệu người truy cập vào website vietnamworks.com mỗi tháng. Có cơ hội được gửi trực tiếp đến ứng viên qua 300.000 email thông báo việc làm mỗi ngày. Là sản phẩm cơ bản nhất giúp tin đăng tuyển của công ty sẽ được hiển thị ngay lập tức trên trang web vietnamworks.com trong 30 ngày.',
-                    includes: [
-                        'Nhận ngay hồ sơ ứng tuyển chất lượng',
-                        'Dễ dàng đăng tuyển chỉ trong vài phút',
-                        'Mở rộng tìm kiếm ứng viên hiệu quả trên máy tính và các thiết bị di động'
-                    ]
-                },
-                'uu-tien-hang-dau-30-ngay-m': {
-                    title: 'Thêm - Ưu Tiên Hàng Đầu 30 ngày - M',
-                    price: '5.805.000 VND',
-                    description: 'Là sự kết hợp hiển thị ưu tiên tin tuyển dụng trên cả trang website và ứng dụng di động của VietnamWorks, bao gồm: Trên trang web: Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 30 ngày. Trên ứng dụng di động: Tin tuyển dụng được đính kèm tag "TOP" và được hiển thị ở khu vực ưu tiên trong suốt 30 ngày trên Trang Kết Quả Tìm Kiếm cũng như mục Việc Làm Nổi Bật. Giúp thu hút nhiều sự chú ý của ứng viên hơn từ đó gia tăng lượt xem tin tuyển dụng. Giữ cho tin đăng tuyển luôn ở trong khu vực ưu tiên đầu Trang Kết Quả Tìm Kiếm để thu hút lượt ứng tuyển của ứng viên. Cạnh tranh với các công ty tuyển dụng cùng nhóm ngành nghề, nghề nghiệp chuyên môn hoặc cùng lĩnh vực kinh doanh của công ty và gia tăng mức độ nhận biết thương hiệu.',
-                    includes: [
-                        'Trên ứng dụng di động: Tin tuyển dụng được đính kèm tag "TOP" và được hiển thị ở khu vực ưu tiên trong suốt 30 ngày trên Trang Kết Quả Tìm Kiếm cũng như mục Việc Làm Nổi Bật.',
-                        'Trên trang web: Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 30 ngày.'
-                    ]
-                },
-                'uu-tien-hang-dau-15-ngay-m': {
-                    title: 'Thêm - Ưu Tiên Hàng Đầu 15 ngày - M',
-                    price: '4.392.000 VND',
-                    description: 'Là sự kết hợp hiển thị ưu tiên tin tuyển dụng trên cả trang website và ứng dụng di động của VietnamWorks, bao gồm: Trên trang web: Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 15 ngày. Trên ứng dụng di động: Tin tuyển dụng được đính kèm tag "TOP" và được hiển thị ở khu vực ưu tiên trong suốt 15 ngày trên Trang Kết Quả Tìm Kiếm cũng như mục Việc Làm Nổi Bật. Giúp thu hút nhiều sự chú ý của ứng viên hơn từ đó gia tăng lượt xem tin tuyển dụng. Giữ cho tin đăng tuyển luôn ở trong khu vực ưu tiên đầu Trang Kết Quả Tìm Kiếm để thu hút lượt ứng tuyển của ứng viên. Cạnh tranh với các công ty tuyển dụng cùng nhóm ngành nghề, nghề nghiệp chuyên môn hoặc cùng lĩnh vực kinh doanh của công ty và gia tăng mức độ nhận biết thương hiệu.',
-                    includes: [
-                        'Trên ứng dụng di động: Tin tuyển dụng được đính kèm tag "TOP" và được hiển thị ở khu vực ưu tiên trong suốt 15 ngày trên Trang Kết Quả Tìm Kiếm cũng như mục Việc Làm Nổi Bật.',
-                        'Trên trang web: Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 15 ngày.'
-                    ]
-                },
-                'uu-tien-hang-dau-30-ngay': {
-                    title: 'Thêm - Ưu Tiên Hàng Đầu 30 ngày',
-                    price: '5.085.000 VND',
-                    description: 'Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo 3 tiêu chí: nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 30 ngày. Giúp thu hút nhiều sự chú ý của ứng viên hơn từ đó gia tăng lượt xem tin tuyển dụng. Giữ cho tin đăng tuyển luôn ở trong khu vực ưu tiên đầu Trang Kết Quả Tìm Kiếm để thu hút lượt ứng tuyển của ứng viên. Cạnh tranh với các công ty tuyển dụng cùng nhóm ngành nghề, nghề nghiệp chuyên môn hoặc cùng lĩnh vực kinh doanh của công ty và gia tăng mức độ nhận biết thương hiệu.',
-                    includes: [
-                        'Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo 3 tiêu chí: nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 30 ngày.'
-                    ]
-                },
-                'uu-tien-hang-dau-15-ngay': {
-                    title: 'Thêm - Ưu Tiên Hàng Đầu 15 ngày',
-                    price: '3.924.000 VND',
-                    description: 'Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo 3 tiêu chí: nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 15 ngày. Giúp thu hút nhiều sự chú ý của ứng viên hơn từ đó gia tăng lượt xem tin tuyển dụng. Giữ cho tin đăng tuyển luôn ở trong khu vực ưu tiên đầu Trang Kết Quả Tìm Kiếm để thu hút lượt ứng tuyển của ứng viên. Cạnh tranh với các công ty tuyển dụng cùng nhóm ngành nghề, nghề nghiệp chuyên môn hoặc cùng lĩnh vực kinh doanh của công ty và gia tăng mức độ nhận biết thương hiệu.',
-                    includes: [
-                        'Tin tuyển dụng được hiển thị ưu tiên ở vị trí hàng đầu trên trang kết quả tìm kiếm theo 3 tiêu chí: nhóm ngành nghề, nghề nghiệp chuyên môn và lĩnh vực kinh doanh của công ty trong 15 ngày.'
-                    ]
-                },
-                'viec-can-tuyen-gap': {
-                    title: 'Việc Cần Tuyển Gấp',
-                    price: '1.134.000 VND',
-                    description: 'Tiêu đề tin đăng tuyển được hiển thị với tag "Urgent" trong 3 ngành nghề tương ứng trong suốt 30 ngày. Hiển thị trong danh sách các công việc cần tuyển gấp khi ứng viên lọc theo "Việc cần tuyển gấp" trên đầu trang kết quả tìm kiếm.',
-                    includes: [
-                        'Tiêu đề tin tuyển dụng được hiển thị tag "Urgent" màu đỏ tại trang kết quả tìm kiếm trong cả 3 ngành nghề.'
-                    ]
-                },
-                'tim-ho-so-1-thang': {
-                    title: 'Tìm Hồ Sơ 1 tháng',
-                    price: '4.644.000 VND',
-                    description: 'Không giới hạn trong việc tìm kiếm và xem hồ sơ ứng viên. Tuyển dụng tài năng ngay từ bây giờ.',
-                    includes: [
-                        'Tìm kiếm không giới hạn hồ sơ ứng viên',
-                        'Xem chi tiết hồ sơ ứng viên',
-                        'Tuyển dụng tài năng hiệu quả'
-                    ]
-                },
-                'tim-ho-so-3-thang': {
-                    title: 'Tìm Hồ Sơ 3 tháng',
-                    price: '12.549.600 VND',
-                    description: 'Không giới hạn trong việc tìm kiếm và xem hồ sơ ứng viên. Tuyển dụng tài năng ngay từ bây giờ.',
-                    includes: [
-                        'Tìm kiếm không giới hạn hồ sơ ứng viên',
-                        'Xem chi tiết hồ sơ ứng viên',
-                        'Tuyển dụng tài năng hiệu quả'
-                    ]
-                },
-                'tim-ho-so-6-thang': {
-                    title: 'Tìm Hồ Sơ 6 tháng',
-                    price: '23.706.000 VND',
-                    description: 'Không giới hạn trong việc tìm kiếm và xem hồ sơ ứng viên. Tuyển dụng tài năng ngay từ bây giờ.',
-                    includes: [
-                        'Tìm kiếm không giới hạn hồ sơ ứng viên',
-                        'Xem chi tiết hồ sơ ứng viên',
-                        'Tuyển dụng tài năng hiệu quả'
-                    ]
-                },
-                'tim-ho-so-12-thang': {
-                    title: 'Tìm Hồ Sơ 12 tháng',
-                    price: '44.604.000 VND',
-                    description: 'Không giới hạn trong việc tìm kiếm và xem hồ sơ ứng viên. Tuyển dụng tài năng ngay từ bây giờ.',
-                    includes: [
-                        'Tìm kiếm không giới hạn hồ sơ ứng viên',
-                        'Xem chi tiết hồ sơ ứng viên',
-                        'Tuyển dụng tài năng hiệu quả'
-                    ]
-                },
-                'ai-premium-basic': {
-                    title: 'AI Premium Basic',
-                    price: '2.500.000 VND',
-                    description: 'Gói AI Premium cơ bản với các tính năng AI hỗ trợ tuyển dụng thông minh. Tự động sàng lọc hồ sơ, đề xuất ứng viên phù hợp và tối ưu hóa quy trình tuyển dụng.',
-                    includes: [
-                        'AI sàng lọc hồ sơ tự động',
-                        'Đề xuất ứng viên phù hợp',
-                        'Phân tích CV thông minh',
-                        'Báo cáo tuyển dụng AI'
-                    ]
-                },
-                'ai-premium-pro': {
-                    title: 'AI Premium Pro',
-                    price: '5.000.000 VND',
-                    description: 'Gói AI Premium nâng cao với đầy đủ tính năng AI. Tự động hóa toàn bộ quy trình tuyển dụng, dự đoán hiệu suất ứng viên và tối ưu hóa chiến lược tuyển dụng.',
-                    includes: [
-                        'Tất cả tính năng Basic',
-                        'Dự đoán hiệu suất ứng viên',
-                        'Tự động hóa quy trình tuyển dụng',
-                        'Phân tích xu hướng thị trường lao động',
-                        'Tư vấn chiến lược tuyển dụng AI'
-                    ]
-                },
-                'ai-premium-enterprise': {
-                    title: 'AI Premium Enterprise',
-                    price: '10.000.000 VND',
-                    description: 'Gói AI Premium doanh nghiệp với các tính năng AI tiên tiến nhất. Hỗ trợ đa ngôn ngữ, tích hợp hệ thống HR hiện có và tư vấn chuyên sâu về AI trong tuyển dụng.',
-                    includes: [
-                        'Tất cả tính năng Pro',
-                        'Hỗ trợ đa ngôn ngữ',
-                        'Tích hợp hệ thống HR hiện có',
-                        'Tư vấn chuyên sâu AI',
-                        'Hỗ trợ 24/7 từ chuyên gia AI',
-                        'Báo cáo doanh nghiệp nâng cao'
-                    ]
-                }
-            };
-            // Chức năng giỏ hàng - lưu vào sessionStorage để không bị mất khi chuyển tab
+            // Global variables for packages data
+            let packagesData = {};
+            let currentTab = 'dang-tuyen';
+            // Shopping cart functionality
             let cart = [];
-            
-            // Load cart from sessionStorage khi khởi tạo
-            function loadCartFromStorage() {
+
+            // Sync cart state from sessionStorage (used when returning from shop-cart)
+            function syncCartFromSession() {
                 try {
-                    const savedCart = sessionStorage.getItem('topcv_cart');
-                    if (savedCart) {
-                        cart = JSON.parse(savedCart);
-                        console.log('Loaded cart from storage:', cart);
+                    const stored = sessionStorage.getItem('cartData');
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        if (Array.isArray(parsed)) {
+                            cart = parsed;
+                        } else {
+                            cart = [];
+                        }
+                    } else {
+                        // If nothing in sessionStorage, ensure in-memory cart is cleared
+                        cart = [];
                     }
+                    updateCartDisplay();
                 } catch (e) {
-                    console.error('Error loading cart from storage:', e);
+                    console.error('Failed to sync cart from sessionStorage:', e);
                     cart = [];
+                    updateCartDisplay();
                 }
             }
-            
-            // Save cart to sessionStorage
-            function saveCartToStorage() {
-                try {
-                    sessionStorage.setItem('topcv_cart', JSON.stringify(cart));
-                    console.log('Saved cart to storage:', cart);
-                } catch (e) {
-                    console.error('Error saving cart to storage:', e);
+
+            // AJAX functions
+            function loadPackagesByType(type) {
+                console.log('=== DEBUG: loadPackagesByType() ===');
+                console.log('Loading packages for type:', type);
+                
+                const xhr = new XMLHttpRequest();
+                const contextPath = '${pageContext.request.contextPath}';
+                const url = contextPath + '/job-package-api?action=getPackagesByType&type=' + encodeURIComponent(type);
+                console.log('Context Path:', contextPath);
+                console.log('Request URL:', url);
+                
+                xhr.open('GET', url, true);
+                xhr.onreadystatechange = function() {
+                    console.log('XHR ReadyState:', xhr.readyState, 'Status:', xhr.status);
+                    
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            console.log('Response received:', xhr.responseText);
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                console.log('Parsed response:', response);
+                                
+                                if (response.success) {
+                                    console.log('Success! Found', response.packages.length, 'packages');
+                                    console.log('Packages data:', response.packages);
+                                    packagesData[type] = response.packages;
+                                    renderPackages(type, response.packages);
+                                } else {
+                                    console.error('Error loading packages:', response.message);
+                                    showError('Không thể tải dữ liệu gói dịch vụ: ' + response.message);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing response:', e);
+                                showError('Lỗi xử lý dữ liệu từ server');
+                            }
+                        } else {
+                            console.error('HTTP Error:', xhr.status);
+                            showError('Lỗi kết nối server: ' + xhr.status);
+                        }
+                    }
+                };
+                xhr.send();
+                console.log('=== END DEBUG: loadPackagesByType() ===');
+            }
+
+
+            function renderPackages(type, packages) {
+                console.log('=== DEBUG: renderPackages() ===');
+                console.log('Type:', type);
+                console.log('Packages received:', packages);
+                console.log('Number of packages:', packages.length);
+                console.log('First package details:', packages[0]);
+                
+                const tabContent = document.getElementById(type);
+                if (!tabContent) {
+                    console.error('Tab content not found for type:', type);
+                    return;
                 }
+
+                // Clear existing content but preserve cart state
+                console.log('Clearing tab content, preserving cart state...');
+                console.log('Current cart before render:', cart);
+                tabContent.innerHTML = '';
+
+                if (packages.length === 0) {
+                    console.log('No packages found, showing empty message');
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-message';
+                    emptyDiv.innerHTML = '<p>Không có gói dịch vụ nào cho loại này.</p>';
+                    tabContent.appendChild(emptyDiv);
+                    return;
+                }
+
+                // Group packages by category
+                const mainPackages = packages.filter(pkg => !pkg.packageName.toLowerCase().includes('thêm'));
+                const supportPackages = packages.filter(pkg => pkg.packageName.toLowerCase().includes('thêm'));
+                
+                console.log('Main packages:', mainPackages.length);
+                console.log('Support packages:', supportPackages.length);
+
+                // Render main packages
+                if (mainPackages.length > 0) {
+                    console.log('Rendering main packages section');
+                    const mainSection = createPackageSection(getTypeDisplayName(type), mainPackages);
+                    tabContent.appendChild(mainSection);
+                }
+
+                // Render support packages
+                if (supportPackages.length > 0) {
+                    console.log('Rendering support packages section');
+                    const supportSection = createPackageSection('DỊCH VỤ HỖ TRỢ', supportPackages);
+                    tabContent.appendChild(supportSection);
+                }
+
+                // Re-initialize event listeners
+                initializePackageEventListeners();
+                
+                // Force update cart display after rendering
+                setTimeout(function() {
+                    console.log('Force updating cart display after render...');
+                    updateCartDisplay();
+                }, 100);
+                
+                console.log('=== END DEBUG: renderPackages() ===');
+            }
+
+            function createPackageSection(title, packages) {
+                console.log('=== DEBUG: createPackageSection() ===');
+                console.log('Title:', title);
+                console.log('Packages to render:', packages);
+                
+                const section = document.createElement('div');
+                section.className = 'sidebar-section';
+
+                const titleH3 = document.createElement('h3');
+                titleH3.textContent = title;
+                section.appendChild(titleH3);
+
+                packages.forEach((pkg, index) => {
+                    console.log('Creating package item', index + 1, ':', pkg.packageName, '-', pkg.price);
+                    
+                    const packageItem = document.createElement('div');
+                    packageItem.className = 'package-item';
+                    if (index === 0) packageItem.classList.add('selected');
+                    
+                    // Check if this package is in cart
+                    const cartItem = cart.find(item => item.title === pkg.packageName);
+                    console.log('Package', pkg.packageName, 'in cart:', cartItem);
+
+                    const packageInfo = document.createElement('div');
+                    packageInfo.className = 'package-info';
+
+                    const packageName = document.createElement('h4');
+                    packageName.textContent = pkg.packageName;
+                    packageInfo.appendChild(packageName);
+
+                    if (pkg.points) {
+                        const badge = document.createElement('div');
+                        badge.className = 'package-badge';
+                        badge.textContent = pkg.points + ' điểm';
+                        packageInfo.appendChild(badge);
+                    }
+
+                    const packagePrice = document.createElement('div');
+                    packagePrice.className = 'package-price';
+                    packagePrice.textContent = formatPrice(pkg.price);
+                    packageInfo.appendChild(packagePrice);
+
+                    const addToCartBtn = document.createElement('button');
+                    addToCartBtn.className = 'add-to-cart-btn';
+                    
+                    // Check if package is in cart and create appropriate button
+                    if (cartItem && cartItem.quantity > 0) {
+                        console.log('Package', pkg.packageName, 'is in cart with quantity:', cartItem.quantity);
+                        // Create quantity spinner for packages in cart
+                        const spinnerDiv = document.createElement('div');
+                        spinnerDiv.className = 'quantity-spinner';
+                        
+                        const minusBtn = document.createElement('button');
+                        minusBtn.textContent = '-';
+                        minusBtn.type = 'button';
+                        minusBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            console.log('Sidebar minus clicked for:', pkg.packageName);
+                            updateQuantity(pkg.packageName, cartItem.quantity - 1);
+                        });
+                        
+                        const quantityInput = document.createElement('input');
+                        quantityInput.type = 'text';
+                        quantityInput.className = 'quantity-display';
+                        quantityInput.value = cartItem.quantity;
+                        quantityInput.readOnly = true;
+                        
+                        const plusBtn = document.createElement('button');
+                        plusBtn.textContent = '+';
+                        plusBtn.type = 'button';
+                        plusBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            console.log('Sidebar plus clicked for:', pkg.packageName);
+                            updateQuantity(pkg.packageName, cartItem.quantity + 1);
+                        });
+                        
+                        spinnerDiv.appendChild(minusBtn);
+                        spinnerDiv.appendChild(quantityInput);
+                        spinnerDiv.appendChild(plusBtn);
+                        
+                        addToCartBtn.appendChild(spinnerDiv);
+                        addToCartBtn.classList.add('in-cart');
+                    } else {
+                        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>';
+                    }
+
+                    packageItem.appendChild(packageInfo);
+                    packageItem.appendChild(addToCartBtn);
+                    section.appendChild(packageItem);
+                });
+
+                console.log('Created section with', packages.length, 'package items');
+                console.log('=== END DEBUG: createPackageSection() ===');
+                return section;
+            }
+
+            function getTypeDisplayName(type) {
+                const typeNames = {
+                    'dang-tuyen': 'ĐĂNG TUYỂN',
+                    'tim-ho-so': 'TÌM HỒ SƠ',
+                    'ai-premium': 'AI PREMIUM'
+                };
+                return typeNames[type] || type.toUpperCase();
+            }
+
+            function formatPrice(price) {
+                if (!price) return '0 VND';
+                return new Intl.NumberFormat('vi-VN').format(price) + ' VND';
+            }
+
+            function showError(message) {
+                // You can implement a proper error display here
+                console.error(message);
+                alert(message);
+            }
+
+            function initializePackageEventListeners() {
+                // Add click handlers to package items in the current active tab only
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab) {
+                    const packageItems = activeTab.querySelectorAll('.package-item');
+                    packageItems.forEach((item, index) => {
+                        // Remove existing event listeners by cloning the element
+                        const newItem = item.cloneNode(true);
+                        item.parentNode.replaceChild(newItem, item);
+                        
+                        newItem.addEventListener('click', function () {
+                            // Remove selected class from all items in current tab
+                            const currentTabContent = this.closest('.tab-content');
+                            const currentTabItems = currentTabContent.querySelectorAll('.package-item');
+                            currentTabItems.forEach(pkg => pkg.classList.remove('selected'));
+                            // Add selected class to clicked item
+                            this.classList.add('selected');
+
+                            // Update content based on clicked package
+                            updatePackageContent(this);
+                        });
+                    });
+                }
+
+                // Initialize cart buttons
+                initializeCartButtons();
             }
 
             // Initialize page
             document.addEventListener('DOMContentLoaded', function () {
-                // Load cart from storage first
-                loadCartFromStorage();
-                // Update cart display after loading
-                updateCartDisplay();
+                console.log('=== DEBUG: DOMContentLoaded ===');
+                console.log('Page loaded, initializing...');
+                // Ensure cart reflects sessionStorage (e.g., after returning from shop-cart)
+                syncCartFromSession();
+                
+                // Force update total on page load
+                setTimeout(function() {
+                    console.log('Force updating total on page load...');
+                    updateTotal();
+                }, 100);
+                
+                // Load initial data
+                loadPackagesByType('dang-tuyen');
+                
                 // Tab switching functionality
                 const tabItems = document.querySelectorAll('.tab-item');
                 const tabContents = document.querySelectorAll('.tab-content');
@@ -1651,6 +1807,7 @@
                 tabItems.forEach(tab => {
                     tab.addEventListener('click', function () {
                         const targetTab = this.getAttribute('data-tab');
+                        currentTab = targetTab;
 
                         // Remove active class from all tabs
                         tabItems.forEach(t => t.classList.remove('active'));
@@ -1662,8 +1819,17 @@
                         // Show target tab content
                         document.getElementById(targetTab).classList.add('active');
 
-                        // Re-initialize cart buttons for the new tab
-                        initializeCartButtons();
+                        // Preserve cart state before loading new tab
+                        preserveCartState();
+                        
+                        // Load packages for the selected tab
+                        loadPackagesByType(targetTab);
+                        
+                        // Re-initialize cart display after tab change
+                        setTimeout(function() {
+                            console.log('Re-initializing cart display after tab change...');
+                            updateCartDisplay();
+                        }, 200);
                     });
                 });
 
@@ -1689,11 +1855,26 @@
                 // Add click handler to main add to cart button
                 const mainAddToCartBtn = document.querySelector('.add-to-cart-main-btn');
                 if (mainAddToCartBtn) {
-                    mainAddToCartBtn.addEventListener('click', function () {
+                    // Remove existing event listeners
+                    const newMainBtn = mainAddToCartBtn.cloneNode(true);
+                    mainAddToCartBtn.parentNode.replaceChild(newMainBtn, mainAddToCartBtn);
+                    
+                    newMainBtn.addEventListener('click', function (e) {
+                        // Check if this is a quantity spinner button click
+                        if (e.target.tagName === 'BUTTON' && e.target.closest('.quantity-spinner')) {
+                            return; // Let the onclick handler handle it
+                        }
+                        
                         const currentPackage = document.querySelector('.package-item.selected');
                         if (currentPackage) {
                             const packageTitle = currentPackage.querySelector('h4').textContent;
-                            const packagePrice = currentPackage.querySelector('.package-price').textContent;
+                            const packagePriceText = currentPackage.querySelector('.package-price').textContent;
+                            
+                            // Extract numeric price from formatted text
+                            const priceStr = packagePriceText.replace(/[^\d]/g, '');
+                            const packagePrice = parseInt(priceStr) || 0;
+                            console.log('Main button - Original price text:', packagePriceText);
+                            console.log('Main button - Extracted price:', packagePrice);
 
                             // Check if item is already in cart
                             const existingItem = cart.find(item => item.title === packageTitle);
@@ -1702,8 +1883,7 @@
                                 updateQuantity(packageTitle, existingItem.quantity + 1);
                             } else {
                                 // If not in cart, add to cart
-                                const packageId = currentPackage.dataset.packageId || 0;
-                                addToCart(packageTitle, packagePrice, packageId);
+                                addToCart(packageTitle, packagePrice);
                             }
                         }
                     });
@@ -1711,12 +1891,11 @@
 
                 // Add click handlers to footer buttons
                 const clearBtn = document.querySelector('.clear-btn');
-                const checkoutBtn = document.getElementById('btnCheckout');
+                const checkoutBtn = document.querySelector('.checkout-btn');
 
                 if (clearBtn) {
                     clearBtn.addEventListener('click', function () {
                         cart = [];
-                        saveCartToStorage(); // Lưu vào storage
                         updateCartDisplay();
                         alert('Đã xóa tất cả khỏi giỏ hàng!');
                     });
@@ -1724,21 +1903,41 @@
 
                 if (checkoutBtn) {
                     checkoutBtn.addEventListener('click', function () {
-                        const totalRaw = getTotalRaw();
-                        if (!totalRaw || totalRaw <= 0) {
-                            alert('Giỏ hàng trống hoặc tổng tiền không hợp lệ!');
+                        console.log('Checkout button clicked');
+                        console.log('Current cart:', cart);
+                        
+                        if (cart.length === 0) {
+                            alert('Giỏ hàng trống! Vui lòng thêm sản phẩm trước khi thanh toán.');
                             return;
                         }
                         
-                        // Lưu giỏ hàng vào sessionStorage
-                        try {
-                            sessionStorage.setItem('topcv_cart', JSON.stringify(cart));
-                        } catch(err) {
-                            console.error('Error saving cart to storage:', err);
-                        }
+                        // Calculate total with VAT
+                        const subtotal = cart.reduce((sum, item) => {
+                            let price = 0;
+                            if (typeof item.price === 'number') {
+                                price = item.price;
+                            } else if (typeof item.price === 'string') {
+                                const priceStr = item.price.replace(/[^\d]/g, '');
+                                price = parseInt(priceStr) || 0;
+                            }
+                            return sum + (price * item.quantity);
+                        }, 0);
                         
-                        // Chuyển hướng đến shop-cart.jsp
-                        window.location.href = '<%= request.getContextPath() %>/Recruiter/shop-cart.jsp';
+                        const vatAmount = subtotal * 0.08;
+                        const totalWithVAT = subtotal + vatAmount;
+                        
+                        console.log('Subtotal:', subtotal);
+                        console.log('VAT:', vatAmount);
+                        console.log('Total with VAT:', totalWithVAT);
+                        
+                        // Store cart data in sessionStorage
+                        sessionStorage.setItem('cartData', JSON.stringify(cart));
+                        sessionStorage.setItem('cartSubtotal', subtotal.toString());
+                        sessionStorage.setItem('cartVAT', vatAmount.toString());
+                        sessionStorage.setItem('cartTotal', totalWithVAT.toString());
+                        
+                        // Redirect to shop-cart page
+                        window.location.href = '${pageContext.request.contextPath}/shop-cart';
                     });
                 }
 
@@ -1756,37 +1955,63 @@
                 }
             });
 
-            // Khởi tạo các nút thêm vào giỏ
+            // Handle back/forward cache navigation: resync cart
+            window.addEventListener('pageshow', function(event) {
+                // When navigating back, some browsers restore the page from BFCache; resync cart
+                if (event.persisted || document.visibilityState === 'visible') {
+                    syncCartFromSession();
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    syncCartFromSession();
+                }
+            });
+
+            // Initialize cart buttons function
             function initializeCartButtons() {
+                // Only initialize buttons in the current active tab
+                const activeTab = document.querySelector('.tab-content.active');
+                if (!activeTab) return;
+
                 // Remove existing event listeners by cloning and replacing buttons
-                const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+                const addToCartBtns = activeTab.querySelectorAll('.add-to-cart-btn');
                 addToCartBtns.forEach(btn => {
                     const newBtn = btn.cloneNode(true);
                     btn.parentNode.replaceChild(newBtn, btn);
                 });
 
                 // Add new event listeners
-                const newAddToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+                const newAddToCartBtns = activeTab.querySelectorAll('.add-to-cart-btn');
                 console.log('Initializing cart buttons:', newAddToCartBtns.length);
                 newAddToCartBtns.forEach((btn, index) => {
                     btn.addEventListener('click', function (e) {
                         e.stopPropagation(); // Prevent triggering package selection
 
-                        // Nếu click bên trong spinner thì không thêm mới nữa (tránh + nhảy 2 lần)
-                        if (e.target && e.target.closest && e.target.closest('.quantity-spinner')) {
-                            return;
+                        // Check if this is a quantity spinner button
+                        if (e.target.tagName === 'BUTTON' && e.target.closest('.quantity-spinner')) {
+                            return; // Let the onclick handler handle it
                         }
 
                         const packageItem = this.closest('.package-item');
                         const packageTitle = packageItem.querySelector('h4').textContent;
-                        const packagePrice = packageItem.querySelector('.package-price').textContent;
+                        const packagePriceText = packageItem.querySelector('.package-price').textContent;
 
-                        console.log('Add to cart clicked:', packageTitle, packagePrice);
+                        console.log('Add to cart clicked:', packageTitle, packagePriceText);
                         console.log('Package item:', packageItem);
                         console.log('Button index:', index);
 
+                        // Extract numeric price from formatted text
+                        // Remove all non-digit characters, then convert to number
+                        const priceStr = packagePriceText.replace(/[^\d]/g, '');
+                        const packagePrice = parseInt(priceStr) || 0;
+                        console.log('Original price text:', packagePriceText);
+                        console.log('Cleaned price string:', priceStr);
+                        console.log('Extracted price:', packagePrice);
+
                         // First select this package
-                        const allPackageItems = document.querySelectorAll('.package-item');
+                        const allPackageItems = activeTab.querySelectorAll('.package-item');
                         allPackageItems.forEach(pkg => pkg.classList.remove('selected'));
                         packageItem.classList.add('selected');
                         console.log('Selected package:', packageTitle);
@@ -1798,52 +2023,66 @@
                             updateQuantity(packageTitle, existingItem.quantity + 1);
                         } else {
                             // If not in cart, add to cart
-                            const packageId = packageItem.dataset.packageId || 0;
-                            addToCart(packageTitle, packagePrice, packageId);
+                            addToCart(packageTitle, packagePrice);
                         }
                     });
                 });
             }
 
-            // Hàm giỏ hàng (toàn cục)
-            function addToCart(title, price, packageId) {
+            // Cart functions (defined globally)
+            function addToCart(title, price) {
+                console.log('=== DEBUG: addToCart() ===');
+                console.log('Adding to cart:', title, 'price:', price);
+                console.log('Price type:', typeof price);
+                console.log('Current cart before add:', cart);
+                
                 const existingItem = cart.find(item => item.title === title);
                 if (existingItem) {
                     existingItem.quantity += 1;
+                    console.log('Updated existing item quantity to:', existingItem.quantity);
                 } else {
                     cart.push({
                         title: title,
                         price: price,
-                        packageId: packageId || 0, // Lưu PackageID từ database
                         quantity: 1
                     });
+                    console.log('Added new item to cart with price:', price);
                 }
-                saveCartToStorage(); // Lưu vào storage
+                console.log('Cart after add:', cart);
                 updateCartDisplay();
+                console.log('=== END DEBUG: addToCart() ===');
             }
 
             function removeFromCart(title) {
                 cart = cart.filter(item => item.title !== title);
-                saveCartToStorage(); // Lưu vào storage
                 updateCartDisplay();
             }
 
             function updateQuantity(title, newQuantity) {
+                console.log('=== DEBUG: updateQuantity() ===');
                 console.log('updateQuantity called:', title, 'current quantity:', cart.find(item => item.title === title)?.quantity, 'new quantity:', newQuantity);
+                console.log('Current cart before update:', cart);
+                
                 const item = cart.find(item => item.title === title);
                 if (item) {
                     if (newQuantity <= 0) {
+                        console.log('Removing item from cart:', title);
                         removeFromCart(title);
                     } else {
                         item.quantity = newQuantity;
-                        saveCartToStorage(); // Lưu vào storage
+                        console.log('Updated item quantity:', item.title, 'to', item.quantity);
+                        console.log('Cart after update:', cart);
                         updateCartDisplay();
                     }
+                } else {
+                    console.error('Item not found in cart:', title);
+                    console.log('Available items in cart:', cart.map(item => item.title));
                 }
+                console.log('=== END DEBUG: updateQuantity() ===');
             }
 
             function updateCartDisplay() {
-            // Cập nhật số lượng trên icon giỏ hàng
+                // Update cart count in header
                 const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
                 const cartIcon = document.querySelector('.nav-icons .fa-shopping-cart');
                 if (cartIcon) {
@@ -1872,11 +2111,14 @@
 
                 // Update total
                 updateTotal();
+                
+                // Debug quantity spinners
+                debugQuantitySpinners();
             }
 
             function updateAddToCartButtons() {
                 console.log('updateAddToCartButtons called, cart:', cart);
-            // Cập nhật nút "Thêm vào giỏ" thành spinner số lượng
+                // Update all add to cart buttons to show quantity spinner
                 const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
                 console.log('Updating buttons:', addToCartBtns.length);
                 addToCartBtns.forEach((btn, index) => {
@@ -1888,20 +2130,55 @@
 
                     if (cartItem && cartItem.quantity > 0) {
                         console.log('Found cart item:', cartItem);
-                        btn.innerHTML = '<div class="quantity-spinner">'
-                            + '<button onclick="event.stopPropagation(); updateQuantity(\'' + packageTitle + '\',' + (cartItem.quantity - 1) + ')">-</button>'
-                            + '<input type="text" class="quantity-display" value="' + cartItem.quantity + '" readonly>'
-                            + '<button onclick="event.stopPropagation(); updateQuantity(\'' + packageTitle + '\',' + (cartItem.quantity + 1) + ')">+</button>'
-                            + '</div>';
+                        console.log('Creating spinner for:', packageTitle, 'quantity:', cartItem.quantity);
+                        
+                        // Create spinner with proper event handling
+                        const spinnerDiv = document.createElement('div');
+                        spinnerDiv.className = 'quantity-spinner';
+                        
+                        const minusBtn = document.createElement('button');
+                        minusBtn.textContent = '-';
+                        minusBtn.type = 'button';
+                        minusBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            console.log('Button minus clicked for:', packageTitle);
+                            updateQuantity(packageTitle, cartItem.quantity - 1);
+                        });
+                        
+                        const quantityInput = document.createElement('input');
+                        quantityInput.type = 'text';
+                        quantityInput.className = 'quantity-display';
+                        quantityInput.value = cartItem.quantity;
+                        quantityInput.readOnly = true;
+                        
+                        const plusBtn = document.createElement('button');
+                        plusBtn.textContent = '+';
+                        plusBtn.type = 'button';
+                        plusBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            console.log('Button plus clicked for:', packageTitle);
+                            updateQuantity(packageTitle, cartItem.quantity + 1);
+                        });
+                        
+                        spinnerDiv.appendChild(minusBtn);
+                        spinnerDiv.appendChild(quantityInput);
+                        spinnerDiv.appendChild(plusBtn);
+                        
+                        btn.innerHTML = '';
+                        btn.appendChild(spinnerDiv);
                         btn.classList.add('in-cart');
+                        
                         console.log('Updated button to spinner for:', packageTitle);
+                        console.log('Button innerHTML after update:', btn.innerHTML);
+                        console.log('Quantity input value:', quantityInput.value);
+                        console.log('Spinner div created:', spinnerDiv);
                     } else {
                         btn.innerHTML = '<i class="fas fa-shopping-cart"></i>';
                         btn.classList.remove('in-cart');
                     }
                 });
 
-            // Cập nhật nút thêm vào giỏ chính
+                // Update main add to cart button
                 const mainAddToCartBtn = document.querySelector('.add-to-cart-main-btn');
                 if (mainAddToCartBtn) {
                     const currentPackage = document.querySelector('.package-item.selected');
@@ -1912,11 +2189,40 @@
                         console.log('Main button - current package:', packageTitle, 'cart item:', cartItem);
 
                         if (cartItem && cartItem.quantity > 0) {
-                            mainAddToCartBtn.innerHTML = '<div class="quantity-spinner">'
-                                + '<button onclick="event.stopPropagation(); updateQuantity(\'' + packageTitle + '\',' + (cartItem.quantity - 1) + ')">-</button>'
-                                + '<input type="text" class="quantity-display" value="' + cartItem.quantity + '" readonly>'
-                                + '<button onclick="event.stopPropagation(); updateQuantity(\'' + packageTitle + '\',' + (cartItem.quantity + 1) + ')">+</button>'
-                                + '</div>';
+                            // Create spinner with proper event handling for main button
+                            const spinnerDiv = document.createElement('div');
+                            spinnerDiv.className = 'quantity-spinner';
+                            
+                            const minusBtn = document.createElement('button');
+                            minusBtn.textContent = '-';
+                            minusBtn.type = 'button';
+                            minusBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                console.log('Main button minus clicked for:', packageTitle);
+                                updateQuantity(packageTitle, cartItem.quantity - 1);
+                            });
+                            
+                            const quantityInput = document.createElement('input');
+                            quantityInput.type = 'text';
+                            quantityInput.className = 'quantity-display';
+                            quantityInput.value = cartItem.quantity;
+                            quantityInput.readOnly = true;
+                            
+                            const plusBtn = document.createElement('button');
+                            plusBtn.textContent = '+';
+                            plusBtn.type = 'button';
+                            plusBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                console.log('Main button plus clicked for:', packageTitle);
+                                updateQuantity(packageTitle, cartItem.quantity + 1);
+                            });
+                            
+                            spinnerDiv.appendChild(minusBtn);
+                            spinnerDiv.appendChild(quantityInput);
+                            spinnerDiv.appendChild(plusBtn);
+                            
+                            mainAddToCartBtn.innerHTML = '';
+                            mainAddToCartBtn.appendChild(spinnerDiv);
                             mainAddToCartBtn.classList.add('in-cart');
                             console.log('Updated main button to spinner for:', packageTitle);
                         } else {
@@ -1930,26 +2236,122 @@
             }
 
             function updateTotal() {
-                const total = cart.reduce((sum, item) => {
-                    const price = parseInt(String(item.price).replace(/[^\d]/g, '')) || 0;
-                    return sum + (price * (item.quantity || 0));
+                console.log('=== DEBUG: updateTotal() ===');
+                console.log('Cart items:', cart);
+                console.log('Cart length:', cart.length);
+                
+                const subtotal = cart.reduce((sum, item) => {
+                    console.log('Processing item:', item.title, 'price:', item.price, 'quantity:', item.quantity);
+                    console.log('Price type:', typeof item.price);
+                    
+                    // Handle different price formats
+                    let price = 0;
+                    if (typeof item.price === 'number') {
+                        price = item.price;
+                    } else if (typeof item.price === 'string') {
+                        // Remove all non-digit characters
+                        const priceStr = item.price.replace(/[^\d]/g, '');
+                        price = parseInt(priceStr) || 0;
+                    }
+                    
+                    const itemTotal = price * item.quantity;
+                    console.log('Calculated price:', price);
+                    console.log('Item total:', itemTotal);
+                    return sum + itemTotal;
                 }, 0);
+
+                // Calculate VAT (8%)
+                const vatAmount = subtotal * 0.08;
+                const totalWithVAT = subtotal + vatAmount;
+                
+                console.log('Subtotal:', subtotal);
+                console.log('VAT (8%):', vatAmount);
+                console.log('Total with VAT:', totalWithVAT);
+                console.log('Total with VAT (rounded):', Math.round(totalWithVAT));
+                console.log('Total with VAT (as string):', Math.round(totalWithVAT).toString());
 
                 const totalElement = document.querySelector('.total-amount');
+                console.log('Total element found:', totalElement);
+                
+                // Debug total element
+                debugTotalElement();
+                
+                // Test number formatting
+                testNumberFormatting();
                 if (totalElement) {
-                    try {
-                        totalElement.textContent = total.toLocaleString('vi-VN') + ' VND';
-                    } catch(err) {
-                        totalElement.textContent = total + ' VND';
+                    if (totalWithVAT > 0) {
+                        // Use custom formatting function
+                        const roundedTotal = Math.round(totalWithVAT);
+                        const formattedTotal = formatVietnameseNumber(roundedTotal);
+                        console.log('Rounded total:', roundedTotal);
+                        console.log('Formatted total:', formattedTotal);
+                        totalElement.textContent = formattedTotal + ' VND';
+                    } else {
+                        totalElement.textContent = '0 VND';
                     }
+                    console.log('Updated total element:', totalElement.textContent);
+                    console.log('Total element innerHTML:', totalElement.innerHTML);
+                } else {
+                    console.error('Total element not found!');
+                    console.log('Available elements with class total-amount:', document.querySelectorAll('.total-amount'));
                 }
+                console.log('=== END DEBUG: updateTotal() ===');
             }
-
-            function getTotalRaw() {
-                return cart.reduce(function(sum, item){
-                    const price = parseInt(String(item.price).replace(/[^\d]/g, '')) || 0;
-                    return sum + (price * (item.quantity || 0));
-                }, 0);
+            
+            // Debug function to check total element
+            function debugTotalElement() {
+                console.log('=== DEBUG: debugTotalElement() ===');
+                const totalElement = document.querySelector('.total-amount');
+                console.log('Total element:', totalElement);
+                console.log('Total element textContent:', totalElement ? totalElement.textContent : 'null');
+                console.log('Total element innerHTML:', totalElement ? totalElement.innerHTML : 'null');
+                console.log('Total element style:', totalElement ? totalElement.style.cssText : 'null');
+                console.log('Total element computed style:', totalElement ? window.getComputedStyle(totalElement) : 'null');
+                console.log('=== END DEBUG: debugTotalElement() ===');
+            }
+            
+            // Debug function to check quantity spinners
+            function debugQuantitySpinners() {
+                console.log('=== DEBUG: debugQuantitySpinners() ===');
+                const spinners = document.querySelectorAll('.quantity-spinner');
+                console.log('Found quantity spinners:', spinners.length);
+                spinners.forEach((spinner, index) => {
+                    console.log(`Spinner ${index}:`, spinner);
+                    console.log(`Spinner ${index} innerHTML:`, spinner.innerHTML);
+                    const input = spinner.querySelector('.quantity-display');
+                    console.log(`Spinner ${index} input value:`, input ? input.value : 'null');
+                });
+                console.log('=== END DEBUG: debugQuantitySpinners() ===');
+            }
+            
+            // Function to preserve cart state when switching tabs
+            function preserveCartState() {
+                console.log('=== DEBUG: preserveCartState() ===');
+                console.log('Current cart state:', cart);
+                console.log('Cart items count:', cart.length);
+                cart.forEach((item, index) => {
+                    console.log(`Cart item ${index}:`, item.title, 'quantity:', item.quantity);
+                });
+                console.log('=== END DEBUG: preserveCartState() ===');
+            }
+            
+            // Function to test number formatting
+            function testNumberFormatting() {
+                console.log('=== DEBUG: testNumberFormatting() ===');
+                const testNumbers = [860, 1234, 12345, 123456, 1234567];
+                testNumbers.forEach(num => {
+                    const formatted = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                    console.log(`${num} -> ${formatted}`);
+                });
+                console.log('=== END DEBUG: testNumberFormatting() ===');
+            }
+            
+            // Function to format Vietnamese number
+            function formatVietnameseNumber(num) {
+                if (num < 1000) {
+                    return num.toString();
+                }
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             }
 
             function showCartDropdown() {
@@ -1968,96 +2370,74 @@
                     }
                 };
 
-                var itemsHtml = '';
-                cart.forEach(function(item) {
-                    itemsHtml += '<div class="cart-dropdown-item" data-title="' + item.title.replace(/"/g,'&quot;') + '">'
-                        + '<div class="item-info">'
-                        + '<h4>' + item.title + '</h4>'
-                        + '<div class="item-price">' + item.price + '</div>'
-                        + '</div>'
-                        + '<div class="item-controls">'
-                        + '<div class="quantity-spinner">'
-                        + '<button class="btn-minus" type="button" style="border: 1px solid red;">-</button>'
-                        + '<input type="text" class="quantity-display" value="' + item.quantity + '" readonly>'
-                        + '<button class="btn-plus" type="button" style="border: 1px solid red;">+</button>'
-                        + '</div>'
-                        + '<button class="remove-btn" type="button">'
-                        + '<i class="fas fa-trash"></i>'
-                        + '</button>'
-                        + '</div>'
-                        + '</div>';
+                // Calculate total count and amount
+                const totalCount = cart.reduce((total, item) => total + item.quantity, 0);
+                const totalAmount = cart.reduce((sum, item) => {
+                    const price = parseInt(item.price.replace(/[^\d]/g, ''));
+                    return sum + (price * item.quantity);
+                }, 0);
+
+                // Build cart items HTML
+                let cartItemsHTML = '';
+                cart.forEach(item => {
+                    cartItemsHTML += `
+              <div class="cart-dropdown-item">
+              <div class="item-info">
+              <h4>${item.title}</h4>
+              <div class="item-price">${item.price}</div>
+              </div>
+              <div class="item-controls">
+              <div class="quantity-spinner">
+              <button onclick="updateQuantity('${item.title}', ${item.quantity - 1})" style="border: 1px solid red;">-</button>
+              <input type="text" class="quantity-display" value="${item.quantity}" readonly>
+              <button onclick="updateQuantity('${item.title}', ${item.quantity + 1})" style="border: 1px solid red;">+</button>
+              </div>
+              <button onclick="removeFromCart('${item.title}')" class="remove-btn">
+              <i class="fas fa-trash"></i>
+              </button>
+              </div>
+              </div>
+                    `;
                 });
-                var headerCount = cart.reduce(function(total, item){return total + item.quantity;}, 0);
-                var totalAmt = cart.reduce(function(sum, item){
-                    var price = parseInt(item.price.replace(/[^\d]/g, ''));
-                            return sum + (price * item.quantity);
-                }, 0).toLocaleString('vi-VN');
-                cartDropdown.innerHTML = '<div class="cart-dropdown-content">'
-                    + '<h3>Giỏ hàng (' + headerCount + ' sản phẩm)</h3>'
-                    + '<div class="cart-dropdown-items">' + itemsHtml + '</div>'
-                    + '<div class="cart-dropdown-total"><strong>Tổng: ' + totalAmt + ' VND</strong></div>'
-                    + '<div class="cart-dropdown-actions">'
-                    + '<button class="close-btn" type="button">Đóng</button>'
-                    + '<button class="checkout-btn" type="button">Thanh toán</button>'
-                    + '</div>'
-                    + '</div>';
+
+                cartDropdown.innerHTML = `
+                    <div class="cart-dropdown-content">
+                        <h3>Giỏ hàng (<span id="cart-total-count">${totalCount}</span> sản phẩm)</h3>
+                        <div class="cart-dropdown-items">
+                            ${cartItemsHTML}
+                        </div>
+                        <div class="cart-dropdown-total">
+                            <strong>Tổng: <span id="cart-total-amount">${totalAmount.toLocaleString('vi-VN')}</span> VND</strong>
+                        </div>
+                        <div class="cart-dropdown-actions">
+                            <button onclick="document.querySelector('.cart-dropdown').style.display='none'" class="close-btn">Đóng</button>
+                            <button onclick="alert('Chuyển đến trang thanh toán...')" class="checkout-btn">Thanh toán</button>
+                        </div>
+                    </div>
+                `;
 
                 cartDropdown.style.display = 'block';
-            }
-
-            // Ủy quyền sự kiện: xử lý + / - / xoá / đóng trong dropdown giỏ hàng
-            document.addEventListener('click', function(e){
-                var minusBtn = e.target.closest ? e.target.closest('.btn-minus') : null;
-                var plusBtn = e.target.closest ? e.target.closest('.btn-plus') : null;
-                var removeBtn = e.target.closest ? e.target.closest('.remove-btn') : null;
-                var closeBtn = e.target.closest ? e.target.closest('.close-btn') : null;
-                var dropdownVisible = document.querySelector('.cart-dropdown') && document.querySelector('.cart-dropdown').style.display === 'block';
-
-                if (minusBtn) {
-                    var row1 = minusBtn.closest('.cart-dropdown-item');
-                    if (row1) { updateQuantity(row1.getAttribute('data-title'), (getQty(row1) - 1)); }
-                    if (dropdownVisible) showCartDropdown();
-                } else if (plusBtn) {
-                    var row2 = plusBtn.closest('.cart-dropdown-item');
-                    if (row2) { updateQuantity(row2.getAttribute('data-title'), (getQty(row2) + 1)); }
-                    if (dropdownVisible) showCartDropdown();
-                } else if (removeBtn) {
-                    var row3 = removeBtn.closest('.cart-dropdown-item');
-                    if (row3) { removeFromCart(row3.getAttribute('data-title')); }
-                    if (dropdownVisible) showCartDropdown();
-                } else if (closeBtn) {
-                    var dd = document.querySelector('.cart-dropdown');
-                    if (dd) dd.style.display = 'none';
-                }
-            });
-
-            function getQty(row){
-                var v = row.querySelector('.quantity-display') ? parseInt(row.querySelector('.quantity-display').value, 10) : 0;
-                return isNaN(v) ? 0 : v;
             }
 
             function updatePackageContent(selectedItem) {
                 const packageTitle = selectedItem.querySelector('h4').textContent;
                 const packagePrice = selectedItem.querySelector('.package-price').textContent;
 
-                // Find matching package data
+                // Find matching package data from current tab data
                 let packageData = null;
-                for (const [key, data] of Object.entries(packages)) {
-                    if (data.title === packageTitle) {
-                        packageData = data;
-                        break;
-                    }
+                if (packagesData[currentTab]) {
+                    packageData = packagesData[currentTab].find(pkg => pkg.packageName === packageTitle);
                 }
 
                 if (packageData) {
                     // Update product header
                     const productHeader = document.querySelector('.product-header');
-                    productHeader.querySelector('h2').textContent = packageData.title;
-                    productHeader.querySelector('.product-price').textContent = packageData.price;
+                    productHeader.querySelector('h2').textContent = packageData.packageName;
+                    productHeader.querySelector('.product-price').textContent = formatPrice(packageData.price);
 
                     // Add warning for "Việc Cần Tuyển Gấp"
                     let warningDiv = productHeader.querySelector('.warning-message');
-                    if (packageData.title === 'Việc Cần Tuyển Gấp') {
+                    if (packageData.packageName.toLowerCase().includes('tuyển gấp')) {
                         if (!warningDiv) {
                             warningDiv = document.createElement('div');
                             warningDiv.className = 'warning-message';
@@ -2072,64 +2452,47 @@
 
                     // Update product description
                     const descriptionSection = document.querySelector('.product-description p');
-                    descriptionSection.textContent = packageData.description;
+                    descriptionSection.textContent = packageData.description || 'Không có mô tả chi tiết.';
 
                     // Update includes section
                     const includesList = document.querySelector('.product-includes ul');
                     includesList.innerHTML = '';
-                    includesList.innerHTML = '';
-                    // Nếu cột Features (JSON hoặc chuỗi ngăn cách) có trong item đang chọn thì ưu tiên dùng
-                    var selected = document.querySelector('.package-item.selected');
-                    var featuresRaw = selected && selected.querySelector('.hidden-features') ? selected.querySelector('.hidden-features').textContent : '';
-                    if (featuresRaw) {
+                    
+                    // Parse features from database
+                    let features = [];
+                    if (packageData.features) {
                         try {
-                            var arr = JSON.parse(featuresRaw);
-                            if (Array.isArray(arr)) {
-                                arr.forEach(function(f){
-                                    var li = document.createElement('li');
-                                    li.innerHTML = '<i class="fas fa-check"></i> ' + f;
-                                    includesList.appendChild(li);
-                                });
-                            }
-                        } catch(err) {
-                            // fallback: split by ;
-                            featuresRaw.split(';').forEach(function(f){
-                                if (f.trim().length>0){
-                                    var li = document.createElement('li');
-                                    li.innerHTML = '<i class="fas fa-check"></i> ' + f.trim();
-                                    includesList.appendChild(li);
-                                }
-                            });
+                            features = JSON.parse(packageData.features);
+                        } catch (e) {
+                            // If not JSON, split by newline or comma
+                            features = packageData.features.split(/[\n,]/).filter(f => f.trim());
                         }
-                    } else if (Array.isArray(packageData.includes)) {
-                        packageData.includes.forEach(function(include){
+                    }
+                    
+                    // Default features if none provided
+                    if (features.length === 0) {
+                        features = [
+                            'Dịch vụ chất lượng cao',
+                            'Hỗ trợ 24/7',
+                            'Bảo hành đầy đủ'
+                        ];
+                    }
+                    
+                    features.forEach(feature => {
                         const li = document.createElement('li');
-                            li.innerHTML = '<i class="fas fa-check"></i> ' + include;
+                        li.innerHTML = `<i class="fas fa-check"></i> ${feature.trim()}`;
                         includesList.appendChild(li);
                     });
+                } else {
+                    // Fallback if package data not found
+                    const productHeader = document.querySelector('.product-header');
+                    productHeader.querySelector('h2').textContent = packageTitle;
+                    productHeader.querySelector('.product-price').textContent = packagePrice;
+                    
+                    const descriptionSection = document.querySelector('.product-description p');
+                    descriptionSection.textContent = 'Thông tin chi tiết đang được cập nhật.';
                 }
             }
-            }
-            // Khi click một gói bên trái, cập nhật chi tiết bên phải theo hidden fields
-            document.addEventListener('click', function(e){
-                var pkg = e.target.closest('.package-item');
-                if (!pkg) return;
-                var title = pkg.querySelector('h4') ? pkg.querySelector('h4').textContent : '';
-                var price = pkg.getAttribute('data-price-raw') || '0';
-                var desc = pkg.querySelector('.hidden-desc') ? pkg.querySelector('.hidden-desc').textContent : '';
-                // Cập nhật tiêu đề và giá bên phải theo gói được chọn
-                var pdTitle = document.getElementById('pd-title');
-                var pdPrice = document.getElementById('pd-price');
-                var pdDesc  = document.getElementById('pd-desc');
-                if (pdTitle) pdTitle.textContent = title;
-                if (pdPrice) {
-                    try {
-                        var n = parseFloat(price);
-                        pdPrice.textContent = isNaN(n) ? price + ' VND' : n.toLocaleString('vi-VN') + ' VND';
-                    } catch(err) { pdPrice.textContent = price + ' VND'; }
-                }
-                if (pdDesc) pdDesc.textContent = desc || pdDesc.textContent;
-            });
         </script>
 
     </body>

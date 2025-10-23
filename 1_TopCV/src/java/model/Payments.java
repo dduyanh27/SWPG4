@@ -3,9 +3,11 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Payment {
+public class Payments {
     private int paymentID;
     private int recruiterID;
+    private Integer packageID;           // nullable
+    private Integer recruiterPackageID;  // nullable
     private BigDecimal amount;
     private String paymentMethod;
     private String paymentStatus;
@@ -13,12 +15,15 @@ public class Payment {
     private LocalDateTime paymentDate;
     private String notes;
 
-    public Payment() {}
+    public Payments() {}
 
-    public Payment(int paymentID, int recruiterID, BigDecimal amount, String paymentMethod,
+    public Payments(int paymentID, int recruiterID, Integer packageID, Integer recruiterPackageID,
+                   BigDecimal amount, String paymentMethod,
                    String paymentStatus, String transactionCode, LocalDateTime paymentDate, String notes) {
         this.paymentID = paymentID;
         this.recruiterID = recruiterID;
+        this.packageID = packageID;
+        this.recruiterPackageID = recruiterPackageID;
         this.amount = amount;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
@@ -27,6 +32,7 @@ public class Payment {
         this.notes = notes;
     }
 
+    // Getters and Setters
     public int getPaymentID() {
         return paymentID;
     }
@@ -41,6 +47,22 @@ public class Payment {
 
     public void setRecruiterID(int recruiterID) {
         this.recruiterID = recruiterID;
+    }
+
+    public Integer getPackageID() {
+        return packageID;
+    }
+
+    public void setPackageID(Integer packageID) {
+        this.packageID = packageID;
+    }
+
+    public Integer getRecruiterPackageID() {
+        return recruiterPackageID;
+    }
+
+    public void setRecruiterPackageID(Integer recruiterPackageID) {
+        this.recruiterPackageID = recruiterPackageID;
     }
 
     public BigDecimal getAmount() {
@@ -93,14 +115,17 @@ public class Payment {
 
     @Override
     public String toString() {
-        return "Payment{" +
+        return "Payments{" +
                 "paymentID=" + paymentID +
                 ", recruiterID=" + recruiterID +
+                ", packageID=" + packageID +
+                ", recruiterPackageID=" + recruiterPackageID +
                 ", amount=" + amount +
                 ", paymentMethod='" + paymentMethod + '\'' +
                 ", paymentStatus='" + paymentStatus + '\'' +
+                ", transactionCode='" + transactionCode + '\'' +
+                ", paymentDate=" + paymentDate +
+                ", notes='" + notes + '\'' +
                 '}';
     }
 }
-
-

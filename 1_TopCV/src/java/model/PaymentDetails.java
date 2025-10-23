@@ -2,16 +2,17 @@ package model;
 
 import java.math.BigDecimal;
 
-public class PaymentDetail {
+public class PaymentDetails {
     private int paymentDetailID;
     private int paymentID;
     private int packageID;
-    private Integer quantity;
+    private int quantity;
     private BigDecimal unitPrice;
 
-    public PaymentDetail() {}
+    public PaymentDetails() {}
 
-    public PaymentDetail(int paymentDetailID, int paymentID, int packageID, Integer quantity, BigDecimal unitPrice) {
+    public PaymentDetails(int paymentDetailID, int paymentID, int packageID,
+                         int quantity, BigDecimal unitPrice) {
         this.paymentDetailID = paymentDetailID;
         this.paymentID = paymentID;
         this.packageID = packageID;
@@ -19,6 +20,7 @@ public class PaymentDetail {
         this.unitPrice = unitPrice;
     }
 
+    // Getters and Setters
     public int getPaymentDetailID() {
         return paymentDetailID;
     }
@@ -43,11 +45,11 @@ public class PaymentDetail {
         this.packageID = packageID;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
@@ -61,7 +63,7 @@ public class PaymentDetail {
 
     @Override
     public String toString() {
-        return "PaymentDetail{" +
+        return "PaymentDetails{" +
                 "paymentDetailID=" + paymentDetailID +
                 ", paymentID=" + paymentID +
                 ", packageID=" + packageID +
@@ -70,5 +72,3 @@ public class PaymentDetail {
                 '}';
     }
 }
-
-

@@ -2,21 +2,21 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class RecruiterPackage {
+public class RecruiterPackages {
     private int recruiterPackageID;
     private int recruiterID;
     private int packageID;
-    private Integer quantity;
-    private Integer usedQuantity;
+    private int quantity;
+    private int usedQuantity;
     private LocalDateTime purchaseDate;
     private LocalDateTime expiryDate;
-    private Boolean isUsed;
+    private boolean isUsed;
 
-    public RecruiterPackage() {}
+    public RecruiterPackages() {}
 
-    public RecruiterPackage(int recruiterPackageID, int recruiterID, int packageID, Integer quantity,
-                            Integer usedQuantity, LocalDateTime purchaseDate, LocalDateTime expiryDate,
-                            Boolean isUsed) {
+    public RecruiterPackages(int recruiterPackageID, int recruiterID, int packageID,
+                            int quantity, int usedQuantity, LocalDateTime purchaseDate,
+                            LocalDateTime expiryDate, boolean isUsed) {
         this.recruiterPackageID = recruiterPackageID;
         this.recruiterID = recruiterID;
         this.packageID = packageID;
@@ -27,6 +27,7 @@ public class RecruiterPackage {
         this.isUsed = isUsed;
     }
 
+    // Getters and Setters
     public int getRecruiterPackageID() {
         return recruiterPackageID;
     }
@@ -51,19 +52,19 @@ public class RecruiterPackage {
         this.packageID = packageID;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public Integer getUsedQuantity() {
+    public int getUsedQuantity() {
         return usedQuantity;
     }
 
-    public void setUsedQuantity(Integer usedQuantity) {
+    public void setUsedQuantity(int usedQuantity) {
         this.usedQuantity = usedQuantity;
     }
 
@@ -83,24 +84,25 @@ public class RecruiterPackage {
         this.expiryDate = expiryDate;
     }
 
-    public Boolean getIsUsed() {
+    public boolean isIsUsed() {
         return isUsed;
     }
 
-    public void setIsUsed(Boolean isUsed) {
+    public void setIsUsed(boolean isUsed) {
         this.isUsed = isUsed;
     }
 
     @Override
     public String toString() {
-        return "RecruiterPackage{" +
+        return "RecruiterPackages{" +
                 "recruiterPackageID=" + recruiterPackageID +
                 ", recruiterID=" + recruiterID +
                 ", packageID=" + packageID +
                 ", quantity=" + quantity +
                 ", usedQuantity=" + usedQuantity +
+                ", purchaseDate=" + purchaseDate +
+                ", expiryDate=" + expiryDate +
+                ", isUsed=" + isUsed +
                 '}';
     }
 }
-
-

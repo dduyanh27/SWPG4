@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class JobFeatureMapping {
+public class JobFeatureMappings {
     private int jobFeatureMapID;
     private int jobID;
     private int recruiterPackageID;
@@ -10,10 +10,10 @@ public class JobFeatureMapping {
     private LocalDateTime appliedDate;
     private LocalDateTime expireDate;
 
-    public JobFeatureMapping() {}
+    public JobFeatureMappings() {}
 
-    public JobFeatureMapping(int jobFeatureMapID, int jobID, int recruiterPackageID, String featureType,
-                             LocalDateTime appliedDate, LocalDateTime expireDate) {
+    public JobFeatureMappings(int jobFeatureMapID, int jobID, int recruiterPackageID,
+                             String featureType, LocalDateTime appliedDate, LocalDateTime expireDate) {
         this.jobFeatureMapID = jobFeatureMapID;
         this.jobID = jobID;
         this.recruiterPackageID = recruiterPackageID;
@@ -22,6 +22,7 @@ public class JobFeatureMapping {
         this.expireDate = expireDate;
     }
 
+    // Getters and Setters
     public int getJobFeatureMapID() {
         return jobFeatureMapID;
     }
@@ -72,13 +73,13 @@ public class JobFeatureMapping {
 
     @Override
     public String toString() {
-        return "JobFeatureMapping{" +
+        return "JobFeatureMappings{" +
                 "jobFeatureMapID=" + jobFeatureMapID +
                 ", jobID=" + jobID +
                 ", recruiterPackageID=" + recruiterPackageID +
                 ", featureType='" + featureType + '\'' +
+                ", appliedDate=" + appliedDate +
+                ", expireDate=" + expireDate +
                 '}';
     }
 }
-
-

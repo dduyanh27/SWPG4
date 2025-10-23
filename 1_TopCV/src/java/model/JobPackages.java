@@ -3,7 +3,7 @@ package model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class JobPackage {
+public class JobPackages {
     private int packageID;
     private String packageName;
     private String packageType;
@@ -12,15 +12,15 @@ public class JobPackage {
     private Integer duration;
     private Integer points;
     private String features;
-    private Boolean isActive;
+    private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public JobPackage() {}
+    public JobPackages() {}
 
-    public JobPackage(int packageID, String packageName, String packageType, String description,
+    public JobPackages(int packageID, String packageName, String packageType, String description,
                       BigDecimal price, Integer duration, Integer points, String features,
-                      Boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                      boolean isActive, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.packageID = packageID;
         this.packageName = packageName;
         this.packageType = packageType;
@@ -34,6 +34,7 @@ public class JobPackage {
         this.updatedAt = updatedAt;
     }
 
+    // Getters and Setters
     public int getPackageID() {
         return packageID;
     }
@@ -98,11 +99,11 @@ public class JobPackage {
         this.features = features;
     }
 
-    public Boolean getIsActive() {
+    public boolean isIsActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -124,13 +125,18 @@ public class JobPackage {
 
     @Override
     public String toString() {
-        return "JobPackage{" +
+        return "JobPackages{" +
                 "packageID=" + packageID +
                 ", packageName='" + packageName + '\'' +
                 ", packageType='" + packageType + '\'' +
+                ", description='" + description + '\'' +
                 ", price=" + price +
+                ", duration=" + duration +
+                ", points=" + points +
+                ", features='" + features + '\'' +
+                ", isActive=" + isActive +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
-
-
