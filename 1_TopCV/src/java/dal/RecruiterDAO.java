@@ -1,83 +1,45 @@
 package dal;
 
 import model.Recruiter;
-import util.MD5Util;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import util.MD5Util;
 
-/**
- * Data Access Object (DAO) cho bảng Recruiter.
- * Chứa các phương thức CRUD và tiện ích hỗ trợ xác thực, kiểm tra dữ liệu.
- */
 public class RecruiterDAO extends DBContext {
 
-    //=============================
-    // HELPER METHOD
-    //=============================
+    // Thêm recruiter mới
+    public boolean addRecruiter(Recruiter recruiter) {
+        String sql = "INSERT INTO Recruiter (Email, Password, Phone, CompanyName, "
+                + "CompanyDescription, CompanyLogoURL, Website, Img, CategoryID, Status, "
+                + "CompanyAddress, CompanySize, ContactPerson, CompanyBenefits, CompanyVideoURL, "
+                + "Taxcode, RegistrationCert) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    /**
-     * Chuyển đổi một dòng ResultSet thành đối tượng Recruiter.
-     */
-    private Recruiter mapResultSetToRecruiter(ResultSet rs) throws SQLException {
-        Recruiter r = new Recruiter();
-        r.setRecruiterID(rs.getInt("RecruiterID"));
-        r.setEmail(rs.getString("Email"));
-        r.setPassword(rs.getString("Password"));
-        r.setPhone(rs.getString("Phone"));
-        r.setCompanyName(rs.getString("CompanyName"));
-        r.setCompanyDescription(rs.getString("CompanyDescription"));
-        r.setCompanyLogoURL(rs.getString("CompanyLogoURL"));
-        r.setWebsite(rs.getString("Website"));
-        r.setImg(rs.getString("Img"));
-        r.setCategoryID(rs.getInt("CategoryID"));
-        r.setStatus(rs.getString("Status"));
-        r.setCompanyAddress(rs.getString("CompanyAddress"));
-        r.setCompanySize(rs.getString("CompanySize"));
-        r.setContactPerson(rs.getString("ContactPerson"));
-        r.setCompanyBenefits(rs.getString("CompanyBenefits"));
-        r.setCompanyVideoURL(rs.getString("CompanyVideoURL"));
-        r.setTaxcode(rs.getString("Taxcode"));
-        r.setRegistrationCert(rs.getString("RegistrationCert"));
-        return r;
-    }
-
-    //=============================
-    // CREATE
-    //=============================
-
-    /**
-     * Thêm mới Recruiter (đăng ký).
-     * @return Recruiter có ID mới nếu thành công, ngược lại null.
-     */
-    public Recruiter insertRecruiter(Recruiter recruiter) {
-        String sql = """
-            INSERT INTO Recruiter (Email, Password, CompanyName, ContactPerson, Phone, Status, CategoryID)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
-
-        try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, recruiter.getEmail());
-            ps.setString(2, MD5Util.getMD5Hash(recruiter.getPassword()));
-            ps.setString(3, recruiter.getCompanyName());
-            ps.setString(4, recruiter.getContactPerson());
-            ps.setString(5, recruiter.getPhone());
-            ps.setString(6, "Active");
-            ps.setInt(7, 1);
+            ps.setString(2, recruiter.getPassword());
+            ps.setString(3, recruiter.getPhone());
+            ps.setString(4, recruiter.getCompanyName());
+            ps.setString(5, recruiter.getCompanyDescription());
+            ps.setString(6, recruiter.getCompanyLogoURL());
+            ps.setString(7, recruiter.getWebsite());
+            ps.setString(8, recruiter.getImg());
+            ps.setInt(9, recruiter.getCategoryID());
+            ps.setString(10, recruiter.getStatus());
+            ps.setString(11, recruiter.getCompanyAddress());
+            ps.setString(12, recruiter.getCompanySize());
+            ps.setString(13, recruiter.getContactPerson());
+            ps.setString(14, recruiter.getCompanyBenefits());
+            ps.setString(15, recruiter.getCompanyVideoURL());
+            ps.setString(16, recruiter.getTaxcode());
+            ps.setString(17, recruiter.getRegistrationCert());
 
-            if (ps.executeUpdate() > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        recruiter.setRecruiterID(rs.getInt(1));
-                        return recruiter;
-                    }
-                }
-            }
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return null;
     }
 
     // Lấy recruiter theo ID
@@ -129,7 +91,7 @@ public class RecruiterDAO extends DBContext {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return list;
+        return null;
     }
 
     // Cập nhật recruiter
@@ -170,8 +132,7 @@ public class RecruiterDAO extends DBContext {
         String sql = "DELETE FROM Recruiter WHERE RecruiterID = ?";
 
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, MD5Util.getMD5Hash(newPassword));
-            ps.setInt(2, recruiterId);
+            ps.setInt(1, recruiterId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -192,7 +153,6 @@ public class RecruiterDAO extends DBContext {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
         return recruiters;
     }
@@ -253,9 +213,20 @@ public class RecruiterDAO extends DBContext {
         return null;
     }
 
-    //=============================
-    // DELETE
-    //=============================
+    // Đếm số lượng Recruiter
+    public int countRecruiter() {
+        String sql = "SELECT COUNT(*) FROM Recruiter";
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     // Lấy tất cả Recruiter đang Active
 //    public List<Recruiter> getAllRecruiters() {
@@ -288,12 +259,13 @@ public class RecruiterDAO extends DBContext {
     public boolean deleteRecruiterById(int id) {
         String sql = "UPDATE Recruiter SET Status = 'Inactive' WHERE RecruiterID = ?";
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, recruiterId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     //MINH
@@ -328,17 +300,23 @@ public class RecruiterDAO extends DBContext {
                         rs.getString("RegistrationCert")
                 );
             }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return recruiter;
     }
 
     public Recruiter login(String email, String password) {
+        Recruiter recruiter = null;
         String sql = "SELECT * FROM Recruiter WHERE Email = ? AND Password = ? AND Status = 'Active'";
 
         try {
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, email);
+            // Mã hóa mật khẩu bằng MD5 trước khi so sánh
             ps.setString(2, MD5Util.getMD5Hash(password));
 
             ResultSet rs = ps.executeQuery();
@@ -444,8 +422,8 @@ public class RecruiterDAO extends DBContext {
             return false;
         } catch (SQLException e) {
             e.printStackTrace();
+            return true; // Return true to be safe (prevent registration if error)
         }
-        return null;
     }
 
     private boolean checkEmailInTable(String tableName, String email) throws SQLException {
@@ -560,7 +538,7 @@ public class RecruiterDAO extends DBContext {
             return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return true; // chặn đăng ký khi có lỗi
+            return false;
         }
     }
 
@@ -595,8 +573,8 @@ public class RecruiterDAO extends DBContext {
             return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return 0;
     }
 
     public boolean isPhoneExists(String phone) {
