@@ -2,6 +2,7 @@
 /1_TopCV/nbproject/
 /1_TopCV/build/
 /1_TopCV/dist/
+1_TopCV/src/java/dal/DBContext.java
 # Ignore secret file
 1_TopCV/src/java/util/IConstant.java
 # Nếu sau này có file config thì ignore luôn
