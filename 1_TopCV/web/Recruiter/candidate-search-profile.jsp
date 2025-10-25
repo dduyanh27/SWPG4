@@ -1,10 +1,12 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tìm kiếm ứng viên - RecruitPro</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* Candidate Search Profile Specific Styles */
@@ -585,7 +587,7 @@
                     <span>RecruitPro</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                     <li><a href="#">Việc Làm</a></li>
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
@@ -686,7 +688,7 @@
                             </div>
                             
                             <div class="menu-footer">
-                                <a href="/LogoutServlet" class="logout-item">
+                                <a href="#" class="logout-item">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Thoát</span>
                                 </a>
@@ -705,15 +707,31 @@
             <!-- Profile Header -->
             <div class="profile-header">
                 <div class="profile-avatar">
-                    HT
+                    <c:choose>
+                        <c:when test="${not empty candidate.fullName}">
+                            ${candidate.fullName.substring(0, 1)}
+                        </c:when>
+                        <c:otherwise>HT</c:otherwise>
+                    </c:choose>
                 </div>
                 <div class="profile-info">
-                    <h1>Hoàng Minh Tran</h1>
-                    <div class="profile-title">Ruby Developer</div>
+                    <h1><c:choose>
+                        <c:when test="${not empty candidate.fullName}">${candidate.fullName}</c:when>
+                        <c:otherwise>Hoàng Minh Tran</c:otherwise>
+                    </c:choose></h1>
+                    <div class="profile-title">
+                        <c:choose>
+                            <c:when test="${not empty candidate.headline}">${candidate.headline}</c:when>
+                            <c:otherwise>Ruby Developer</c:otherwise>
+                        </c:choose>
+                    </div>
                     <div class="profile-title">Full-time</div>
                     <div class="profile-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        Đà Nẵng
+                        <c:choose>
+                            <c:when test="${not empty candidate.address}">${candidate.address}</c:when>
+                            <c:otherwise>Đà Nẵng</c:otherwise>
+                        </c:choose>
                     </div>
                     <div class="profile-update">
                         Cập nhật gần nhất: 09/09/2019
@@ -750,7 +768,12 @@
                 <div class="details-grid">
                     <div class="detail-item">
                         <span class="detail-label">Vị trí hiện tại</span>
-                        <span class="detail-value">Ruby Developer</span>
+                        <span class="detail-value">
+                            <c:choose>
+                                <c:when test="${not empty candidate.headline}">${candidate.headline}</c:when>
+                                <c:otherwise>Ruby Developer</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Cấp bậc hiện tại</span>
@@ -786,7 +809,12 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Địa chỉ</span>
-                        <span class="detail-value">Quận Hải Châu, Đà Nẵng</span>
+                        <span class="detail-value">
+                            <c:choose>
+                                <c:when test="${not empty candidate.address}">${candidate.address}</c:when>
+                                <c:otherwise>Quận Hải Châu, Đà Nẵng</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Nơi làm việc mong muốn</span>
@@ -929,7 +957,7 @@ VietnamWorks Service</textarea>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
     <script>
         // Modal functions
         function openModal() {

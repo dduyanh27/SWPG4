@@ -86,7 +86,7 @@
             </form>
 
             <div class="signup-link">
-                <p>Don't have an account? <a href="${pageContext.request.contextPath}/Recruiter/registration.jsp">Sign up</a></p>
+                <p>Don't have an account? <a href="${pageContext.request.contextPath}/RecruiterRegistrationServlet">Sign up</a></p>
             </div>
 
             <div class="success-message" id="successMessage">

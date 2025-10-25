@@ -7,11 +7,25 @@
     
     // If no recruiter from request, try to get from session
     if (recruiter == null) {
-        Recruiter sessionRecruiter = (Recruiter) session.getAttribute("user");
+        Recruiter sessionRecruiter = (Recruiter) session.getAttribute("recruiter");
         if (sessionRecruiter != null) {
             recruiter = sessionRecruiter;
         }
     }
+    
+    // Get user info for display
+    String userName = (recruiter != null) ? recruiter.getContactPerson() : "User";
+    
+    // Debug info
+    System.out.println("=== Company Info Page Debug ===");
+    System.out.println("Recruiter from request: " + (request.getAttribute("recruiter") != null ? "Yes" : "No"));
+    System.out.println("Recruiter from session: " + (session.getAttribute("recruiter") != null ? "Yes" : "No"));
+    System.out.println("Final recruiter: " + (recruiter != null ? "Yes" : "No"));
+    if (recruiter != null) {
+        System.out.println("Recruiter name: " + recruiter.getContactPerson());
+        System.out.println("Recruiter company: " + recruiter.getCompanyName());
+    }
+    System.out.println("=== End Company Info Page Debug ===");
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -23,6 +37,20 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="company-info-page">
+    <!-- Recruiter Info Debug Section -->
+    <div style="background: #fff3cd; padding: 10px; margin: 10px; border: 1px solid #ffeaa7; border-radius: 5px; font-size: 12px;">
+        <strong>DEBUG - Company Info Page:</strong><br>
+        Recruiter in session: <%= session.getAttribute("recruiter") != null ? "Yes" : "No" %><br>
+        Recruiter loaded: <%= recruiter != null ? "Yes" : "No" %><br>
+        <% if (recruiter != null) { %>
+            Name: <%= recruiter.getContactPerson() %><br>
+            Company: <%= recruiter.getCompanyName() %><br>
+            Email: <%= recruiter.getEmail() %><br>
+        <% } else { %>
+            <span style="color: red;">No recruiter data found!</span>
+        <% } %>
+    </div>
+    
     <!-- Top Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">

@@ -155,4 +155,24 @@
         <url-pattern>/saved-jobs</url-pattern>
     </servlet-mapping>
     
+    <!-- Candidate Search -->
+    <servlet>
+        <servlet-name>CandidateSearchServlet</servlet-name>
+        <servlet-class>controller.recuiter.CandidateSearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CandidateSearchServlet</servlet-name>
+        <url-pattern>/candidate-search</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Candidate Search Profile -->
+    <servlet>
+        <servlet-name>CandidateSearchProfileServlet</servlet-name>
+        <servlet-class>controller.recuiter.CandidateSearchProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CandidateSearchProfileServlet</servlet-name>
+        <url-pattern>/candidate-profile</url-pattern>
+    </servlet-mapping>
+    
 </web-app>

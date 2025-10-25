@@ -36,19 +36,50 @@ public class CategoryDAO extends DBContext {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT * FROM Categories WHERE ParentCategoryID IS NULL ORDER BY CategoryName";
         
+        System.out.println("=== CategoryDAO.getParentCategories() DEBUG ===");
+        System.out.println("SQL: " + sql);
+        System.out.println("Connection status: " + (c != null ? "Connected" : "NULL"));
+        
+        if (c != null) {
+            try {
+                System.out.println("Database URL: " + c.getMetaData().getURL());
+                System.out.println("Database Product: " + c.getMetaData().getDatabaseProductName());
+            } catch (SQLException e) {
+                System.out.println("Error getting database metadata: " + e.getMessage());
+            }
+        }
+        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
+            System.out.println("PreparedStatement created successfully");
             ResultSet rs = ps.executeQuery();
+            System.out.println("Query executed successfully");
             
+            int count = 0;
             while (rs.next()) {
+                count++;
                 Category category = new Category();
                 category.setCategoryID(rs.getInt("CategoryID"));
                 category.setCategoryName(rs.getString("CategoryName"));
                 category.setParentCategoryID(null);
                 categories.add(category);
+                
+                System.out.println("Found category " + count + ": ID=" + category.getCategoryID() + 
+                                 ", Name=" + category.getCategoryName() + ", ParentID=" + category.getParentCategoryID());
             }
+            System.out.println("Total categories found: " + count);
+            
         } catch (SQLException e) {
+            System.err.println("SQL Error in getParentCategories: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("General Error in getParentCategories: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        System.out.println("Returning " + categories.size() + " categories");
+        System.out.println("=== END CategoryDAO.getParentCategories() DEBUG ===");
         return categories;
     }
     
@@ -147,4 +178,6 @@ public class CategoryDAO extends DBContext {
             return false;
         }
     }
+    
+    
 }

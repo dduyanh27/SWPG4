@@ -5,8 +5,9 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="no-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -269,6 +270,7 @@
 
         .form-input.touched {
             /* Only show validation styling after user interaction */
+            border-color: inherit;
         }
 
         .form-select {
@@ -397,6 +399,115 @@
 
         .error-message.show {
             display: block !important;
+        }
+
+        /* Phone validation styles */
+        .phone-input {
+            position: relative;
+        }
+        
+        .phone-validation-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+        
+        .phone-validation-indicator.checking {
+            color: #007bff;
+        }
+        
+        .phone-validation-indicator.valid {
+            color: #28a745;
+        }
+        
+        .phone-validation-indicator.invalid {
+            color: #dc3545;
+        }
+        
+        .phone-validation-indicator.exists {
+            color: #ffc107;
+        }
+        
+        .validation-feedback {
+            margin-top: 5px;
+            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .validation-feedback.checking {
+            display: block;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+        
+        .validation-feedback.valid {
+            display: block;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .validation-feedback.invalid {
+            display: block;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .validation-feedback.exists {
+            display: block;
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        /* Email validation styles */
+        .email-input {
+            position: relative;
+        }
+        
+        .email-validation-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+        
+        .email-validation-indicator.checking {
+            color: #007bff;
+        }
+        
+        .email-validation-indicator.valid {
+            color: #28a745;
+        }
+        
+        .email-validation-indicator.exists {
+            color: #dc3545;
+        }
+        
+        /* Hide validation elements when JavaScript is disabled */
+        noscript .phone-validation-indicator,
+        noscript .email-validation-indicator,
+        noscript .validation-feedback {
+            display: none !important;
+        }
+        
+        /* Enhanced progressive enhancement */
+        .no-js .phone-validation-indicator,
+        .no-js .email-validation-indicator,
+        .no-js .validation-feedback {
+            display: none !important;
+        }
+        
+        .js-enhanced .validate-on-input {
+            /* Enhanced styles for JS-enabled browsers */
+            transition: all 0.3s ease;
         }
 
         .password-help {
@@ -552,6 +663,13 @@
     </style>
 </head>
 <body>
+    <!-- Noscript message -->
+    <noscript>
+        <div style="background: #fff3cd; color: #856404; padding: 15px; margin: 20px; border-radius: 8px; border: 1px solid #ffeaa7;">
+            <strong>Lưu ý:</strong> Trình duyệt của bạn đã tắt JavaScript. Form sẽ hoạt động với validation cơ bản, tuy nhiên để có trải nghiệm tốt nhất, vui lòng bật JavaScript.
+        </div>
+    </noscript>
+    
     <!-- Header -->
     <header class="header">
         <div class="header-content">
@@ -585,7 +703,7 @@
                         <div class="step-number inactive">2</div>
                         <div class="step-info">
                             <h4>Thông tin công ty</h4>
-                            <p>Tên công ty, ngành nghề</p>
+                            <p>Tên công ty, mã số thuế, giấy phép</p>
                         </div>
                     </div>
                     <div class="progress-step inactive" data-step="3">
@@ -609,15 +727,19 @@
             <%
                 String error = request.getParameter("error");
                 String success = request.getParameter("success");
+                String processedImagePath = request.getParameter("processedImage");
                 
                 // Success message
                 if (success != null && success.equals("registration_success")) {
             %>
-            <div style="background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bee5eb; text-align: center;">
-                <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
-                <h3 style="margin: 10px 0; color: #0c5460;">🎉 Đăng ký thành công!</h3>
-                <p style="margin: 5px 0;">Tài khoản của bạn đã được tạo thành công và đang chờ phê duyệt.</p>
-                <p style="margin: 5px 0; font-size: 14px;">Bạn sẽ được chuyển đến trang đăng nhập sau <span id="countdown">5</span> giây...</p>
+            <div style="background: #d1ecf1; color: #0c5460; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bee5eb;">
+                <div style="text-align: center;">
+                    <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <h3 style="margin: 10px 0; color: #0c5460;">🎉 Đăng ký thành công!</h3>
+                    <p style="margin: 5px 0;">Tài khoản của bạn đã được tạo thành công!</p>
+                    <p style="margin: 5px 0; font-size: 14px;">Bạn sẽ được chuyển đến trang chủ sau <span id="countdown">5</span> giây...</p>
+                </div>
+                
             </div>
             <script>
                 // Auto redirect after 5 seconds
@@ -628,7 +750,7 @@
                     countdownElement.textContent = countdown;
                     if (countdown <= 0) {
                         clearInterval(timer);
-                        window.location.href = '${pageContext.request.contextPath}/Recruiter/recruiter-login.jsp';
+                        window.location.href = '${pageContext.request.contextPath}/Recruiter/index.jsp';
                     }
                 }, 1000);
             </script>
@@ -645,9 +767,53 @@
                 %>
                     Vui lòng điền đầy đủ tất cả các trường bắt buộc.
                 <%
+                    } else if (error.equals("invalid_phone")) {
+                %>
+                    Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam (bắt đầu bằng 03, 08 hoặc 09) với đúng 10 số.
+                <%
+                    } else if (error.equals("phone_exists")) {
+                %>
+                    Số điện thoại này đã được sử dụng trong hệ thống. Vui lòng chọn số điện thoại khác.
+                <%
+                    } else if (error.equals("invalid_email")) {
+                %>
+                    Địa chỉ email không hợp lệ. Vui lòng nhập địa chỉ email đúng định dạng.
+                <%
                     } else if (error.equals("email_exists")) {
                 %>
                     Email này đã được sử dụng trong hệ thống (có thể đã đăng ký với vai trò khác). Vui lòng chọn email khác.
+                <%
+                    } else if (error.equals("invalid_tax_code")) {
+                %>
+                    Mã số thuế không hợp lệ. Vui lòng nhập đúng 10 số.
+                <%
+                    } else if (error.equals("file_required")) {
+                %>
+                    Vui lòng tải lên ảnh giấy phép đăng ký doanh nghiệp.
+                <%
+                    } else if (error.equals("invalid_file_type")) {
+                %>
+                    Định dạng file không được hỗ trợ. Vui lòng tải lên file JPG, PNG hoặc PDF.
+                <%
+                    } else if (error.equals("file_upload_failed")) {
+                %>
+                    Không thể tải lên file. Vui lòng thử lại sau.
+                <%
+                    } else if (error.equals("file_processing_failed")) {
+                %>
+                    Không thể xử lý file. Vui lòng thử lại sau.
+                <%
+                    } else if (error.equals("file_too_large")) {
+                %>
+                    File quá lớn. Vui lòng chọn file nhỏ hơn 5MB.
+                <%
+                    } else if (error.equals("image_too_small")) {
+                %>
+                    Kích thước ảnh quá nhỏ. Vui lòng chọn ảnh có kích thước tối thiểu 100x100 pixels.
+                <%
+                    } else if (error.equals("processing_error")) {
+                %>
+                    Lỗi xử lý file. Vui lòng thử lại sau.
                 <%
                     } else if (error.equals("registration_failed")) {
                 %>
@@ -668,7 +834,9 @@
                 }
             %>
             
-            <form id="registrationForm" class="registration-form" action="${pageContext.request.contextPath}/RecruiterRegistrationServlet" method="POST" <%= success != null && success.equals("registration_success") ? "style='display: none;'" : "" %>>
+            
+            
+            <form id="registrationForm" class="registration-form" action="${pageContext.request.contextPath}/RecruiterRegistrationServlet" method="POST" enctype="multipart/form-data" <%= success != null && success.equals("registration_success") ? "style='display: none;'" : "" %>>
                 <!-- Step 1: Contact Information -->
                 <div id="step1" class="form-step active">
                     <h2 class="step-title">Thông tin liên lạc</h2>
@@ -695,16 +863,30 @@
                         <label class="form-label" for="phone">
                             Điện thoại <span class="required">*</span>
                         </label>
-                        <input type="tel" id="phone" name="phone" class="form-input" required>
-                        <div class="error-message" id="phoneError">Vui lòng nhập số điện thoại</div>
+                        <div class="phone-input">
+                            <input type="tel" id="phone" name="phone" 
+                                   pattern="^[0-9]{10}$" 
+                                   minlength="10" maxlength="10"
+                                   title="Số điện thoại Việt Nam: Bắt đầu bằng 03, 08 hoặc 09 với đúng 10 số, không có khoảng trắng hoặc ký tự đặc biệt" 
+                                   class="form-input" placeholder="Nhập số điện thoại (10 số)" required>
+                            <div class="phone-validation-indicator" id="phoneIndicator" style="display: none;"></div>
+                        </div>
+                        <div class="error-message" id="phoneError">Vui lòng nhập số điện thoại hợp lệ</div>
+                        <div class="validation-feedback" id="phoneFeedback"></div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="email">
                             Địa chỉ email <span class="required">*</span>
                         </label>
-                        <input type="email" id="email" name="email" class="form-input" required>
+                        <div class="email-input">
+                            <input type="email" id="email" name="email" 
+                                   title="Vui lòng nhập địa chỉ email hợp lệ, không có khoảng trắng ở đầu/cuối" 
+                                   class="form-input" placeholder="Nhập địa chỉ email" required>
+                            <div class="email-validation-indicator" id="emailIndicator" style="display: none;"></div>
+                        </div>
                         <div class="error-message" id="emailError">Vui lòng nhập địa chỉ email hợp lệ</div>
+                        <div class="validation-feedback" id="emailFeedback"></div>
                     </div>
 
                         <div class="form-group">
@@ -747,21 +929,25 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="industry">
-                            Ngành nghề
+                        <label class="form-label" for="category">
+                            Ngành nghề <span class="required">*</span>
                         </label>
-                        <select id="industry" name="industry" class="form-select">
+                        
+                        
+                        <select id="category" name="category" class="form-select" required>
                             <option value="">Chọn ngành nghề</option>
-                            <option value="accommodation">Dịch vụ lưu trú/Nhà hàng/Khách sạn/Du lịch</option>
-                            <option value="technology">Công nghệ thông tin</option>
-                            <option value="finance">Tài chính/Ngân hàng</option>
-                            <option value="healthcare">Y tế/Chăm sóc sức khỏe</option>
-                            <option value="education">Giáo dục/Đào tạo</option>
-                            <option value="manufacturing">Sản xuất</option>
-                            <option value="retail">Bán lẻ</option>
-                            <option value="construction">Xây dựng</option>
-                            <option value="other">Khác</option>
+                            <c:choose>
+                                <c:when test="${parentCategories != null && !parentCategories.isEmpty()}">
+                                    <c:forEach var="category" items="${parentCategories}">
+                                        <option value="${category.categoryID}">${category.categoryName}</option>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="1">Test Category (No Data)</option>
+                                </c:otherwise>
+                            </c:choose>
                         </select>
+                        <div class="error-message" id="categoryError">Vui lòng chọn ngành nghề</div>
                     </div>
 
                     <div class="form-group">
@@ -778,6 +964,53 @@
                             <option value="other">Tỉnh/Thành phố khác</option>
                         </select>
                         <div class="error-message" id="addressError">Vui lòng chọn địa chỉ</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="taxCode">
+                            Mã số thuế (không bắt buộc)
+                        </label>
+                        <input type="text" id="taxCode" name="taxCode" class="form-input" 
+                               placeholder="Nhập mã số thuế công ty" 
+                               pattern="^[0-9]{10}$" 
+                               minlength="10" maxlength="10"
+                               title="Mã số thuế phải có đúng 10 số">
+                        <div class="error-message" id="taxCodeError" style="display:none;">Vui lòng nhập mã số thuế hợp lệ (10 số)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="registrationCert">
+                            Ảnh Giấy phép đăng ký doanh nghiệp (không bắt buộc)
+                        </label>
+                        <input type="file" id="registrationCert" name="registrationCert" class="form-input" 
+                               accept="image/*" 
+                               title="Vui lòng tải lên ảnh giấy phép đăng ký doanh nghiệp">
+                        <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                            Định dạng hỗ trợ: JPG, PNG, PDF. Kích thước tối đa: 5MB
+                        </small>
+                        <div class="error-message" id="registrationCertError" style="display:none;">Vui lòng tải lên ảnh giấy phép đăng ký doanh nghiệp</div>
+                        
+                        <!-- Image preview container -->
+                        <div id="imagePreview" style="margin-top: 10px; display: none;">
+                            <img id="previewImg" style="max-width: 200px; max-height: 150px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px;" />
+                            <div style="text-align: right;">
+                                <button type="button" onclick="removeImage()" style="padding: 4px 12px; font-size: 12px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Xóa</button>
+                            </div>
+                        </div>
+                        
+                        <!-- File info display -->
+                        <div id="fileInfo" style="margin-top: 10px;"></div>
+                        
+                        <!-- Official processed image display (will be shown after successful upload) -->
+                        <div id="officialImageContainer" style="margin-top: 10px; display: none;">
+                            <div style="background: #d4edda; color: #0c5460; padding: 10px; border-radius: 4px; border: 1px solid #c3e6cb;">
+                                <strong>✅ Ảnh đã được xử lý và lưu</strong>
+                            </div>
+                            <img id="officialImage" style="max-width: 200px; max-height: 150px; margin-top: 10px; border: 2px solid #28a745; border-radius: 4px;" />
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">
+                                Đây là ảnh chính thức đã được xử lý và lưu trên server
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -903,15 +1136,271 @@
 
         // Step validation fields
         const step1Fields = ['firstName', 'lastName', 'phone', 'email', 'password', 'confirmPassword'];
-        const step2Fields = ['companyName', 'address'];
+        const step2Fields = ['companyName', 'address', 'category'];
         const step3Fields = []; // No required fields in step 3
+
+        // Progressive Enhancement - Add JS class to body
+        document.documentElement.className = document.documentElement.className.replace('no-js', 'js-enhanced');
+        document.body.classList.add('js-enhanced');
 
         // Initialize form
         document.addEventListener('DOMContentLoaded', function() {
             initializeStep1();
             initializeStep2();
             initializeStep3();
+            initializeValidation();
+            
+            // Add enhanced class to form fields
+            const phoneInput = document.getElementById('phone');
+            const emailInput = document.getElementById('email');
+            if (phoneInput) phoneInput.classList.add('validate-on-input');
+            if (emailInput) emailInput.classList.add('validate-on-input');
         });
+
+        // Validation state variables
+        let phoneValidationState = 'none'; // none, checking, valid, invalid, exists
+        let emailValidationState = 'none';
+        let phoneValidationTimeout = null;
+        let emailValidationTimeout = null;
+
+        // Initialize AJAX validation
+        function initializeValidation() {
+            const phoneInput = document.getElementById('phone');
+            const emailInput = document.getElementById('email');
+
+            // Phone validation
+            phoneInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                
+                // Clear previous timeout
+                if (phoneValidationTimeout) {
+                    clearTimeout(phoneValidationTimeout);
+                }
+                
+                // Reset validation state
+                phoneValidationState = 'none';
+                updatePhoneValidationUI();
+                
+                if (value.length > 0) {
+                    // Check for any spaces first (including middle spaces)
+                    if (value.includes(' ')) {
+                        // Contains any spaces - invalid
+                        phoneValidationState = 'invalid';
+                        updatePhoneValidationUI();
+                        return;
+                    }
+                    
+                    // No spaces - validate format  
+                    const phoneRegex = /^(03|08|09)\d{8}$/;
+                    
+                    if (value.length !== 10) {
+                        // Not exactly 10 digits
+                        phoneValidationState = 'invalid';
+                        updatePhoneValidationUI();
+                    } else if (!phoneRegex.test(value)) {
+                        // Wrong format (not 03/08/09 + 8 digits)
+                        phoneValidationState = 'invalid';
+                        updatePhoneValidationUI();
+                    } else {
+                        // Format is valid, check for duplicates after delay
+                        phoneValidationTimeout = setTimeout(() => {
+                            checkPhoneDuplicate(value.trim());
+                        }, 500);
+                    }
+                }
+            });
+
+            // Email validation
+            emailInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                
+                // Clear previous timeout
+                if (emailValidationTimeout) {
+                    clearTimeout(emailValidationTimeout);
+                }
+                
+                // Reset validation state
+                emailValidationState = 'none';
+                updateEmailValidationUI();
+                
+                if (value.length > 0) {
+                    // Check for leading/trailing spaces first
+                    if (value !== value.trim()) {
+                        emailValidationState = 'invalid';
+                        updateEmailValidationUI();
+                        return;
+                    }
+                    
+                    // Validate format after trimming
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if (emailRegex.test(value.trim())) {
+                        // Format is valid, check for duplicates after delay
+                        emailValidationTimeout = setTimeout(() => {
+                            checkEmailDuplicate(value.trim());
+                        }, 500);
+                    } else {
+                        // Format is invalid - show error immediately
+                        emailValidationState = 'invalid';
+                        updateEmailValidationUI();
+                    }
+                }
+            });
+        }
+
+        // Check phone number duplicate
+        function checkPhoneDuplicate(phone) {
+            phoneValidationState = 'checking';
+            updatePhoneValidationUI();
+            
+            var phoneValidationUrl = encodeURIComponent(phone);
+            var fetchUrl = '${pageContext.request.contextPath}/RegistrationValidationServlet?check=phone&value=' + phoneValidationUrl;
+            
+            fetch(fetchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        phoneValidationState = 'none';
+                    } else {
+                        phoneValidationState = data.exists ? 'exists' : 'valid';
+                    }
+                    updatePhoneValidationUI();
+                    checkStep1Validity(); // Re-check form validity
+                })
+                .catch(error => {
+                    console.error('Phone validation error:', error);
+                    phoneValidationState = 'none';
+                    updatePhoneValidationUI();
+                    checkStep1Validity(); // Re-check form validity
+                });
+        }
+
+        // Check email duplicate
+        function checkEmailDuplicate(email) {
+            emailValidationState = 'checking';
+            updateEmailValidationUI();
+            
+            var emailValidationUrl = encodeURIComponent(email);
+            var fetchUrl = '${pageContext.request.contextPath}/RegistrationValidationServlet?check=email&value=' + emailValidationUrl;
+            
+            fetch(fetchUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        emailValidationState = 'none';
+                    } else {
+                        emailValidationState = data.exists ? 'exists' : 'valid';
+                    }
+                    updateEmailValidationUI();
+                    checkStep1Validity(); // Re-check form validity
+                })
+                .catch(error => {
+                    console.error('Email validation error:', error);
+                    emailValidationState = 'none';
+                    updateEmailValidationUI();
+                    checkStep1Validity(); // Re-check form validity
+                });
+        }
+
+        // Update phone validation UI
+        function updatePhoneValidationUI() {
+            const indicator = document.getElementById('phoneIndicator');
+            const feedback = document.getElementById('phoneFeedback');
+            const input = document.getElementById('phone');
+            
+            // Reset classes
+            indicator.className = 'phone-validation-indicator';
+            feedback.className = 'validation-feedback';
+            indicator.style.display = 'none';
+            feedback.style.display = 'none';
+            
+            switch (phoneValidationState) {
+                case 'checking':
+                    indicator.innerHTML = '⟳';
+                    indicator.classList.add('checking');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Đang kiểm tra số điện thoại...';
+                    feedback.classList.add('checking');
+                    feedback.style.display = 'block';
+                    break;
+                case 'valid':
+                    indicator.innerHTML = '✓';
+                    indicator.classList.add('valid');
+                    indicator.style.display = 'block';
+                    // Don't show feedback message for valid state
+                    feedback.style.display = 'none';
+                    input.classList.remove('error');
+                    break;
+                case 'invalid':
+                    indicator.innerHTML = '✗';
+                    indicator.classList.add('invalid');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Số điện thoại không hợp lệ. Không được có khoảng trắng và phải bắt đầu bằng 03, 08 hoặc 09 với đúng 10 số';
+                    feedback.classList.add('invalid');
+                    feedback.style.display = 'block';
+                    input.classList.add('error');
+                    break;
+                case 'exists':
+                    indicator.innerHTML = '⚠';
+                    indicator.classList.add('exists');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Số điện thoại này đã được sử dụng';
+                    feedback.classList.add('exists');
+                    feedback.style.display = 'block';
+                    input.classList.add('error');
+                    break;
+            }
+        }
+
+        // Update email validation UI
+        function updateEmailValidationUI() {
+            const indicator = document.getElementById('emailIndicator');
+            const feedback = document.getElementById('emailFeedback');
+            const input = document.getElementById('email');
+            
+            // Reset classes
+            indicator.className = 'email-validation-indicator';
+            feedback.className = 'validation-feedback';
+            indicator.style.display = 'none';
+            feedback.style.display = 'none';
+            
+            switch (emailValidationState) {
+                case 'checking':
+                    indicator.innerHTML = '⟳';
+                    indicator.classList.add('checking');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Đang kiểm tra email...';
+                    feedback.classList.add('checking');
+                    feedback.style.display = 'block';
+                    break;
+                case 'valid':
+                    indicator.innerHTML = '✓';
+                    indicator.classList.add('valid');
+                    indicator.style.display = 'block';
+                    // Don't show feedback message for valid state
+                    feedback.style.display = 'none';
+                    input.classList.remove('error');
+                    break;
+                case 'invalid':
+                    indicator.innerHTML = '✗';
+                    indicator.classList.add('invalid');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Email không hợp lệ. Không được có khoảng trắng ở đầu/cuối và phải đúng định dạng';
+                    feedback.classList.add('invalid');
+                    feedback.style.display = 'block';
+                    input.classList.add('error');
+                    break;
+                case 'exists':
+                    indicator.innerHTML = '✗';
+                    indicator.classList.add('exists');
+                    indicator.style.display = 'block';
+                    feedback.textContent = 'Email này đã được sử dụng';
+                    feedback.classList.add('exists');
+                    feedback.style.display = 'block';
+                    input.classList.add('error');
+                    break;
+            }
+        }
 
         // Step 1 functions
         function initializeStep1() {
@@ -960,9 +1449,14 @@
                         }
                         break;
                     case 'phone':
-                        const phoneRegex = /^[0-9+\-\s()]+$/;
-                        if (!phoneRegex.test(field.value) || field.value.length < 10) {
+                        // Check for spaces first - invalid if any spaces exist
+                        if (field.value.includes(' ')) {
                             isValid = false;
+                        } else {
+                            const phoneRegex = /^(03|08|09)\d{8}$/;
+                            if (!phoneRegex.test(field.value) || field.value.length !== 10) {
+                            isValid = false;
+                            }
                         }
                         break;
                     case 'password':
@@ -1008,7 +1502,11 @@
             const passwordValid = validateStep1Field('password');
             const confirmPasswordValid = validateStep1Field('confirmPassword');
 
-            const formValid = allValid && emailValid && phoneValid && passwordValid && confirmPasswordValid;
+            // Check AJAX validation states
+            const emailAvailable = emailValidationState === 'valid';
+            const phoneAvailable = phoneValidationState === 'valid';
+
+            const formValid = allValid && emailValid && phoneValid && passwordValid && confirmPasswordValid && emailAvailable && phoneAvailable;
             
             const continueBtn = document.getElementById('step1ContinueBtn');
             continueBtn.disabled = !formValid;
@@ -1041,6 +1539,28 @@
                     });
                 }
             });
+            // Optional field AJAX validations
+            const taxCodeInput = document.getElementById('taxCode');
+            if (taxCodeInput) {
+                taxCodeInput.addEventListener('input', () => {
+                    const value = taxCodeInput.value.trim();
+                    if (value.length > 0) {
+                        ajaxValidateTaxCode(value);
+                    } else {
+                        clearFieldError('taxCode');
+                    }
+                });
+            }
+            const regCertInput = document.getElementById('registrationCert');
+            if (regCertInput) {
+                regCertInput.addEventListener('change', () => {
+                    if (regCertInput.files && regCertInput.files.length > 0) {
+                        ajaxValidateRegistrationCert(regCertInput.files[0]);
+                    } else {
+                        clearFieldError('registrationCert');
+                    }
+                });
+            }
             checkStep2Validity();
         }
 
@@ -1052,15 +1572,52 @@
             const hasBeenTouched = field.classList.contains('touched');
             
             field.classList.remove('error');
-            errorElement.style.display = 'none';
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
 
             if (!field.value.trim()) {
                 isValid = false;
+            } else {
+                // Specific validation for certain fields
+                switch(fieldName) {
+                    case 'taxCode':
+                        // Optional: only validate if provided
+                        if (field.value.trim().length > 0) {
+                            const taxCodeRegex = /^[0-9]{10}$/;
+                            if (!taxCodeRegex.test(field.value.trim())) {
+                                isValid = false;
+                            }
+                        } else {
+                            isValid = true;
+                        }
+                        break;
+                    case 'registrationCert':
+                        // Optional: only validate if a file is selected
+                        if (field.files.length > 0) {
+                            const file = field.files[0];
+                            const maxSize = 5 * 1024 * 1024; // 5MB
+                            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+                            
+                            if (file.size > maxSize) {
+                                isValid = false;
+                                errorElement.textContent = 'Kích thước file phải nhỏ hơn 5MB';
+                            } else if (!allowedTypes.includes(file.type)) {
+                                isValid = false;
+                                errorElement.textContent = 'Chỉ hỗ trợ định dạng JPG, PNG, PDF';
+                            }
+                        } else {
+                            isValid = true;
+                        }
+                        break;
+                }
             }
 
             if (!isValid && hasBeenTouched) {
                 field.classList.add('error');
-                errorElement.style.display = 'block';
+                if (errorElement) {
+                    errorElement.style.display = 'block';
+                }
             }
 
             return isValid;
@@ -1084,6 +1641,94 @@
             }
 
             return allValid;
+        }
+
+        // Helpers for AJAX validation UI
+        function setFieldError(fieldName, message) {
+            const field = document.getElementById(fieldName);
+            const errorElement = document.getElementById(fieldName + 'Error');
+            if (field) field.classList.add('error');
+            if (errorElement) {
+                if (message) errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function clearFieldError(fieldName) {
+            const field = document.getElementById(fieldName);
+            const errorElement = document.getElementById(fieldName + 'Error');
+            if (field) field.classList.remove('error');
+            if (errorElement) errorElement.style.display = 'none';
+        }
+
+        function ajaxValidateTaxCode(value) {
+            const url = '${pageContext.request.contextPath}/RegistrationValidationServlet?check=taxCode&value=' + encodeURIComponent(value);
+            fetch(url)
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.valid === true) {
+                        clearFieldError('taxCode');
+                    } else {
+                        setFieldError('taxCode', 'Vui lòng nhập mã số thuế hợp lệ (10 số)');
+                    }
+                })
+                .catch(() => {
+                    // On error, do not block but show generic error
+                    setFieldError('taxCode', 'Không thể kiểm tra mã số thuế lúc này');
+                });
+        }
+
+        function ajaxValidateRegistrationCert(file) {
+            const formData = new FormData();
+            formData.append('check', 'registrationCert');
+            formData.append('registrationCert', file);
+            fetch('${pageContext.request.contextPath}/RegistrationValidationServlet', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.valid === true) {
+                        clearFieldError('registrationCert');
+                        // Show preview only after validation passes
+                        showFilePreview(file);
+                    } else {
+                        let msg = 'File không hợp lệ';
+                        if (data && data.sizeOk === false) msg = 'Kích thước file phải nhỏ hơn 5MB';
+                        else if (data && data.typeOk === false) msg = 'Chỉ hỗ trợ định dạng JPG, PNG, PDF';
+                        setFieldError('registrationCert', msg);
+                        // Hide preview on validation failure
+                        document.getElementById('imagePreview').style.display = 'none';
+                    }
+                })
+                .catch(() => {
+                    setFieldError('registrationCert', 'Không thể kiểm tra file lúc này');
+                    // Hide preview on error
+                    document.getElementById('imagePreview').style.display = 'none';
+                });
+        }
+
+        function showFilePreview(file) {
+            const previewContainer = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            // Validate basic file type for preview only
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
+            if (allowedTypes.includes(file.type)) {
+                // Show image preview ONLY for viewing
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                // For PDF files, show file icon and name
+                previewImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2Y1ZjVmNSIgc3Ryb2tlPSIjZGRkIiBzdHJva2Utd2lkdGg9IjEiLz4KICA8dGV4dCB4PSIxMDAiIHk9Ijc1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZpbGUgUERGPC90ZXh0Pgo8L3N2Zz4K';
+                previewContainer.style.display = 'block';
+            } else {
+                // Show warning for unsupported preview but allow submission
+                previewImg.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2ZmZjNlMyIgc3Ryb2tlPSIjZGI4MjJiIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjcwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2YjUzMmMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuG7tVdpbGwgcHJvY2Vzc2VkPC90ZXh0Pgo8L3N2Zz4K';
+                previewContainer.style.display = 'block';
+            }
         }
 
         // Step 3 functions
@@ -1220,7 +1865,7 @@
                 
                 currentStep = step;
             } else {
-                console.log('Form validation failed for step', currentStep);
+                // Stop at invalid step
             }
         }
 
@@ -1254,6 +1899,67 @@
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
+        }
+
+        // File handling functions
+        document.addEventListener('DOMContentLoaded', function() {
+            const registrationCertInput = document.getElementById('registrationCert');
+            if (registrationCertInput) {
+                registrationCertInput.addEventListener('change', function(e) {
+                    handleFileInput(e);
+                });
+            }
+        });
+
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            const previewContainer = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (file) {
+                // Clear any previous messages
+                const errorElement = document.getElementById('registrationCertError');
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+                
+                // Clear file info (no longer displaying detailed info)
+                const fileInfo = document.getElementById('fileInfo');
+                if (fileInfo) {
+                    fileInfo.innerHTML = '';
+                }
+                
+                // Hide preview first
+                previewContainer.style.display = 'none';
+                
+                // AJAX validate first, then show preview only if valid
+                ajaxValidateRegistrationCert(file);
+                
+                // Mark field as touched and validate (basic validation only)
+                event.target.classList.add('touched');
+                validateStep2Field('registrationCert');
+                checkStep2Validity();
+            }
+        }
+
+        function removeImage() {
+            const registrationCertInput = document.getElementById('registrationCert');
+            const previewContainer = document.getElementById('imagePreview');
+            const fileInfo = document.getElementById('fileInfo');
+            const officialImageContainer = document.getElementById('officialImageContainer');
+            
+            // Clear file input
+            registrationCertInput.value = '';
+            
+            // Hide all containers
+            previewContainer.style.display = 'none';
+            if (fileInfo) fileInfo.innerHTML = '';
+            if (officialImageContainer) officialImageContainer.style.display = 'none';
+            
+            // Mark field as touched and validate
+            registrationCertInput.classList.add('touched');
+            validateStep2Field('registrationCert');
+            checkStep2Validity();
         }
 
         // Form submission

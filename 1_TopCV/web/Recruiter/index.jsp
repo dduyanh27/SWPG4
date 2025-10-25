@@ -1,16 +1,22 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="model.Recruiter" %>
+<%
+    String success = request.getParameter("success");
+    Recruiter recruiter = (Recruiter) session.getAttribute("recruiter");
+    String userName = (recruiter != null) ? recruiter.getContactPerson() : "User";
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recruiter Dashboard - ${userName}</title>
+    <title>Recruiter Dashboard - <%= userName %></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/Recruiter/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="index-page">
+    
     <!-- Top Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
@@ -59,7 +65,7 @@
                              
                         </div>
                     </div>
-                    <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">Tìm Ứng Viên</button>
+                    <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/candidate-search'">Tìm Ứng Viên</button>
                     <button class="btn btn-white">Mua</button>
                 </div>
                 <div class="nav-icons">
@@ -73,9 +79,9 @@
                             <div class="user-header">
                                 <i class="fas fa-user-circle"></i>
                                 <div class="user-info">
-                                    <div class="user-name">${userName}</div>
+                                    <div class="user-name"><%= userName %></div>
                                     <div class="user-role">Recruiter</div>
-                                    <div class="user-id">ID: ${userID}</div>
+                                    <div class="user-id">ID: <%= recruiter != null ? recruiter.getRecruiterID() : "N/A" %></div>
                                 </div>
                                 <i class="fas fa-times close-menu"></i>
                             </div>
@@ -149,7 +155,7 @@
                 <!-- Welcome Section -->
                 <div class="welcome-section">
                     <div class="welcome-content">
-                        <h1>Xin chào, ${userName}</h1>
+                        <h1>Xin chào, <%= userName %>!</h1>
                         <p>Chào mừng bạn đến với Recruiter Dashboard! Đây là một số thông tin để bạn có thể bắt đầu sử dụng:</p>
                         <div class="welcome-links">
                             <a href="#" class="link">FAQ/Hướng dẫn sử dụng</a>
