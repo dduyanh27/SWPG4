@@ -24,9 +24,7 @@
         if ("admin".equals(selectedRole)) {
             adminWithRoleList = adminDAO.getAdminByRole("Admin");
         } else if ("other".equals(selectedRole)) {
-            // Lấy tất cả admin và filter theo role khác "Admin"
             adminWithRoleList = adminDAO.getAllAdminWithRole();
-            // Filter trong code để loại bỏ admin có role "Admin"
             adminWithRoleList = adminWithRoleList.stream()
                 .filter(adminWithRole -> adminWithRole.getRole() == null || 
                         !"Admin".equals(adminWithRole.getRole().getName()))
@@ -35,8 +33,6 @@
             adminWithRoleList = adminDAO.getAllAdminWithRole();
         }
     }
-
-    // Đặt vào request để dùng trong JSTL
     request.setAttribute("adminWithRoleList", adminWithRoleList);
     request.setAttribute("roleList", roleList);
     request.setAttribute("selectedRole", selectedRole);
@@ -252,9 +248,9 @@
                                                                     data-admin-name="${admin.fullName}" 
                                                                     data-current-role="${not empty role ? role.name : 'Chưa phân quyền'}"
                                                                     class="btn primary">Phân quyền</button>
-                                                            <a href="${pageContext.request.contextPath}/delete-staff?id=${admin.adminId}&type=admin" 
+<!--                                                            <a href="${pageContext.request.contextPath}/delete-staff?id=${admin.adminId}&type=admin" 
                                                                class="btn danger" 
-                                                               onclick="return confirm('Bạn có chắc chắn muốn xóa Admin này?')">Xóa</a>
+                                                               onclick="return confirm('Bạn có chắc chắn muốn xóa Admin này?')">Xóa</a>-->
                                                         </td>
                                                     </tr>
                                                 </c:if>

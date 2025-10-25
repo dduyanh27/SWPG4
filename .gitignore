@@ -1,12 +1,34 @@
+# ===============================
+# NetBeans build and private files
+# ===============================
 /1_TopCV/nbproject/private/
 /1_TopCV/nbproject/
 /1_TopCV/build/
 /1_TopCV/dist/
-1_TopCV/src/java/dal/DBContext.java
-# Ignore secret file
-1_TopCV/src/java/util/IConstant.java
-# Nếu sau này có file config thì ignore luôn
-config.properties
-*.orig
-*.iml
+
+# ===============================
+# IDE-specific files
+# ===============================
 .idea/
+*.iml
+
+# ===============================
+# Database and secret configuration
+# ===============================
+1_TopCV/src/java/dal/DBContext.java
+1_TopCV/src/java/util/IConstant.java
+config.properties
+
+# ===============================
+# Backup and temporary files
+# ===============================
+*.orig
+*.log
+*.tmp
+*.bak
+
+# ===============================
+# OS-specific (macOS, Windows, etc.)
+# ===============================
+.DS_Store
+Thumbs.db
