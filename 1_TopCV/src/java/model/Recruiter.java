@@ -1,7 +1,6 @@
 package model;
 
 public class Recruiter {
-
     private int recruiterID;
     private String email;
     private String password;
@@ -21,12 +20,22 @@ public class Recruiter {
     private String taxcode;
     private String registrationCert;
 
-    // Constructor không tham số
     public Recruiter() {
     }
 
-    // Constructor đầy đủ tham số
-    public Recruiter(int recruiterID, String email, String password, String phone, String companyName, String companyDescription, String companyLogoURL, String website, String img, int categoryID, String status, String companyAddress, String companySize, String contactPerson, String companyBenefits, String companyVideoURL, String taxcode, String registrationCert) {
+    public Recruiter(int recruiterID, String companyName) {
+        this.recruiterID = recruiterID;
+        this.companyName = companyName;
+    }
+    
+    
+
+    public Recruiter(int recruiterID, String email, String password, String phone, 
+                     String companyName, String companyDescription, 
+                     String companyLogoURL, String website, String img, int categoryID, 
+                     String status, String companyAddress, String companySize, 
+                     String contactPerson, String companyBenefits, String companyVideoURL,
+                     String taxcode, String registrationCert) {
         this.recruiterID = recruiterID;
         this.email = email;
         this.password = password;
@@ -47,7 +56,6 @@ public class Recruiter {
         this.registrationCert = registrationCert;
     }
 
-    // --- Getters and Setters ---
     public int getRecruiterID() {
         return recruiterID;
     }
@@ -72,6 +80,14 @@ public class Recruiter {
         this.password = password;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -79,6 +95,7 @@ public class Recruiter {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
 
     public String getCompanyName() {
         return companyName;
@@ -126,14 +143,6 @@ public class Recruiter {
 
     public void setCategoryID(int categoryID) {
         this.categoryID = categoryID;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getCompanyAddress() {
@@ -190,5 +199,28 @@ public class Recruiter {
 
     public void setRegistrationCert(String registrationCert) {
         this.registrationCert = registrationCert;
+    }
+
+    @Override
+    public String toString() {
+        return "Recruiter{" +
+                "recruiterID=" + recruiterID +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", companyName='" + companyName + '\'' +
+                ", companyDescription='" + companyDescription + '\'' +
+                ", companyLogoURL='" + companyLogoURL + '\'' +
+                ", website='" + website + '\'' +
+                ", img='" + img + '\'' +
+                ", categoryID=" + categoryID +
+                ", status='" + status + '\'' +
+                ", companyAddress='" + companyAddress + '\'' +
+                ", companySize='" + companySize + '\'' +
+                ", contactPerson='" + contactPerson + '\'' +
+                ", companyBenefits='" + companyBenefits + '\'' +
+                ", companyVideoURL='" + companyVideoURL + '\'' +
+                ", taxcode='" + taxcode + '\'' +
+                ", registrationCert='" + registrationCert + '\'' +
+                '}';
     }
 }
