@@ -18,6 +18,7 @@
 1_TopCV/src/java/dal/DBContext.java
 1_TopCV/src/java/util/IConstant.java
 config.properties
+TopCV_Avatars/
 
 # ===============================
 # Backup and temporary files
