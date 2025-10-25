@@ -20,6 +20,11 @@
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/admin-cv-management.css">
     </head>
     <body>
+        <!-- Mobile menu toggle button -->
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()" style="display: none;">
+            ☰
+        </button>
+
         <!-- Sidebar -->
         <div class="unified-sidebar" id="unifiedSidebar">
             <div class="sidebar-brand">
@@ -63,12 +68,30 @@
 
         <div class="container">
             <div class="main">
-                <div class="page-header">
-                    <h1 class="page-title">Quản lý CV ứng viên</h1>
-                    <div class="breadcrumb">
-                        <a href="admin-dashboard.jsp">Dashboard</a> / Quản lý CV
+                <header class="topbar">
+                    <div class="title">Quản lý CV ứng viên</div>
+                    <div class="topbar-actions">
+                        <a href="#" class="btn btn-ghost btn-sm">🔄 Làm mới</a>
+                        <button class="btn btn-primary btn-sm" onclick="exportCVs()">📊 Xuất báo cáo</button>
                     </div>
-                </div>
+                </header>
+
+                <main class="content">
+
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty param.success}">
+                    <div class="alert alert-success">
+                        <span class="alert-icon">✅</span>
+                        <span class="alert-message">${param.success}</span>
+                    </div>
+                </c:if>
+                
+                <c:if test="${not empty param.error}">
+                    <div class="alert alert-error">
+                        <span class="alert-icon">❌</span>
+                        <span class="alert-message">${param.error}</span>
+                    </div>
+                </c:if>
 
                 <!-- Filter Section -->
                 <div class="filter-section">
@@ -113,7 +136,7 @@
 
                         <div class="filter-actions">
                             <button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
-                            <a href="admin-cv-management.jsp" class="btn btn-secondary">🔄 Đặt lại</a>
+                            <a href="${pageContext.request.contextPath}/admin/cv-management" class="btn btn-secondary">🔄 Đặt lại</a>
                         </div>
                     </form>
                 </div>
@@ -175,7 +198,7 @@
                                             <div class="cv-avatar">
                                                 <c:choose>
                                                     <c:when test="${not empty cv.avatarURL}">
-                                                        <img src="${cv.avatarURL}" alt="${cv.fullName}">
+                                                        <img src="${pageContext.request.contextPath}/assets/img/jobseeker/${cv.avatarURL}" alt="${cv.fullName}">
                                                     </c:when>
                                                     <c:otherwise>
                                                         <div class="cv-avatar-placeholder">
@@ -244,9 +267,30 @@
                                                class="action-link view">
                                                 👁️ Xem chi tiết
                                             </a>
-                                            <a href="${cv.cvFileURL}" target="_blank" class="action-link download">
+                                            <a href="${pageContext.request.contextPath}/assets/cv/${cv.cvFileURL}" target="_blank" class="action-link download">
                                                 📥 Tải CV
                                             </a>
+                                            <c:choose>
+                                                <c:when test="${cv.status eq 'active'}">
+                                                    <form method="post" action="${pageContext.request.contextPath}/admin/cv-action" class="inline-form">
+                                                        <input type="hidden" name="cvId" value="${cv.cvId}">
+                                                        <input type="hidden" name="action" value="deactivate">
+                                                        <button type="submit" class="action-link deactivate" 
+                                                                onclick="return confirm('Bạn có chắc chắn muốn vô hiệu hóa CV này?')">
+                                                            ⏸️ Vô hiệu hóa
+                                                        </button>
+                                                    </form>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <form method="post" action="${pageContext.request.contextPath}/admin/cv-action" class="inline-form">
+                                                        <input type="hidden" name="cvId" value="${cv.cvId}">
+                                                        <input type="hidden" name="action" value="activate">
+                                                        <button type="submit" class="action-link activate">
+                                                            ▶️ Kích hoạt
+                                                        </button>
+                                                    </form>
+                                                </c:otherwise>
+                                            </c:choose>
                                             <form method="post" action="${pageContext.request.contextPath}/admin/cv-action" class="inline-form">
                                                 <input type="hidden" name="cvId" value="${cv.cvId}">
                                                 <input type="hidden" name="action" value="delete">
@@ -264,7 +308,7 @@
                             <c:if test="${totalPages > 1}">
                                 <div class="pagination">
                                     <c:if test="${currentPage > 1}">
-                                        <a href="?page=${currentPage - 1}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
+                                        <a href="${pageContext.request.contextPath}/admin/cv-management?page=${currentPage - 1}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
                                            class="pagination-link">« Trước</a>
                                     </c:if>
 
@@ -274,22 +318,41 @@
                                                 <span class="pagination-link active">${i}</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <a href="?page=${i}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
+                                                <a href="${pageContext.request.contextPath}/admin/cv-management?page=${i}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
                                                    class="pagination-link">${i}</a>
                                             </c:otherwise>
                                         </c:choose>
                                     </c:forEach>
 
                                     <c:if test="${currentPage < totalPages}">
-                                        <a href="?page=${currentPage + 1}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
+                                        <a href="${pageContext.request.contextPath}/admin/cv-management?page=${currentPage + 1}&keyword=${param.keyword}&status=${param.status}&experience=${param.experience}&sort=${param.sort}" 
                                            class="pagination-link">Sau »</a>
                                     </c:if>
                                 </div>
                             </c:if>
                         </c:otherwise>
                     </c:choose>
-                </div>
+                </main>
             </div>
         </div>
+
+        <script>
+            function exportCVs() {
+                alert('Chức năng xuất báo cáo CV đang được phát triển...');
+            }
+
+            function toggleSidebar() {
+                const sidebar = document.getElementById('unifiedSidebar');
+                sidebar.classList.toggle('show');
+            }
+
+            // Mobile responsive
+            window.addEventListener('resize', function() {
+                const sidebar = document.getElementById('unifiedSidebar');
+                if (window.innerWidth > 1024) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        </script>
     </body>
 </html>

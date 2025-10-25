@@ -28,7 +28,7 @@
     request.setAttribute("totalJobSeekers", totalJobSeekers);
 
     RecruiterDAO rcdao = new RecruiterDAO();
-    int totalRecruiters = rcdao.countRecruiter();
+    int totalRecruiters = rcdao.getAllRecruiters().size();
     request.setAttribute("totalRecruiters", totalRecruiters);
 %>
 

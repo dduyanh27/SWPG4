@@ -58,7 +58,6 @@ public class DAO extends DBContext {
 
             st.setString(3, re.getPhone());
             st.setString(4, re.getCompanyName());
-            st.setString(5, re.getGender());
             st.setString(6, re.getStatus());
             st.executeUpdate();
         } catch (SQLException e) {

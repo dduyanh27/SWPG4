@@ -260,9 +260,9 @@
             <nav class="sidebar-nav">
                 <div class="nav-title">Menu chính</div>
                 <a href="#" class="nav-item active">📊 Tổng quan</a>
-                <a href="#" class="nav-item">💬 Tin nhắn khách hàng</a>
-                <a href="#" class="nav-item">🛒 Bán khóa up job</a>
-                <a href="#" class="nav-item">👥 Quản lý khách hàng</a>
+                <a href="${pageContext.request.contextPath}/Staff/cus-service.jsp" class="nav-item">💬 Customer Service</a>
+                <a href="${pageContext.request.contextPath}/Staff/order-service.jsp" class="nav-item">🛒 Quản lý đơn hàng</a>
+                <a href="${pageContext.request.contextPath}/Staff/dt.jsp" class="nav-item">👥 Quản lý doanh thu</a>
                 <a href="#" class="nav-item">📈 Báo cáo doanh thu</a>
                 <a href="#" class="nav-item">⚙️ Cài đặt</a>
             </nav>
@@ -338,7 +338,7 @@
                         <p class="card-description">
                             Theo dõi thông tin khách hàng, lịch sử mua hàng và tương tác. Xây dựng mối quan hệ khách hàng.
                         </p>
-                        <a href="#" class="btn btn-primary">Danh sách khách hàng</a>
+                        <a href="#" class="btn btn-primary">Danh sách khách mua hàng</a>
                     </div>
 
                     <!-- Reports Card -->

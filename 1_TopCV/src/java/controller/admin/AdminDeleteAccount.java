@@ -51,10 +51,10 @@ public class AdminDeleteAccount extends HttpServlet {
                         ok = adminDAO.deleteAdminById(id);
                         message = ok ? "Đã xóa Admin thành công!" : "Không thể xóa Admin.";
                         break;
-                    case "recruiter":
-                        ok = recruiterDAO.deleteRecruiterById(id);
-                        message = ok ? "Đã xóa Recruiter thành công!" : "Không thể xóa Recruiter.";
-                        break;
+//                    case "recruiter":
+//                        ok = recruiterDAO.deleteRecruiterById(id);
+//                        message = ok ? "Đã xóa Recruiter thành công!" : "Không thể xóa Recruiter.";
+//                        break;
                     case "jobseeker":
                         ok = jobSeekerDAO.deleteJobSeekerById(id);
                         message = ok ? "Đã xóa Job Seeker thành công!" : "Không thể xóa Job Seeker.";
