@@ -76,8 +76,18 @@ public class JobSeekerDAO extends DBContext {
             ps.setString(5, js.getHeadline());
             ps.setString(6, js.getContactInfo());
             ps.setString(7, js.getAddress());
-            ps.setInt(8, js.getLocationId());
-            ps.setInt(9, js.getCurrentLevelId());
+            // LocationID
+            if (js.getLocationId() == null) {
+                ps.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(8, js.getLocationId());
+            }
+            // CurrentLevelID
+            if (js.getCurrentLevelId() == null) {
+                ps.setNull(9, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(9, js.getCurrentLevelId());
+            }
             ps.setString(10, js.getStatus());
             ps.setInt(11, js.getJobSeekerId());
 
@@ -174,11 +184,23 @@ public class JobSeekerDAO extends DBContext {
         }
         return false;
     }
+    
+    public boolean updateAvatar(int jobSeekerId, String imgFileName) {
+        String sql = "UPDATE JobSeeker SET Img = ? WHERE JobSeekerID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, imgFileName);
+            ps.setInt(2, jobSeekerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     //MINH
     public JobSeeker login(String email, String password) {
         JobSeeker jobSeeker = null;
-        String sql = "SELECT * FROM JobSeeker WHERE Email = ? AND Password = ? AND Status = 'Active'";
+        String sql = "SELECT * FROM JobSeeker WHERE Email = ? AND Password = ?";
 
         try {
             PreparedStatement ps = c.prepareStatement(sql);
