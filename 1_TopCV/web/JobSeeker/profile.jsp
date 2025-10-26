@@ -273,10 +273,6 @@
         color: #10b981;
     }
 
-    .activity-status.interview {
-        background: #dbeafe;
-        color: #3b82f6;
-    }
 
     .activity-status.rejected {
         background: #fee2e2;
@@ -538,16 +534,430 @@
     }
 
     .profile-avatar-large {
-        width: 110px !important;
-        height: 110px !important;
+        width: 150px !important;
+        height: 150px !important;
         background: #0066cc !important;
         border-radius: 50% !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         color: white !important;
-        font-size: 3rem !important;
+        font-size: 4rem !important;
         flex-shrink: 0 !important;
+        cursor: pointer !important;
+        position: relative !important;
+        overflow: hidden !important;
+        transition: all 0.3s ease !important;
+        border: 4px solid white !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    }
+    
+    .profile-avatar-large:hover {
+        transform: scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+    }
+    
+    .profile-avatar-large img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        border-radius: 50% !important;
+    }
+    
+    .avatar-overlay {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0,0,0,0.5) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 0 !important;
+        transition: opacity 0.3s ease !important;
+        border-radius: 50% !important;
+    }
+    
+    .profile-avatar-large:hover .avatar-overlay {
+        opacity: 1 !important;
+    }
+    
+    .avatar-overlay i {
+        color: white !important;
+        font-size: 1.5rem !important;
+    }
+    
+    /* Avatar dropdown menu */
+    .avatar-menu {
+        position: absolute !important;
+        top: calc(100% + 10px) !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        background: white !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+        min-width: 200px !important;
+        padding: 8px !important;
+        display: none !important;
+        z-index: 1000 !important;
+        animation: slideDown 0.3s ease !important;
+    }
+    
+    .avatar-menu.show {
+        display: block !important;
+    }
+    
+    .avatar-menu-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 12px 16px !important;
+        color: #333 !important;
+        text-decoration: none !important;
+        border-radius: 8px !important;
+        transition: all 0.2s !important;
+        cursor: pointer !important;
+        font-size: 1rem !important;
+    }
+    
+    .avatar-menu-item:hover {
+        background: #f8f9fa !important;
+    }
+    
+    .avatar-menu-item i {
+        width: 20px !important;
+        text-align: center !important;
+        color: #0066cc !important;
+    }
+    
+    .avatar-menu-item.delete i {
+        color: #ef4444 !important;
+    }
+    
+    .avatar-menu-item.delete:hover {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #ef4444 !important;
+    }
+    
+    /* Avatar view modal */
+    .avatar-view-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0,0,0,0.9) !important;
+        display: none !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 9999 !important;
+        padding: 20px !important;
+    }
+    
+    .avatar-view-modal.show {
+        display: flex !important;
+    }
+    
+    .avatar-view-content {
+        position: relative !important;
+        max-width: 90% !important;
+        max-height: 90% !important;
+    }
+    
+    .avatar-view-content img {
+        max-width: 100% !important;
+        max-height: 90vh !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
+    }
+    
+    .avatar-view-close {
+        position: absolute !important;
+        top: -40px !important;
+        right: 0 !important;
+        background: rgba(255,255,255,0.2) !important;
+        border: none !important;
+        color: white !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        font-size: 1.5rem !important;
+        cursor: pointer !important;
+        transition: all 0.3s !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .avatar-view-close:hover {
+        background: rgba(255,255,255,0.3) !important;
+        transform: rotate(90deg) !important;
+    }
+
+    .edit-profile-btn {
+        background: #0066cc !important; /* solid blue for edit button */
+        color: white !important;
+        border: none !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 50% !important;
+        font-size: 1.2rem !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 15px rgba(0, 102, 204, 0.25) !important;
+        transition: all 0.2s !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 2 !important;
+    }
+
+    .edit-profile-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(0, 102, 204, 0.35) !important;
+    }
+
+    /* Pill-style change password button placed near the name */
+    .change-password-pill {
+        background: transparent !important;
+        border: 1.5px solid #0066cc !important;
+        color: #0066cc !important;
+        padding: 8px 12px !important;
+        border-radius: 999px !important;
+        font-size: 0.95rem !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+
+    .change-password-pill:hover {
+        background: rgba(0,102,204,0.08) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Change Password Modal */
+    .change-password-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        display: none !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 9999 !important;
+        padding: 20px !important;
+    }
+
+    .change-password-modal.show {
+        display: flex !important;
+    }
+
+    .change-password-content {
+        background: white !important;
+        padding: 30px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+        max-width: 450px !important;
+        width: 100% !important;
+        position: relative !important;
+    }
+
+    /* Make modal's submit/cancel visible and styled (global .btn-submit is hidden elsewhere) */
+    .change-password-content .btn-submit {
+        display: inline-flex !important;
+        opacity: 1 !important;
+        transform: none !important;
+        padding: 12px 20px !important;
+        border-radius: 8px !important;
+        background: #0066cc !important;
+        color: #fff !important;
+        box-shadow: 0 6px 18px rgba(0,102,204,0.18) !important;
+        font-weight: 600 !important;
+        margin-top: 0 !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    .change-password-content .btn-cancel {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 12px 18px !important;
+        border-radius: 8px !important;
+        background: #f5f5f5 !important;
+        color: #333 !important;
+        border: none !important;
+    }
+
+    .change-password-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin-bottom: 25px !important;
+        padding-bottom: 15px !important;
+        border-bottom: 2px solid #f0f0f0 !important;
+    }
+
+    .change-password-header h3 {
+        margin: 0 !important;
+        font-size: 1.5rem !important;
+        color: #333 !important;
+        font-weight: 600 !important;
+    }
+
+    .change-password-close {
+        background: transparent !important;
+        border: none !important;
+        font-size: 1.5rem !important;
+        color: #999 !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        width: 30px !important;
+        height: 30px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s !important;
+    }
+
+    .change-password-close:hover {
+        color: #333 !important;
+        transform: rotate(90deg) !important;
+    }
+
+    .change-password-form {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .form-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .form-group label {
+        font-size: 0.95rem !important;
+        color: #555 !important;
+        font-weight: 500 !important;
+    }
+
+    .form-group label .required {
+        color: #e74c3c !important;
+        margin-left: 2px !important;
+    }
+
+    .password-input-wrapper {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .form-group input[type="password"],
+    .form-group input[type="text"] {
+        width: 100% !important;
+        padding: 12px 45px 12px 15px !important;
+        border: 1.5px solid #ddd !important;
+        border-radius: 8px !important;
+        font-size: 0.95rem !important;
+        transition: all 0.3s !important;
+    }
+
+    .form-group input:focus {
+        outline: none !important;
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    }
+
+    .toggle-password {
+        position: absolute !important;
+        right: 15px !important;
+        background: transparent !important;
+        border: none !important;
+        color: #999 !important;
+        cursor: pointer !important;
+        padding: 5px !important;
+        font-size: 1.1rem !important;
+        transition: color 0.3s !important;
+    }
+
+    .toggle-password:hover {
+        color: #667eea !important;
+    }
+
+    .password-requirements {
+        font-size: 0.85rem !important;
+        color: #999 !important;
+        margin-top: 5px !important;
+        line-height: 1.4 !important;
+    }
+
+    .form-actions {
+        display: flex !important;
+        gap: 12px !important;
+        margin-top: 10px !important;
+    }
+
+    .btn-submit,
+    .btn-cancel {
+        flex: 1 !important;
+        padding: 12px 20px !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.3s !important;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.6 !important;
+        cursor: not-allowed !important;
+    }
+
+    .btn-cancel {
+        background: #f5f5f5 !important;
+        color: #666 !important;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0 !important;
+    }
+
+    .message {
+        padding: 12px 15px !important;
+        border-radius: 8px !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 15px !important;
+        display: none !important;
+    }
+
+    .message.show {
+        display: block !important;
+    }
+
+    .message.success {
+        background: #d4edda !important;
+        color: #155724 !important;
+        border: 1px solid #c3e6cb !important;
+    }
+
+    .message.error {
+        background: #f8d7da !important;
+        color: #721c24 !important;
+        border: 1px solid #f5c6cb !important;
     }
 
     .profile-details h2 {
@@ -586,31 +996,6 @@
         text-align: center !important;
         font-size: 1.3rem !important;
         flex-shrink: 0 !important;
-    }
-
-    .edit-profile-btn {
-        position: absolute !important;
-        top: 1.5rem !important;
-        right: 1.5rem !important;
-        background: #f8f9fa !important;
-        border: 1px solid #e9ecef !important;
-        color: #666 !important;
-        width: 52px !important;
-        height: 52px !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-        transition: all 0.2s !important;
-        font-size: 1.2rem !important;
-    }
-
-    .edit-profile-btn:hover {
-        background: #0066cc !important;
-        color: white !important;
-        border-color: #0066cc !important;
-        transform: scale(1.08) !important;
     }
 
     /* ========== RESPONSIVE ========== */
@@ -1842,11 +2227,61 @@
             <!-- Personal Information Card -->
             <div class="profile-info-card">
                 <div class="profile-header">
-                    <div class="profile-avatar-large">
-                        <i class="fas fa-user"></i>
+                    <div style="position: relative;">
+                        <div class="profile-avatar-large" id="profileAvatar">
+                            <c:choose>
+                                <c:when test="${not empty jobSeeker.img}">
+                                    <img src="${pageContext.request.contextPath}/avatar/${jobSeeker.img}" 
+                                         alt="Avatar"
+                                         onerror="this.style.display='none';"
+                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: 50%;">
+                                    <i class="fas fa-user" style="position: relative; z-index: 0;"></i>
+                                    <div class="avatar-overlay">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <i class="fas fa-user"></i>
+                                    <div class="avatar-overlay">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                        
+                        <!-- Avatar Menu Dropdown -->
+                        <div class="avatar-menu" id="avatarMenu">
+                            <c:if test="${not empty jobSeeker.img}">
+                                <div class="avatar-menu-item" id="viewAvatarBtn">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Xem ảnh</span>
+                                </div>
+                            </c:if>
+                            <div class="avatar-menu-item" id="uploadAvatarBtn">
+                                <i class="fas fa-upload"></i>
+                                <span>Upload ảnh</span>
+                            </div>
+                            <c:if test="${not empty jobSeeker.img}">
+                                <div class="avatar-menu-item delete" id="deleteAvatarBtn">
+                                    <i class="fas fa-trash-alt"></i>
+                                    <span>Xóa ảnh</span>
+                                </div>
+                            </c:if>
+                        </div>
+                        
+                        <!-- Hidden file input for avatar upload -->
+                        <form id="avatarUploadForm" action="${pageContext.request.contextPath}/upload-avatar" method="post" enctype="multipart/form-data" style="display: none;">
+                            <input type="file" 
+                                   id="avatarFileInput" 
+                                   name="avatarFile" 
+                                   accept="image/jpeg,image/png,image/jpg">
+                        </form>
                     </div>
                     <div class="profile-details">
-                        <h2 data-field="fullName">${jobSeeker.fullName}</h2>
+                        <div class="profile-header" style="display:flex; align-items:center; gap:12px;">
+                            <h2 data-field="fullName">${jobSeeker.fullName}</h2>
+                            <button type="button" class="change-password-pill" onclick="openChangePasswordModal()">Đổi mật khẩu</button>
+                        </div>
                         <p class="job-title" data-field="headline-experience">${jobSeeker.headline != null ? jobSeeker.headline : 'Chưa cập nhật Headline'}</p>
                         <div class="profile-meta">
                             <div class="meta-item">
@@ -1872,9 +2307,11 @@
                         </div>
                     </div>
                 </div>
-                <button class="edit-profile-btn" onclick="openProfileModal()">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
+                <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 12px; z-index: 2;">
+                    <button class="edit-profile-btn" onclick="openProfileModal()" title="Chỉnh sửa hồ sơ">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Desired Job Section -->
@@ -2063,10 +2500,6 @@
                             <span style="font-size: 14px; color: #6b7280;">Chấp thuận: <strong>${acceptedCount != null ? acceptedCount : 0}</strong></span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 16px; height: 16px; background: #2196F3; border-radius: 4px;"></span>
-                            <span style="font-size: 14px; color: #6b7280;">Phỏng vấn: <strong>${interviewCount != null ? interviewCount : 0}</strong></span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="width: 16px; height: 16px; background: #F44336; border-radius: 4px;"></span>
                             <span style="font-size: 14px; color: #6b7280;">Từ chối: <strong>${rejectedCount != null ? rejectedCount : 0}</strong></span>
                         </div>
@@ -2102,11 +2535,6 @@
                                             <c:when test="${app.status eq 'Accepted' or app.status eq 'accepted'}">
                                                 <div class="activity-status accepted">
                                                     <i class="fas fa-check-circle"></i> Chấp thuận
-                                                </div>
-                                            </c:when>
-                                            <c:when test="${app.status eq 'Interview' or app.status eq 'interview'}">
-                                                <div class="activity-status interview">
-                                                    <i class="fas fa-calendar-check"></i> Phỏng vấn
                                                 </div>
                                             </c:when>
                                             <c:when test="${app.status eq 'Rejected' or app.status eq 'rejected'}">
@@ -2153,29 +2581,50 @@
                 </div>
 
                 <!-- Profile Completion -->
+                <c:set var="hasAvatar" value="${not empty jobSeeker.img}" />
+                <c:set var="hasCV" value="${not empty uploadedCVs}" />
+                <c:set var="hasPhone" value="${not empty jobSeeker.phone}" />
+                <c:set var="hasAddress" value="${not empty jobSeeker.address}" />
+                <c:set var="hasHeadline" value="${not empty jobSeeker.headline}" />
+                <c:set var="hasLevel" value="${not empty jobSeeker.currentLevelId}" />
+                <c:set var="hasGender" value="${not empty jobSeeker.gender}" />
+                <c:set var="completedCount" value="${(hasAvatar ? 1 : 0) + (hasCV ? 1 : 0) + (hasPhone ? 1 : 0) + (hasAddress ? 1 : 0) + (hasHeadline ? 1 : 0) + (hasLevel ? 1 : 0) + (hasGender ? 1 : 0)}" />
+                <c:set var="completionPercent" value="${Math.round((completedCount * 100.0) / 7)}" />
                 <div class="profile-completion">
                     <h3><i class="fas fa-tasks"></i> Hoàn thiện hồ sơ</h3>
                     <div class="completion-bar">
-                        <div class="completion-progress" style="width: 75%">
-                            <span>75%</span>
+                        <div class="completion-progress" style="width: ${completionPercent}%">
+                            <span>${completionPercent}%</span>
                         </div>
                     </div>
                     <div class="completion-checklist">
-                        <div class="checklist-item completed">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Xác thực email</span>
+                        <div class="checklist-item ${hasAvatar ? 'completed' : ''}">
+                            <i class="fas ${hasAvatar ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            <span>Thêm ảnh đại diện</span>
                         </div>
-                        <div class="checklist-item completed">
-                            <i class="fas fa-check-circle"></i>
+                        <div class="checklist-item ${hasCV ? 'completed' : ''}">
+                            <i class="fas ${hasCV ? 'fa-check-circle' : 'fa-circle'}"></i>
                             <span>Tải lên CV</span>
                         </div>
-                        <div class="checklist-item completed">
-                            <i class="fas fa-check-circle"></i>
+                        <div class="checklist-item ${hasPhone ? 'completed' : ''}">
+                            <i class="fas ${hasPhone ? 'fa-check-circle' : 'fa-circle'}"></i>
                             <span>Thêm số điện thoại</span>
                         </div>
-                        <div class="checklist-item">
-                            <i class="fas fa-circle"></i>
-                            <span>Thêm ảnh đại diện</span>
+                        <div class="checklist-item ${hasAddress ? 'completed' : ''}">
+                            <i class="fas ${hasAddress ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            <span>Thêm địa chỉ</span>
+                        </div>
+                        <div class="checklist-item ${hasHeadline ? 'completed' : ''}">
+                            <i class="fas ${hasHeadline ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            <span>Thêm headline</span>
+                        </div>
+                        <div class="checklist-item ${hasLevel ? 'completed' : ''}">
+                            <i class="fas ${hasLevel ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            <span>Thêm cấp bậc hiện tại</span>
+                        </div>
+                        <div class="checklist-item ${hasGender ? 'completed' : ''}">
+                            <i class="fas ${hasGender ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            <span>Thêm giới tính</span>
                         </div>
                     </div>
                 </div>
@@ -2386,6 +2835,107 @@
     </div>
 
     </div><!-- Close main-container -->
+
+    <!-- Avatar View Modal -->
+    <div class="avatar-view-modal" id="avatarViewModal" onclick="closeAvatarView()">
+        <div class="avatar-view-content" onclick="event.stopPropagation()">
+            <button class="avatar-view-close" onclick="closeAvatarView()">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="avatarViewImage" src="" alt="Avatar">
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="change-password-modal" id="changePasswordModal">
+        <div class="change-password-content" onclick="event.stopPropagation()">
+            <div class="change-password-header">
+                <h3><i class="fas fa-key"></i> Đổi Mật Khẩu</h3>
+                <button class="change-password-close" onclick="closeChangePasswordModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="changePasswordMessage" class="message"></div>
+
+            <form class="change-password-form" id="changePasswordForm" onsubmit="return submitChangePassword(event)">
+                <div class="form-group">
+                    <label for="currentPassword">
+                        Mật khẩu hiện tại <span class="required">*</span>
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" 
+                               id="currentPassword" 
+                               name="currentPassword" 
+                               required
+                               autocomplete="current-password"
+                               placeholder="Nhập mật khẩu hiện tại">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('currentPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">
+                        Mật khẩu mới <span class="required">*</span>
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" 
+                               id="newPassword" 
+                               name="newPassword" 
+                               required
+                               autocomplete="new-password"
+                               placeholder="Nhập mật khẩu mới"
+                               minlength="6"
+                               maxlength="50">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('newPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-requirements">
+                        Mật khẩu phải có ít nhất 6 ký tự
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        Xác nhận mật khẩu mới <span class="required">*</span>
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" 
+                               id="confirmPassword" 
+                               name="confirmPassword" 
+                               required
+                               autocomplete="new-password"
+                               placeholder="Nhập lại mật khẩu mới"
+                               minlength="6"
+                               maxlength="50">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeChangePasswordModal()">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn-submit" id="changePasswordSubmitBtn">
+                        <i class="fas fa-check"></i> Đổi Mật Khẩu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay for Avatar Upload -->
+    <div id="avatarUploadOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9998; align-items: center; justify-content: center;">
+        <div style="text-align: center; color: white;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 48px; margin-bottom: 20px;"></i>
+            <p style="font-size: 18px; font-weight: 500;">Đang tải ảnh lên...</p>
+        </div>
+    </div>
 
     <script>
         // Định nghĩa contextPath để sử dụng trong JavaScript
@@ -3017,24 +3567,20 @@
             // Get data from JSP variables
             const pendingCount = ${pendingCount != null ? pendingCount : 0};
             const acceptedCount = ${acceptedCount != null ? acceptedCount : 0};
-            const interviewCount = ${interviewCount != null ? interviewCount : 0};
             const rejectedCount = ${rejectedCount != null ? rejectedCount : 0};
-            
             const applicationChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Đang chờ', 'Chấp thuận', 'Phỏng vấn', 'Từ chối'],
+                    labels: ['Đang chờ', 'Chấp thuận', 'Từ chối'],
                     datasets: [{
                         label: 'Trạng thái ứng tuyển',
-                        data: [pendingCount, acceptedCount, interviewCount, rejectedCount],
+                        data: [pendingCount, acceptedCount, rejectedCount],
                         backgroundColor: [
                             '#FFA500',  // Orange - Đang chờ
                             '#4CAF50',  // Green - Chấp thuận
-                            '#2196F3',  // Blue - Phỏng vấn
                             '#F44336'   // Red - Từ chối
                         ],
                         borderColor: [
-                            '#fff',
                             '#fff',
                             '#fff',
                             '#fff'
@@ -3071,6 +3617,508 @@
     });
 
 </script>
+
+<script>
+    // ========== Avatar Functions - Inline at end of page ==========
+    (function() {
+        console.log('Avatar script loading...');
+        
+        // Small delay to ensure DOM is fully ready
+        setTimeout(function() {
+            // Get elements
+            const profileAvatar = document.getElementById('profileAvatar');
+            const avatarMenu = document.getElementById('avatarMenu');
+            const viewAvatarBtn = document.getElementById('viewAvatarBtn');
+            const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
+            const deleteAvatarBtn = document.getElementById('deleteAvatarBtn');
+            const avatarFileInput = document.getElementById('avatarFileInput');
+            
+            console.log('Avatar elements:', {
+                profileAvatar: profileAvatar,
+                avatarMenu: avatarMenu,
+                viewAvatarBtn: viewAvatarBtn,
+                uploadAvatarBtn: uploadAvatarBtn,
+                deleteAvatarBtn: deleteAvatarBtn,
+                avatarFileInput: avatarFileInput
+            });
+            
+            if (!profileAvatar) {
+                console.error('profileAvatar element NOT FOUND!');
+                return;
+            }
+            
+            if (!avatarMenu) {
+                console.error('avatarMenu element NOT FOUND!');
+                return;
+            }
+            
+            console.log('All required elements found! Setting up event listeners...');
+            
+            // Toggle avatar menu when clicking on avatar
+            profileAvatar.addEventListener('click', function(event) {
+                event.stopPropagation();
+                console.log('✓ Avatar clicked!');
+                avatarMenu.classList.toggle('show');
+                console.log('✓ Menu is now:', avatarMenu.classList.contains('show') ? 'VISIBLE' : 'HIDDEN');
+            });
+            
+            console.log('✓ Click listener added to profileAvatar');
+            
+            // Stop propagation when clicking inside menu
+            avatarMenu.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileAvatar.contains(e.target)) {
+                    avatarMenu.classList.remove('show');
+                }
+            });
+            
+            // View avatar button
+            if (viewAvatarBtn) {
+                viewAvatarBtn.addEventListener('click', function() {
+                    console.log('View avatar clicked');
+                    viewAvatar();
+                });
+            }
+            
+            // Upload avatar button
+            if (uploadAvatarBtn && avatarFileInput) {
+                let isUploading = false;
+                let lastClickTime = 0;
+                
+                uploadAvatarBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Prevent double-click within 1 second
+                    const now = Date.now();
+                    if (now - lastClickTime < 1000) {
+                        console.log('Click ignored - too soon after previous click');
+                        return;
+                    }
+                    lastClickTime = now;
+                    
+                    console.log('Upload avatar button clicked');
+                    
+                    // Close menu immediately
+                    avatarMenu.classList.remove('show');
+                    
+                    // Small delay to ensure menu closes before opening dialog
+                    setTimeout(function() {
+                        avatarFileInput.value = ''; // Clear previous selection
+                        avatarFileInput.click();
+                    }, 100);
+                });
+                
+                // Handle file selection
+                avatarFileInput.addEventListener('change', function(e) {
+                    console.log('Change event fired, files:', this.files?.length);
+                    
+                    // Check if files are actually selected
+                    if (!this.files || this.files.length === 0) {
+                        console.log('No files selected (user cancelled)');
+                        isUploading = false;
+                        return;
+                    }
+                    
+                    // Prevent multiple uploads
+                    if (isUploading) {
+                        console.log('Upload already in progress, skipping');
+                        return;
+                    }
+                    
+                    const fileName = this.files[0].name;
+                    console.log('File selected:', fileName);
+                    
+                    isUploading = true;
+                    uploadAvatar(this);
+                });
+                
+                // Handle dialog cancel (when user closes without selecting)
+                avatarFileInput.addEventListener('cancel', function(e) {
+                    console.log('Cancel event fired');
+                    isUploading = false;
+                });
+            }
+            
+            // Delete avatar button
+            if (deleteAvatarBtn) {
+                deleteAvatarBtn.addEventListener('click', function() {
+                    console.log('Delete avatar clicked');
+                    confirmDeleteAvatar();
+                });
+            }
+            
+            console.log('✓ Avatar script loaded successfully!');
+        }, 100); // Wait 100ms
+    })();
+    
+    // Delete avatar button
+    if (deleteAvatarBtn) {
+        deleteAvatarBtn.addEventListener('click', function() {
+            console.log('Delete avatar clicked');
+            confirmDeleteAvatar();
+        });
+    }
+    
+    // View avatar in modal
+    function viewAvatar() {
+        const avatarImg = document.querySelector('.profile-avatar-large img');
+        if (avatarImg) {
+            const modal = document.getElementById('avatarViewModal');
+            const modalImg = document.getElementById('avatarViewImage');
+            if (modal && modalImg) {
+                modalImg.src = avatarImg.src;
+                modal.classList.add('show');
+            }
+        }
+        
+        // Close menu
+        if (avatarMenu) {
+            avatarMenu.classList.remove('show');
+        }
+    }
+    
+    // Close avatar view modal
+    function closeAvatarView() {
+        const modal = document.getElementById('avatarViewModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+    
+    // Upload avatar
+    function uploadAvatar(input) {
+        console.log('=== uploadAvatar function called ===');
+        
+        if (!input.files || !input.files[0]) {
+            console.log('ERROR: No file in input');
+            return;
+        }
+        
+        const file = input.files[0];
+        const fileName = file.name.toLowerCase();
+        console.log('Processing file:', fileName, '| Size:', (file.size / 1024).toFixed(2) + 'KB', '| Type:', file.type);
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            console.log('ERROR: Invalid file type');
+            showNotification('Chỉ hỗ trợ file ảnh định dạng JPG, JPEG, PNG', 'error');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            console.log('ERROR: File too large');
+            showNotification('Kích thước ảnh không được vượt quá 5MB', 'error');
+            input.value = '';
+            return;
+        }
+        
+        console.log('✓ File validation passed');
+        
+        // Close menu immediately
+        if (avatarMenu) {
+            avatarMenu.classList.remove('show');
+        }
+        
+        // Show loading overlay
+        const overlay = document.getElementById('avatarUploadOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            console.log('✓ Loading overlay shown');
+        }
+        
+        // Show preview immediately for better UX
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            console.log('✓ File read complete, showing preview');
+            const avatarContainer = document.querySelector('.profile-avatar-large');
+            if (avatarContainer) {
+                // Create or update preview image
+                let previewImg = avatarContainer.querySelector('img');
+                if (!previewImg) {
+                    previewImg = document.createElement('img');
+                    previewImg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: 50%;';
+                    avatarContainer.appendChild(previewImg);
+                }
+                previewImg.src = e.target.result;
+                
+                // Hide icon
+                const icon = avatarContainer.querySelector('.fa-user');
+                if (icon) {
+                    icon.style.display = 'none';
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+        
+        // Submit form
+        const form = document.getElementById('avatarUploadForm');
+        const formData = new FormData(form);
+        
+        console.log('→ Sending upload request to server...');
+        
+        fetch(contextPath + '/upload-avatar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log('← Server response received:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('← Server data:', data);
+            if (data.success) {
+                console.log('✓ Upload successful!');
+                showNotification('✓ Cập nhật ảnh thành công!', 'success');
+                
+                // Reload page
+                setTimeout(() => {
+                    console.log('→ Reloading page...');
+                    window.location.reload();
+                }, 500);
+            } else {
+                console.log('✗ Upload failed:', data.message);
+                if (overlay) overlay.style.display = 'none';
+                showNotification('✗ Lỗi: ' + (data.message || 'Không thể tải lên ảnh'), 'error');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
+        })
+        .catch(error => {
+            console.error('✗ Upload error:', error);
+            if (overlay) overlay.style.display = 'none';
+            showNotification('✗ Không thể kết nối đến server', 'error');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        })
+        .finally(() => {
+            input.value = '';
+            console.log('=== Upload process ended ===');
+        });
+    }
+    
+    // Confirm delete avatar
+    function confirmDeleteAvatar() {
+        const confirmed = confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?\n\nẢnh sẽ trở về icon mặc định.');
+        
+        if (confirmed) {
+            deleteAvatar();
+        }
+        
+        // Close menu
+        if (avatarMenu) {
+            avatarMenu.classList.remove('show');
+        }
+    }
+    
+    // Delete avatar
+    function deleteAvatar() {
+        showNotification('Đang xóa ảnh...', 'success');
+        
+        fetch(contextPath + '/delete-avatar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Đã xóa ảnh đại diện thành công!', 'success');
+                
+                // Reload page sau 1 giây để cập nhật avatar
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showNotification('Lỗi: ' + (data.message || 'Không thể xóa ảnh'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            showNotification('Không thể kết nối đến server', 'error');
+        });
+    }
+    
+    // Close avatar view modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const avatarModal = document.getElementById('avatarViewModal');
+            if (avatarModal && avatarModal.classList.contains('show')) {
+                closeAvatarView();
+            }
+            
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            if (changePasswordModal && changePasswordModal.classList.contains('show')) {
+                closeChangePasswordModal();
+            }
+        }
+    });
+    
+    // ==================== CHANGE PASSWORD FUNCTIONS ====================
+    
+    // Open change password modal
+    function openChangePasswordModal() {
+        const modal = document.getElementById('changePasswordModal');
+        const form = document.getElementById('changePasswordForm');
+        const message = document.getElementById('changePasswordMessage');
+        
+        if (modal) {
+            // Reset form và message
+            if (form) form.reset();
+            if (message) {
+                message.className = 'message';
+                message.textContent = '';
+            }
+            
+            // Reset tất cả input về type password
+            ['currentPassword', 'newPassword', 'confirmPassword'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.type = 'password';
+                    const btn = input.parentElement.querySelector('.toggle-password i');
+                    if (btn) btn.className = 'fas fa-eye';
+                }
+            });
+            
+            modal.classList.add('show');
+        }
+    }
+    
+    // Close change password modal
+    function closeChangePasswordModal() {
+        const modal = document.getElementById('changePasswordModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('changePasswordModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeChangePasswordModal();
+        }
+    });
+    
+    // Toggle password visibility
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const button = input.parentElement.querySelector('.toggle-password');
+        const icon = button.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+    
+    // Show message in modal
+    function showChangePasswordMessage(message, type) {
+        const messageDiv = document.getElementById('changePasswordMessage');
+        if (messageDiv) {
+            messageDiv.textContent = message;
+            messageDiv.className = 'message ' + type + ' show';
+        }
+    }
+    
+    // Submit change password form
+    function submitChangePassword(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('changePasswordForm');
+        const submitBtn = document.getElementById('changePasswordSubmitBtn');
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
+        
+        // Validate
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showChangePasswordMessage('Vui lòng điền đầy đủ thông tin.', 'error');
+            return false;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            showChangePasswordMessage('Mật khẩu mới và xác nhận mật khẩu không khớp.', 'error');
+            return false;
+        }
+        
+        if (newPassword.length < 6) {
+            showChangePasswordMessage('Mật khẩu mới phải có ít nhất 6 ký tự.', 'error');
+            return false;
+        }
+        
+        if (newPassword.length > 50) {
+            showChangePasswordMessage('Mật khẩu mới không được vượt quá 50 ký tự.', 'error');
+            return false;
+        }
+        
+        if (currentPassword === newPassword) {
+            showChangePasswordMessage('Mật khẩu mới phải khác mật khẩu hiện tại.', 'error');
+            return false;
+        }
+        
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        
+        // Prepare form data
+        const formData = new URLSearchParams();
+        formData.append('currentPassword', currentPassword);
+        formData.append('newPassword', newPassword);
+        formData.append('confirmPassword', confirmPassword);
+        
+        // Send request
+        fetch(contextPath + '/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showChangePasswordMessage(data.message || 'Đổi mật khẩu thành công!', 'success');
+                
+                // Reset form và đóng modal sau 2 giây
+                setTimeout(() => {
+                    form.reset();
+                    closeChangePasswordModal();
+                    showNotification('Đổi mật khẩu thành công!', 'success');
+                }, 2000);
+            } else {
+                showChangePasswordMessage(data.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Change password error:', error);
+            showChangePasswordMessage('Không thể kết nối đến server. Vui lòng thử lại.', 'error');
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Đổi Mật Khẩu';
+        });
+        
+        return false;
+    }
+    
+    console.log('Avatar script loaded successfully!');
+</script>
 </body>
 </html>
+
 

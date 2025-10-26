@@ -532,7 +532,6 @@
         .stat-item:nth-child(2) .stat-number { color: #f59e0b; } /* Pending - Orange */
         .stat-item:nth-child(3) .stat-number { color: #10b981; } /* Accepted - Green */
         .stat-item:nth-child(4) .stat-number { color: #ef4444; } /* Rejected - Red */
-        .stat-item:nth-child(5) .stat-number { color: #8b5cf6; } /* Interviewed - Purple */
 
         .stat-label {
             font-size: 14px;
@@ -1000,10 +999,6 @@
             <div class="stat-item">
                 <span class="stat-number">${rejectedApplications}</span>
                 <span class="stat-label">Bị từ chối</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">${interviewedApplications}</span>
-                <span class="stat-label">Đã phỏng vấn</span>
             </div>
         </div>
 
