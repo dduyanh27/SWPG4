@@ -502,6 +502,19 @@ public class AdminDAO extends DBContext {
         }
     }
 
+    public boolean updateAdminPassword(int adminId, String newPassword) {
+        String sql = "UPDATE Admins SET Password = ? WHERE AdminID = ?";
+        try (PreparedStatement st = c.prepareStatement(sql)) {
+            st.setString(1, newPassword);
+            st.setInt(2, adminId);
+            int rowsAffected = st.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     //Minh
     public Admin login(String email, String password) {
         Admin admin = null;
