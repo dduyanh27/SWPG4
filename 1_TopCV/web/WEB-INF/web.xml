@@ -41,6 +41,16 @@
         <url-pattern>/LoginServlet</url-pattern>
     </servlet-mapping>
     
+    <!-- Clear Session Servlet -->
+    <servlet>
+        <servlet-name>ClearSessionServlet</servlet-name>
+        <servlet-class>controller.base.ClearSessionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ClearSessionServlet</servlet-name>
+        <url-pattern>/ClearSessionServlet</url-pattern>
+    </servlet-mapping>
+    
     <!-- Jobseeker -->
     <servlet>
         <servlet-name>GoogleLoginServlet</servlet-name>
@@ -103,6 +113,16 @@
     <servlet-mapping>
         <servlet-name>UpdateAdminProfile</servlet-name>
         <url-pattern>/updateadminprofile</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Staff Profile Update -->
+    <servlet>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <servlet-class>controller.staff.UpdateStaffProfile</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <url-pattern>/updatestaffprofile</url-pattern>
     </servlet-mapping>
     
     <!-- Recruiter (package 'recuiter' in sources) -->

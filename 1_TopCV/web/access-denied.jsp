@@ -213,8 +213,12 @@
                 </c:otherwise>
             </c:choose>
             
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                ← Quay lại
+            <a href="${pageContext.request.contextPath}/ClearSessionServlet" class="btn btn-primary">
+                🔄 Đăng nhập lại
+            </a>
+            
+            <a href="${pageContext.request.contextPath}/index.html" class="btn btn-secondary">
+                🏠 Về trang chủ
             </a>
         </div>
         
@@ -231,6 +235,27 @@
                 console.log('Access denied message displayed');
             </c:if>
         }, 10000);
+        
+        // Prevent back button and force session clear
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Page was loaded from cache (back button)
+                console.log('Page loaded from cache - redirecting to clear session');
+                window.location.href = '${pageContext.request.contextPath}/ClearSessionServlet';
+            }
+        });
+        
+        // Clear session on page refresh
+        window.addEventListener('beforeunload', function() {
+            // This will trigger when user refreshes or navigates away
+            console.log('Page unloading - session should be cleared on next access');
+        });
+        
+        // Disable back button
+        history.pushState(null, null, location.href);
+        window.onpopstate = function(event) {
+            history.go(1);
+        };
     </script>
 </body>
 </html>

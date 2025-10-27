@@ -14,6 +14,74 @@
     AdminDAO adminDAO = new AdminDAO();
     int days = adminDAO.getActiveDays(admin.getAdminId());
     request.setAttribute("activeDays", days);
+    
+    // Xác định role của staff để hiển thị navigation phù hợp
+    String staffRole = "sales"; // Mặc định là sales
+    String dashboardUrl = "/Staff/salehome.jsp";
+    String dashboardTitle = "Sales Dashboard";
+    
+    // Kiểm tra role từ URL parameter (ưu tiên cao nhất)
+    String roleParam = request.getParameter("role");
+    if ("marketing".equals(roleParam)) {
+        staffRole = "marketing";
+        dashboardUrl = "/Staff/marketinghome.jsp";
+        dashboardTitle = "Marketing Dashboard";
+        // Lưu role vào session để sử dụng cho các lần sau
+        session.setAttribute("staffRole", "marketing");
+    } else if ("sales".equals(roleParam)) {
+        staffRole = "sales";
+        dashboardUrl = "/Staff/salehome.jsp";
+        dashboardTitle = "Sales Dashboard";
+        // Lưu role vào session để sử dụng cho các lần sau
+        session.setAttribute("staffRole", "sales");
+    } else {
+        // Kiểm tra role từ session trước
+        String sessionRole = (String) session.getAttribute("staffRole");
+        if ("marketing".equals(sessionRole)) {
+            staffRole = "marketing";
+            dashboardUrl = "/Staff/marketinghome.jsp";
+            dashboardTitle = "Marketing Dashboard";
+        } else if ("sales".equals(sessionRole)) {
+            staffRole = "sales";
+            dashboardUrl = "/Staff/salehome.jsp";
+            dashboardTitle = "Sales Dashboard";
+        } else {
+            // Fallback: Kiểm tra nếu là marketing staff - có thể dựa vào:
+            // 1. Email chứa "marketing"
+            // 2. Tên chứa "marketing" 
+            // 3. Hoặc dựa vào referrer URL
+            String referrer = request.getHeader("referer");
+            boolean isMarketingStaff = false;
+            
+            if (admin.getEmail() != null && admin.getEmail().toLowerCase().contains("marketing")) {
+                isMarketingStaff = true;
+            } else if (admin.getFullName() != null && admin.getFullName().toLowerCase().contains("marketing")) {
+                isMarketingStaff = true;
+            } else if (referrer != null && referrer.contains("marketinghome")) {
+                isMarketingStaff = true;
+            }
+            
+            if (isMarketingStaff) {
+                staffRole = "marketing";
+                dashboardUrl = "/Staff/marketinghome.jsp";
+                dashboardTitle = "Marketing Dashboard";
+                session.setAttribute("staffRole", "marketing");
+            } else {
+                session.setAttribute("staffRole", "sales");
+            }
+        }
+    }
+    
+    // Debug: In ra console để kiểm tra
+    System.out.println("Staff Role Detection:");
+    System.out.println("Role Parameter: " + roleParam);
+    System.out.println("Email: " + admin.getEmail());
+    System.out.println("FullName: " + admin.getFullName());
+    System.out.println("Detected Role: " + staffRole);
+    
+    request.setAttribute("staffRole", staffRole);
+    request.setAttribute("dashboardUrl", dashboardUrl);
+    request.setAttribute("dashboardTitle", dashboardTitle);
 %>
 
 <!DOCTYPE html>
@@ -34,25 +102,45 @@
         <div class="unified-sidebar" id="unifiedSidebar">
             <div class="sidebar-brand">
                 <h1 class="brand-title">JOBs</h1>
-                <p class="brand-subtitle">Staff Dashboard</p>
+                <p class="brand-subtitle">${dashboardTitle}</p>
             </div>
 
             <div class="sidebar-profile">
                 <div class="sidebar-admin-name">${sessionScope.admin.fullName}</div>
-                <div class="sidebar-admin-role">👤 Staff</div>
+                <div class="sidebar-admin-role">
+                    <c:choose>
+                        <c:when test="${staffRole eq 'marketing'}">📢 Marketing Staff</c:when>
+                        <c:otherwise>💼 Sales Staff</c:otherwise>
+                    </c:choose>
+                </div>
                 <span class="sidebar-status">Hoạt động</span>
             </div>
 
             <nav class="sidebar-nav">
                 <div class="nav-title">Menu chính</div>
-                <a href="${pageContext.request.contextPath}/Staff/marketinghome.jsp" class="nav-item">📊 Tổng quan</a>
-                <a href="${pageContext.request.contextPath}/Staff/campaign.jsp" class="nav-item">🎯 Chiến dịch Marketing</a>
-                <a href="${pageContext.request.contextPath}/Staff/content.jsp" class="nav-item">📝 Quản lý nội dung</a>
-                <a href="${pageContext.request.contextPath}/Staff/stats.jsp" class="nav-item">📈 Phân tích & Báo cáo</a>
+                
+                <c:choose>
+                    <c:when test="${staffRole eq 'marketing'}">
+                        <!-- Marketing Staff Navigation -->
+                        <a href="${pageContext.request.contextPath}/Staff/marketinghome.jsp" class="nav-item">📊 Tổng quan</a>
+                        <a href="${pageContext.request.contextPath}/Staff/campaign.jsp" class="nav-item">🎯 Chiến dịch Marketing</a>
+                        <a href="${pageContext.request.contextPath}/Staff/content.jsp" class="nav-item">📝 Quản lý nội dung</a>
+                        <a href="${pageContext.request.contextPath}/Staff/stats.jsp" class="nav-item">📈 Phân tích & Báo cáo</a>
+                        <a href="#" class="nav-item">📱 Social Media</a>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Sales Staff Navigation -->
+                        <a href="${pageContext.request.contextPath}/Staff/salehome.jsp" class="nav-item">📊 Tổng quan</a>
+                        <a href="${pageContext.request.contextPath}/Staff/cus-service.jsp" class="nav-item">💬 Customer Service</a>
+                        <a href="${pageContext.request.contextPath}/Staff/order-service.jsp" class="nav-item">🛒 Quản lý đơn hàng</a>
+                        <a href="${pageContext.request.contextPath}/Staff/dt.jsp" class="nav-item">👥 Quản lý doanh thu</a>
+                        <a href="#" class="nav-item">📈 Báo cáo doanh thu</a>
+                    </c:otherwise>
+                </c:choose>
             </nav>
 
             <div class="sidebar-actions">
-                <a href="${pageContext.request.contextPath}/Staff/staff-profile.jsp" class="action-btn active">👤 Hồ sơ cá nhân</a>
+                <a href="${pageContext.request.contextPath}/Staff/staff-profile.jsp?role=${staffRole}" class="action-btn active">👤 Hồ sơ cá nhân</a>
                 <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
             </div>
         </div>
@@ -62,7 +150,7 @@
                 <div class="page-header">
                     <h1 class="page-title">Hồ sơ Staff</h1>
                     <div class="breadcrumb">
-                        <a href="${pageContext.request.contextPath}/Staff/marketinghome.jsp">Dashboard</a> / Hồ sơ cá nhân
+                        <a href="${pageContext.request.contextPath}${dashboardUrl}">Dashboard</a> / Hồ sơ cá nhân
                     </div>
                 </div>
 
@@ -100,7 +188,12 @@
 
                         <div class="profile-info">
                             <div class="profile-name">${sessionScope.admin.fullName}</div>
-                            <div class="profile-role">👤 Staff</div>
+                            <div class="profile-role">
+                                <c:choose>
+                                    <c:when test="${staffRole eq 'marketing'}">📢 Marketing Staff</c:when>
+                                    <c:otherwise>💼 Sales Staff</c:otherwise>
+                                </c:choose>
+                            </div>
                             <span class="status-badge status-active">Hoạt động</span>
                             <div class="profile-stats">
                                 <div class="stat-item">
@@ -120,7 +213,7 @@
                     </div>
 
                     <!-- Update Profile -->
-                    <form class="form-section" method="post" action="${pageContext.request.contextPath}/updateadminprofile">
+                    <form class="form-section" method="post" action="${pageContext.request.contextPath}/updatestaffprofile">
                         <h2 class="section-title">Thông tin cá nhân</h2>
                         <div class="form-grid">
                             <div class="form-group">

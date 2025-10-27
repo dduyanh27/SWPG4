@@ -105,12 +105,10 @@ public class RoleBasedAccessControlFilter implements Filter {
             return;
         }
         
-        // Check session conflict first
-        if (SessionManager.hasSessionConflict(httpRequest)) {
-            System.out.println("SESSION CONFLICT DETECTED in RoleBasedAccessControlFilter");
-            SessionManager.clearSessionConflict(httpRequest);
-            redirectToAccessDenied(httpRequest, httpResponse, 
-                "Phát hiện xung đột session. Vui lòng đăng nhập lại.");
+        // Check session conflicts and invalid sessions first
+        if (SessionManager.checkAndClearSessionIfNeeded(httpRequest)) {
+            System.out.println("SESSION CLEARED in RoleBasedAccessControlFilter - Redirecting to login");
+            httpResponse.sendRedirect(contextPath + "/JobSeeker/jobseeker-login.jsp");
             return;
         }
         

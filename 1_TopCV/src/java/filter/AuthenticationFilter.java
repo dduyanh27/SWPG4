@@ -143,11 +143,10 @@ public class AuthenticationFilter implements Filter {
             return;
         }
         
-        // Check for session conflicts first
-        if (SessionManager.hasSessionConflict(httpRequest)) {
-            System.out.println("SESSION CONFLICT DETECTED in AuthenticationFilter");
-            SessionManager.clearSessionConflict(httpRequest);
-            httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
+        // Check for session conflicts and invalid sessions first
+        if (SessionManager.checkAndClearSessionIfNeeded(httpRequest)) {
+            System.out.println("SESSION CLEARED in AuthenticationFilter - Redirecting to login");
+            httpResponse.sendRedirect(contextPath + "/JobSeeker/jobseeker-login.jsp");
             return;
         }
         

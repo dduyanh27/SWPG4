@@ -109,4 +109,67 @@ public class PaymentsDAO extends DBContext {
         }
         return payments;
     }
+    //duy anh
+    
+    // Get all payments with recruiter information for admin
+    public List<java.util.Map<String, Object>> getAllPaymentsWithRecruiterInfo() {
+        List<java.util.Map<String, Object>> paymentList = new ArrayList<>();
+        String sql = "SELECT p.*, r.CompanyName, r.Email, r.ContactPerson " +
+                    "FROM Payments p " +
+                    "LEFT JOIN Recruiter r ON p.RecruiterID = r.RecruiterID " +
+                    "ORDER BY p.PaymentDate DESC";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    java.util.Map<String, Object> payment = new java.util.HashMap<>();
+                    payment.put("id", "PAY" + String.format("%03d", rs.getInt("PaymentID")));
+                    payment.put("paymentID", rs.getInt("PaymentID"));
+                    payment.put("recruiterName", rs.getString("CompanyName"));
+                    payment.put("recruiterEmail", rs.getString("Email"));
+                    payment.put("contactPerson", rs.getString("ContactPerson"));
+                    payment.put("amount", rs.getBigDecimal("Amount"));
+                    payment.put("currency", "VND");
+                    payment.put("paymentMethod", rs.getString("PaymentMethod"));
+                    payment.put("status", rs.getString("PaymentStatus"));
+                    payment.put("transactionDate", rs.getTimestamp("PaymentDate").toString());
+                    payment.put("description", rs.getString("Notes"));
+                    payment.put("invoiceNumber", "INV-" + rs.getString("TransactionCode"));
+                    payment.put("transactionCode", rs.getString("TransactionCode"));
+                    paymentList.add(payment);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return paymentList;
+    }
+    
+    // Get payment statistics for admin dashboard
+    public java.util.Map<String, Object> getPaymentStatistics() {
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        String sql = "SELECT " +
+                    "COUNT(*) as totalPayments, " +
+                    "SUM(CASE WHEN PaymentStatus = 'success' THEN 1 ELSE 0 END) as completedPayments, " +
+                    "SUM(CASE WHEN PaymentStatus = 'pending' THEN 1 ELSE 0 END) as pendingPayments, " +
+                    "SUM(CASE WHEN PaymentStatus = 'failed' THEN 1 ELSE 0 END) as failedPayments, " +
+                    "SUM(CASE WHEN PaymentStatus = 'success' THEN Amount ELSE 0 END) as totalRevenue " +
+                    "FROM Payments";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    stats.put("totalPayments", rs.getInt("totalPayments"));
+                    stats.put("completedPayments", rs.getInt("completedPayments"));
+                    stats.put("pendingPayments", rs.getInt("pendingPayments"));
+                    stats.put("failedPayments", rs.getInt("failedPayments"));
+                    stats.put("totalRevenue", rs.getBigDecimal("totalRevenue"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+    //duy anh
 }

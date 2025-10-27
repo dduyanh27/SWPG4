@@ -305,6 +305,101 @@ public class SessionManager {
     }
     
     /**
+     * Clear session hoàn toàn - xóa tất cả dữ liệu session
+     * @param request HttpServletRequest
+     */
+    public static void clearSessionCompletely(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            System.out.println("CLEARING SESSION COMPLETELY");
+            
+            // Clear tất cả attributes
+            session.removeAttribute(USER_KEY);
+            session.removeAttribute(USER_TYPE_KEY);
+            session.removeAttribute(USER_ID_KEY);
+            session.removeAttribute(USER_NAME_KEY);
+            session.removeAttribute(ADMIN_KEY);
+            session.removeAttribute(ADMIN_ROLE_KEY);
+            session.removeAttribute(JOBSEEKER_KEY);
+            session.removeAttribute(RECRUITER_KEY);
+            session.removeAttribute(SESSION_IDENTIFIER_KEY);
+            session.removeAttribute(ACCESS_DENIED_MESSAGE_KEY);
+            
+            // Invalidate session
+            session.invalidate();
+        }
+    }
+    
+    /**
+     * Kiểm tra và clear session nếu có conflict
+     * @param request HttpServletRequest
+     * @return true nếu session đã được clear
+     */
+    public static boolean checkAndClearSessionIfNeeded(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return false;
+        }
+        
+        // Kiểm tra xem có session conflict không
+        if (hasSessionConflict(request)) {
+            System.out.println("SESSION CONFLICT DETECTED - Clearing session completely");
+            clearSessionCompletely(request);
+            return true;
+        }
+        
+        // Kiểm tra xem có dữ liệu không hợp lệ không
+        String userType = (String) session.getAttribute(USER_TYPE_KEY);
+        if (userType == null) {
+            // Session không có userType - có thể là session cũ
+            System.out.println("INVALID SESSION - No userType found, clearing session");
+            clearSessionCompletely(request);
+            return true;
+        }
+        
+        // Kiểm tra tính nhất quán của session
+        if (!isSessionConsistent(session, userType)) {
+            System.out.println("INCONSISTENT SESSION - Clearing session completely");
+            clearSessionCompletely(request);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Kiểm tra tính nhất quán của session
+     * @param session HttpSession
+     * @param userType String
+     * @return true nếu session nhất quán
+     */
+    private static boolean isSessionConsistent(HttpSession session, String userType) {
+        switch (userType) {
+            case "admin":
+                // Admin session phải có admin object và adminRole
+                return session.getAttribute(ADMIN_KEY) != null && 
+                       session.getAttribute(ADMIN_ROLE_KEY) != null &&
+                       session.getAttribute(JOBSEEKER_KEY) == null &&
+                       session.getAttribute(RECRUITER_KEY) == null;
+                       
+            case "jobseeker":
+                // JobSeeker session phải có jobseeker object
+                return session.getAttribute(JOBSEEKER_KEY) != null &&
+                       session.getAttribute(ADMIN_KEY) == null &&
+                       session.getAttribute(RECRUITER_KEY) == null;
+                       
+            case "recruiter":
+                // Recruiter session phải có recruiter object
+                return session.getAttribute(RECRUITER_KEY) != null &&
+                       session.getAttribute(ADMIN_KEY) == null &&
+                       session.getAttribute(JOBSEEKER_KEY) == null;
+                       
+            default:
+                return false;
+        }
+    }
+    
+    /**
      * Lấy redirect path dựa trên role
      * @param request HttpServletRequest
      * @return Redirect path
