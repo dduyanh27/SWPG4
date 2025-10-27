@@ -77,7 +77,7 @@
 
             <!-- Actions -->
             <div class="sidebar-actions">
-                <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
+                <a href="${pageContext.request.contextPath}/Staff/staff-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
                 <a href="${pageContext.request.contextPath}/LogoutServlet" class="action-btn logout">🚪 Đăng xuất</a>
             </div>
         </div>
@@ -274,5 +274,8 @@
                 observer.observe(el);
             });
         </script>
+        
+        <!-- Chatbot Integration -->
+        <jsp:include page="../components/chatbot.jsp" />
     </body>
 </html>

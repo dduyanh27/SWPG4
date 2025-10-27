@@ -14,7 +14,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sale Dashboard - JOBs</title>
+        <title>Sales Dashboard - JOBs</title>
         <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/Admin/dashboard.css">
         <style>
             .sale-container {
@@ -234,7 +234,7 @@
             <!-- Brand Section -->
             <div class="sidebar-brand">
                 <h1 class="brand-title">JOBs</h1>
-                <p class="brand-subtitle">Sale Dashboard</p>
+                <p class="brand-subtitle">Sales Dashboard</p>
             </div>
 
             <!-- Profile Section -->
@@ -252,7 +252,7 @@
                     </c:choose>
                 </div>
                 <div class="sidebar-admin-name">${sessionScope.admin.fullName}</div>
-                <div class="sidebar-admin-role">💼 Sale Staff</div>
+                <div class="sidebar-admin-role">💼 Sales Staff</div>
                 <span class="sidebar-status">Hoạt động</span>
             </div>
 
@@ -269,7 +269,7 @@
 
             <!-- Actions -->
             <div class="sidebar-actions">
-                <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
+                <a href="${pageContext.request.contextPath}/Staff/staff-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
                 <a href="${pageContext.request.contextPath}/LogoutServlet" class="action-btn logout">🚪 Đăng xuất</a>
             </div>
         </div>
@@ -279,7 +279,7 @@
             <div class="main">
                 <!-- Header -->
                 <div class="sale-header">
-                    <h1>💼 Sale Dashboard</h1>
+                    <h1>💼 Sales Dashboard</h1>
                     <p>Quản lý tin nhắn khách hàng và bán khóa up job</p>
                 </div>
 
@@ -407,5 +407,8 @@
                 }
             });
         </script>
+        
+        <!-- Chatbot Integration -->
+        <jsp:include page="../components/chatbot.jsp" />
     </body>
 </html>

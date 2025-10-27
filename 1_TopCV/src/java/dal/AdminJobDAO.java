@@ -331,8 +331,12 @@ public class AdminJobDAO extends DBContext {
             params.add("%" + search + "%");
         }
         if (location != null && !location.isEmpty()) {
-            sql.append("AND l.LocationName LIKE ? ");
-            params.add("%" + location + "%");
+            // Map location values to actual location names
+            String locationName = getLocationName(location);
+            if (locationName != null) {
+                sql.append("AND l.LocationName LIKE ? ");
+                params.add("%" + locationName + "%");
+            }
         }
         if (type != null && !type.isEmpty()) {
             int typeId = getJobTypeId(type);
@@ -346,8 +350,12 @@ public class AdminJobDAO extends DBContext {
             params.add(status);
         }
         if (category != null && !category.isEmpty()) {
-            sql.append("AND c.CategoryName LIKE ? ");
-            params.add("%" + category + "%");
+            // Map category values to actual category names
+            String categoryName = getCategoryName(category);
+            if (categoryName != null) {
+                sql.append("AND c.CategoryName LIKE ? ");
+                params.add("%" + categoryName + "%");
+            }
         }
         if (salary != null && !salary.isEmpty()) {
             // Sử dụng SalaryRange thay vì MinSalary/MaxSalary
@@ -456,6 +464,38 @@ public class AdminJobDAO extends DBContext {
                 return 4; // Assuming TypeID 4 is Internship
             default:
                 return 0; // Invalid type
+        }
+    }
+    
+    private String getCategoryName(String categoryString) {
+        switch (categoryString.toLowerCase()) {
+            case "it":
+                return "Công nghệ thông tin";
+            case "marketing":
+                return "Marketing";
+            case "sales":
+                return "Kinh doanh";
+            case "hr":
+                return "Nhân sự";
+            case "finance":
+                return "Tài chính";
+            default:
+                return null; // Invalid category
+        }
+    }
+    
+    private String getLocationName(String locationString) {
+        switch (locationString.toLowerCase()) {
+            case "hanoi":
+                return "Hà Nội";
+            case "hcm":
+                return "Hồ Chí Minh";
+            case "danang":
+                return "Đà Nẵng";
+            case "other":
+                return "Khác";
+            default:
+                return null; // Invalid location
         }
     }
 }
