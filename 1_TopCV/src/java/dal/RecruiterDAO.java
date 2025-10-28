@@ -622,5 +622,68 @@ public class RecruiterDAO extends DBContext {
             }
         }
     }
+    
+    // Update company information with tax code and registration certificate
+    public boolean updateCompanyInfoWithTaxAndCert(int recruiterId, String companyName, String phone,
+            String companyAddress, String companySize, String contactPerson,
+            String companyBenefits, String companyDescription,
+            String companyVideoURL, String website, String logoPath,
+            String companyImagesPath, String taxCode, String registrationCert) {
+        String sql = "UPDATE Recruiter SET CompanyName = ?, Phone = ?, CompanyAddress = ?, "
+                + "CompanySize = ?, ContactPerson = ?, CompanyBenefits = ?, "
+                + "CompanyDescription = ?, CompanyVideoURL = ?, Website = ?, "
+                + "CompanyLogoURL = ?, Img = ?, Taxcode = ?, RegistrationCert = ? WHERE RecruiterID = ?";
+
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, companyName);
+            ps.setString(2, phone);
+            ps.setString(3, companyAddress);
+            ps.setString(4, companySize);
+            ps.setString(5, contactPerson);
+            ps.setString(6, companyBenefits);
+            ps.setString(7, companyDescription);
+            ps.setString(8, companyVideoURL);
+            ps.setString(9, website);
+            ps.setString(10, logoPath);
+            ps.setString(11, companyImagesPath);
+            ps.setString(12, taxCode);
+            ps.setString(13, registrationCert);
+            ps.setInt(14, recruiterId);
+
+            int affectedRows = ps.executeUpdate();
+            ps.close();
+
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // Check if phone exists for other recruiters (excluding current recruiter)
+    public boolean isPhoneExistsForOtherRecruiter(String phone, int currentRecruiterId) {
+        String sql = "SELECT COUNT(*) FROM Recruiter WHERE Phone = ? AND RecruiterID != ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, phone);
+            ps.setInt(2, currentRecruiterId);
+            
+            ResultSet rs = ps.executeQuery();
+            boolean exists = false;
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0;
+            }
+            
+            rs.close();
+            ps.close();
+            return exists;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     //MINH
 }

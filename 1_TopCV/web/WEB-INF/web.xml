@@ -28,6 +28,11 @@
         <servlet-name>GoogleLoginServlet</servlet-name>
         <url-pattern>/googleloginservlet</url-pattern>
     </servlet-mapping>
+    <!-- Map Google OAuth callback used by redirect_uri -->
+    <servlet-mapping>
+        <servlet-name>GoogleLoginServlet</servlet-name>
+        <url-pattern>/JobSeeker/jobseeker-login</url-pattern>
+    </servlet-mapping>
     
     <!-- Admin -->
     <servlet>

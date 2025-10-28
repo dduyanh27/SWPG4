@@ -9,13 +9,13 @@ public class PaymentDetailsDAO extends DBContext {
     
     // Create new payment detail record
     public boolean createPaymentDetail(PaymentDetails paymentDetail) {
-        // Align with DB where UnitPrice column may not exist
-        String sql = "INSERT INTO PaymentDetails (PaymentID, PackageID, Quantity) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO PaymentDetails (PaymentID, PackageID, Quantity, UnitPrice) VALUES (?, ?, ?, ?)";
         
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, paymentDetail.getPaymentID());
             ps.setInt(2, paymentDetail.getPackageID());
             ps.setInt(3, paymentDetail.getQuantity());
+            ps.setBigDecimal(4, paymentDetail.getUnitPrice());
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -26,7 +26,7 @@ public class PaymentDetailsDAO extends DBContext {
     
     // Create multiple payment details
     public boolean createPaymentDetails(List<PaymentDetails> paymentDetails) {
-        String sql = "INSERT INTO PaymentDetails (PaymentID, PackageID, Quantity) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO PaymentDetails (PaymentID, PackageID, Quantity, UnitPrice) VALUES (?, ?, ?, ?)";
         
         System.out.println("PaymentDetailsDAO: Creating " + paymentDetails.size() + " payment details");
         
@@ -34,10 +34,12 @@ public class PaymentDetailsDAO extends DBContext {
             for (PaymentDetails detail : paymentDetails) {
                 System.out.println("Adding batch: PaymentID=" + detail.getPaymentID() + 
                                  ", PackageID=" + detail.getPackageID() + 
-                                 ", Quantity=" + detail.getQuantity());
+                                 ", Quantity=" + detail.getQuantity() +
+                                 ", UnitPrice=" + detail.getUnitPrice());
                 ps.setInt(1, detail.getPaymentID());
                 ps.setInt(2, detail.getPackageID());
                 ps.setInt(3, detail.getQuantity());
+                ps.setBigDecimal(4, detail.getUnitPrice());
                 ps.addBatch();
             }
             

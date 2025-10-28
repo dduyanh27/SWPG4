@@ -39,7 +39,8 @@ public class GoogleLoginServlet extends HttpServlet {
             
             if (user == null) {
                 // Email doesn't exist, create new account
-                user = dao.insertJobSeeker(account.getEmail(), "GOOGLE_LOGIN", "Active");
+                // 创建新 JobSeeker，确保 FullName 非空
+                user = dao.insertJobSeeker(account.getEmail(), "GOOGLE_LOGIN", "Active", account.getName());
                 
                 if (user == null) {
                     throw new Exception("Không thể tạo tài khoản mới");
@@ -50,11 +51,10 @@ public class GoogleLoginServlet extends HttpServlet {
                     // Account exists with password, prevent Google login
                     throw new Exception("Email này đã được đăng ký với mật khẩu. Vui lòng đăng nhập bằng email và mật khẩu thay vì Google.");
                 } else if (dao.isGoogleAccount(account.getEmail())) {
-                    // It's already a Google account, proceed with login
-                    // No action needed, user is already set
+                    // Already a Google account
                 } else {
-                    // Account exists but no password set, update to Google login
-                    dao.updatePassword(account.getId(), "GOOGLE_LOGIN");
+                    // Mark existing account as Google login account
+                    dao.setAsGoogleAccount(user.getJobSeekerId());
                 }
             }
 

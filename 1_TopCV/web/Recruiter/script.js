@@ -1,6 +1,12 @@
 // Initialize Chart.js pie chart
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('statusChart').getContext('2d');
+    try {
+        const statusChartElement = document.getElementById('statusChart');
+        if (!statusChartElement) {
+            console.log('statusChart element not found, skipping chart initialization');
+            return;
+        }
+        const ctx = statusChartElement.getContext('2d');
     
     const statusChart = new Chart(ctx, {
         type: 'pie',
@@ -66,6 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Bạn đã click vào chart
         }
     });
+    } catch (error) {
+        console.error('Chart initialization error:', error);
+    }
 });
 
 // Dropdown functionality
@@ -297,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Handle specific menu items
                 if (itemText === 'Thông tin công ty') {
-                    window.location.href = 'company-info.html';
+                    window.location.href = 'company-info.jsp';
                 } else if (itemText === 'Quản lý tài khoản') {
                     // Navigate to account management
                     console.log('Navigate to account management');
@@ -403,6 +412,11 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const changePasswordLink = document.getElementById('change-password-link');
     const passwordForm = document.getElementById('password-form');
+    
+    if (!changePasswordLink || !passwordForm) {
+        console.log('Password form elements not found, skipping password functionality');
+        return;
+    }
     const cancelBtn = document.querySelector('.cancel-btn');
     
     if (changePasswordLink && passwordForm) {
@@ -495,6 +509,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorModal = document.getElementById('error-modal');
     const loginRedirectBtn = document.getElementById('login-redirect');
     const errorCloseBtn = document.getElementById('error-close');
+    
+    if (!successModal || !errorModal) {
+        console.log('Modal elements not found, skipping modal functionality');
+        return;
+    }
     
     if (loginRedirectBtn) {
         loginRedirectBtn.addEventListener('click', function() {

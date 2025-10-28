@@ -82,6 +82,33 @@ public class PaymentsDAO extends DBContext {
         return null;
     }
     
+    // Get payment by transaction code
+    public Payments getPaymentByTransactionCode(String transactionCode) {
+        String sql = "SELECT * FROM Payments WHERE TransactionCode = ?";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, transactionCode);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Payments payment = new Payments();
+                    payment.setPaymentID(rs.getInt("PaymentID"));
+                    payment.setRecruiterID(rs.getInt("RecruiterID"));
+                    payment.setAmount(rs.getBigDecimal("Amount"));
+                    payment.setPaymentMethod(rs.getString("PaymentMethod"));
+                    payment.setPaymentStatus(rs.getString("PaymentStatus"));
+                    payment.setTransactionCode(rs.getString("TransactionCode"));
+                    payment.setPaymentDate(rs.getTimestamp("PaymentDate").toLocalDateTime());
+                    payment.setNotes(rs.getString("Notes"));
+                    return payment;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     // Get payments by recruiter ID
     public List<Payments> getPaymentsByRecruiterId(int recruiterID) {
         List<Payments> payments = new ArrayList<>();

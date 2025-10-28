@@ -338,6 +338,52 @@ public class JobSeekerDAO extends DBContext {
         return null;
     }
 
+    /**
+     * Dùng cho đăng nhập Google: tạo tài khoản tối thiểu kèm FullName (NOT NULL)
+     */
+    public JobSeeker insertJobSeeker(String email, String password, String status, String fullName) {
+        String safeName = (fullName != null && !fullName.trim().isEmpty()) ? fullName.trim() : email;
+        String sql = "INSERT INTO JobSeeker (Email, Password, Status, FullName) VALUES (?, ?, ?, ?)";
+        try {
+            PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, email);
+            ps.setString(2, password);
+            ps.setString(3, status);
+            ps.setString(4, safeName);
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int jobSeekerID = generatedKeys.getInt(1);
+                    JobSeeker jobSeeker = new JobSeeker(
+                            jobSeekerID,
+                            email,
+                            password,
+                            safeName, // FullName
+                            null, // Phone
+                            null, // Gender
+                            null, // Headline
+                            null, // ContactInfo
+                            null, // Address
+                            0, // LocationID
+                            null, // Img
+                            0, // CurrentLevelID
+                            status
+                    );
+                    generatedKeys.close();
+                    ps.close();
+                    return jobSeeker;
+                }
+                generatedKeys.close();
+            }
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public boolean updatePassword(int jobSeekerId, String newPassword) {
         if (c == null) {
             System.err.println("Database connection is null in JobSeekerDAO.updatePassword");
@@ -348,6 +394,25 @@ public class JobSeekerDAO extends DBContext {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, MD5Util.getMD5Hash(newPassword));
             ps.setInt(2, jobSeekerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * 将账号标记为 Google 登录账号（不再存常规密码）。
+     */
+    public boolean setAsGoogleAccount(int jobSeekerId) {
+        if (c == null) {
+            System.err.println("Database connection is null in JobSeekerDAO.setAsGoogleAccount");
+            return false;
+        }
+
+        String sql = "UPDATE JobSeeker SET Password = 'GOOGLE_LOGIN' WHERE JobSeekerID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, jobSeekerId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

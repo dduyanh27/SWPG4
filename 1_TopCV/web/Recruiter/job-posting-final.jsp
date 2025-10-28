@@ -87,7 +87,7 @@
                                     <i class="fas fa-cog"></i>
                                     <span>Quản lý tài khoản</span>
                                 </a>
-                                <a href="${pageContext.request.contextPath}/Recruiter/company-info.html" class="menu-item highlighted">
+                                <a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="menu-item highlighted">
                                     <i class="fas fa-building"></i>
                                     <span>Thông tin công ty</span>
                                 </a>

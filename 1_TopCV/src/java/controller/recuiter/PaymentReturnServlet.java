@@ -64,16 +64,18 @@ public class PaymentReturnServlet extends HttpServlet {
             String vnp_TransactionStatus = request.getParameter("vnp_TransactionStatus");
             String vnp_TxnRef = request.getParameter("vnp_TxnRef");
             
-            // Get payment ID from session
-            Integer paymentID = (Integer) request.getSession().getAttribute("currentPaymentID");
-            if (paymentID == null) {
-                response.getWriter().println("<html><body><h3>Lỗi: Không tìm thấy thông tin thanh toán!</h3></body></html>");
+            // Get payment by transaction code (more reliable than session)
+            Payments payment = paymentsDAO.getPaymentByTransactionCode(vnp_TxnRef);
+            if (payment == null) {
+                response.getWriter().println("<html><body><h3>Lỗi: Không tìm thấy thông tin thanh toán với mã giao dịch: " + vnp_TxnRef + "</h3></body></html>");
                 return;
             }
             
+            int paymentID = payment.getPaymentID();
+            
             if ("00".equals(vnp_TransactionStatus)) {
                 // Payment successful
-                handleSuccessfulPayment(paymentID, vnp_TxnRef, request, response);
+                handleSuccessfulPayment(payment, vnp_TxnRef, request, response);
             } else {
                 // Payment failed
                 handleFailedPayment(paymentID, vnp_TxnRef, request, response);
@@ -85,11 +87,13 @@ public class PaymentReturnServlet extends HttpServlet {
         }
     }
     
-    private void handleSuccessfulPayment(int paymentID, String transactionCode, 
+    private void handleSuccessfulPayment(Payments payment, String transactionCode, 
                                       HttpServletRequest request, HttpServletResponse response) 
                                       throws IOException {
         
         try {
+            int paymentID = payment.getPaymentID();
+            
             // Update payment status to success
             boolean updateSuccess = paymentsDAO.updatePaymentStatus(paymentID, "success", transactionCode);
             
@@ -100,13 +104,6 @@ public class PaymentReturnServlet extends HttpServlet {
             
             // Get payment details
             List<PaymentDetails> paymentDetails = paymentDetailsDAO.getPaymentDetailsByPaymentId(paymentID);
-            
-            // Get payment info
-            Payments payment = paymentsDAO.getPaymentById(paymentID);
-            if (payment == null) {
-                response.getWriter().println("<html><body><h3>Lỗi: Không tìm thấy thông tin thanh toán!</h3></body></html>");
-                return;
-            }
             
             // Create recruiter packages
             List<RecruiterPackages> recruiterPackages = new ArrayList<>();
