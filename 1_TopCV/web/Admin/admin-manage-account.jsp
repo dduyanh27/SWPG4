@@ -150,7 +150,7 @@
                                                       <td>${recruiter.phone}</td>
                                                       <td><span class="status ${recruiter.status}">${recruiter.status}</span></td>
                                                       <td>
-                                                          <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${recruiter.recruiterID}&type=recruiter" class="btn outline">Chi tiết</a>
+                                                          <a href="${pageContext.request.contextPath}/admin-view-recruiter-company?id=${recruiter.recruiterID}" class="btn outline">Chi tiết</a>
                                                           <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${recruiter.recruiterID}&type=recruiter" class="btn danger" 
                                                              onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
                                                       </td>

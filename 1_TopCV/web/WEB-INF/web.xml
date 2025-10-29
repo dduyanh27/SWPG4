@@ -120,6 +120,15 @@
         <url-pattern>/updateadminprofile</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>AdminViewRecruiterCompanyServlet</servlet-name>
+        <servlet-class>controller.admin.AdminViewRecruiterCompanyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminViewRecruiterCompanyServlet</servlet-name>
+        <url-pattern>/admin-view-recruiter-company</url-pattern>
+    </servlet-mapping>
+    
     <!-- Staff Profile Update -->
     <servlet>
         <servlet-name>UpdateStaffProfile</servlet-name>

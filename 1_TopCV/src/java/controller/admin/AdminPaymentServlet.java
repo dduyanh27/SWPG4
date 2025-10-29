@@ -1,9 +1,10 @@
 package controller.admin;
 
 import dal.PaymentsDAO;
+import model.PaymentWithRecruiterInfo;
+import model.PaymentStatistics;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,17 +21,13 @@ public class AdminPaymentServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
-            // Load all payments with recruiter information
-            List<Map<String, Object>> paymentList = paymentsDAO.getAllPaymentsWithRecruiterInfo();
+            // Load all payments with recruiter information - Traditional DAO approach
+            List<PaymentWithRecruiterInfo> paymentList = paymentsDAO.getAllPaymentsWithRecruiterInfo();
             request.setAttribute("paymentList", paymentList);
             
-            // Load payment statistics
-            Map<String, Object> stats = paymentsDAO.getPaymentStatistics();
-            request.setAttribute("totalPayments", stats.get("totalPayments"));
-            request.setAttribute("completedPayments", stats.get("completedPayments"));
-            request.setAttribute("pendingPayments", stats.get("pendingPayments"));
-            request.setAttribute("failedPayments", stats.get("failedPayments"));
-            request.setAttribute("totalRevenue", stats.get("totalRevenue"));
+            // Load payment statistics - Traditional DAO approach
+            PaymentStatistics stats = paymentsDAO.getPaymentStatistics();
+            request.setAttribute("paymentStats", stats);
             
             // Forward to JSP page
             request.getRequestDispatcher("/Admin/ad-payment.jsp").forward(request, response);

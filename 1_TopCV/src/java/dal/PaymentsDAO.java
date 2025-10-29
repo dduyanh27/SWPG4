@@ -1,6 +1,8 @@
 package dal;
 
 import model.Payments;
+import model.PaymentWithRecruiterInfo;
+import model.PaymentStatistics;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -138,9 +140,9 @@ public class PaymentsDAO extends DBContext {
     }
     //duy anh
     
-    // Get all payments with recruiter information for admin
-    public List<java.util.Map<String, Object>> getAllPaymentsWithRecruiterInfo() {
-        List<java.util.Map<String, Object>> paymentList = new ArrayList<>();
+    // Get all payments with recruiter information for admin - Traditional DAO approach
+    public List<PaymentWithRecruiterInfo> getAllPaymentsWithRecruiterInfo() {
+        List<PaymentWithRecruiterInfo> paymentList = new ArrayList<>();
         String sql = "SELECT p.*, r.CompanyName, r.Email, r.ContactPerson " +
                     "FROM Payments p " +
                     "LEFT JOIN Recruiter r ON p.RecruiterID = r.RecruiterID " +
@@ -149,20 +151,18 @@ public class PaymentsDAO extends DBContext {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    java.util.Map<String, Object> payment = new java.util.HashMap<>();
-                    payment.put("id", "PAY" + String.format("%03d", rs.getInt("PaymentID")));
-                    payment.put("paymentID", rs.getInt("PaymentID"));
-                    payment.put("recruiterName", rs.getString("CompanyName"));
-                    payment.put("recruiterEmail", rs.getString("Email"));
-                    payment.put("contactPerson", rs.getString("ContactPerson"));
-                    payment.put("amount", rs.getBigDecimal("Amount"));
-                    payment.put("currency", "VND");
-                    payment.put("paymentMethod", rs.getString("PaymentMethod"));
-                    payment.put("status", rs.getString("PaymentStatus"));
-                    payment.put("transactionDate", rs.getTimestamp("PaymentDate").toString());
-                    payment.put("description", rs.getString("Notes"));
-                    payment.put("invoiceNumber", "INV-" + rs.getString("TransactionCode"));
-                    payment.put("transactionCode", rs.getString("TransactionCode"));
+                    PaymentWithRecruiterInfo payment = new PaymentWithRecruiterInfo();
+                    payment.setPaymentID(rs.getInt("PaymentID"));
+                    payment.setRecruiterID(rs.getInt("RecruiterID"));
+                    payment.setAmount(rs.getBigDecimal("Amount"));
+                    payment.setPaymentMethod(rs.getString("PaymentMethod"));
+                    payment.setPaymentStatus(rs.getString("PaymentStatus"));
+                    payment.setTransactionCode(rs.getString("TransactionCode"));
+                    payment.setPaymentDate(rs.getTimestamp("PaymentDate").toLocalDateTime());
+                    payment.setNotes(rs.getString("Notes"));
+                    payment.setCompanyName(rs.getString("CompanyName"));
+                    payment.setRecruiterEmail(rs.getString("Email"));
+                    payment.setContactPerson(rs.getString("ContactPerson"));
                     paymentList.add(payment);
                 }
             }
@@ -172,9 +172,8 @@ public class PaymentsDAO extends DBContext {
         return paymentList;
     }
     
-    // Get payment statistics for admin dashboard
-    public java.util.Map<String, Object> getPaymentStatistics() {
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+    // Get payment statistics for admin dashboard - Traditional DAO approach
+    public PaymentStatistics getPaymentStatistics() {
         String sql = "SELECT " +
                     "COUNT(*) as totalPayments, " +
                     "SUM(CASE WHEN PaymentStatus = 'success' THEN 1 ELSE 0 END) as completedPayments, " +
@@ -186,17 +185,19 @@ public class PaymentsDAO extends DBContext {
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    stats.put("totalPayments", rs.getInt("totalPayments"));
-                    stats.put("completedPayments", rs.getInt("completedPayments"));
-                    stats.put("pendingPayments", rs.getInt("pendingPayments"));
-                    stats.put("failedPayments", rs.getInt("failedPayments"));
-                    stats.put("totalRevenue", rs.getBigDecimal("totalRevenue"));
+                    PaymentStatistics stats = new PaymentStatistics();
+                    stats.setTotalPayments(rs.getInt("totalPayments"));
+                    stats.setCompletedPayments(rs.getInt("completedPayments"));
+                    stats.setPendingPayments(rs.getInt("pendingPayments"));
+                    stats.setFailedPayments(rs.getInt("failedPayments"));
+                    stats.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
+                    return stats;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return stats;
+        return new PaymentStatistics(); // Return empty stats if error
     }
     //duy anh
 }
