@@ -133,7 +133,7 @@
                         <li><a href="#">Onboarding</a></li>
                         <li><a href="#">Đơn hàng</a></li>
                         <li><a href="#">Báo cáo</a></li>
-                        <li><a href="company-info.html">Công ty</a></li>
+                        <li><a href="company-info.jsp">Công ty</a></li>
                     </ul>
                 </div>
                 <div class="nav-right">

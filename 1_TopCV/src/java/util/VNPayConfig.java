@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 public class VNPayConfig {
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:9999/TestPayment/payment-return";
+    public static String vnp_ReturnUrl = "http://localhost:9999/1_TopCV/payment-return";
     public static String vnp_TmnCode = "ENG3I3LH";
     public static String vnp_HashSecret = "QS3HAQHG3JCO5OXQ4LG2R42L1BPX62DZ";
 

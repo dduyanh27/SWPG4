@@ -1,13 +1,14 @@
 package model;
 
 public class GoogleAccount {
-    private int id;
+    // Google 的 user id 是一个很长的数字字符串，不能用 int 保存
+    private String id;
     private String email;
     private String name;
     private String picture;
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

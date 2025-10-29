@@ -86,7 +86,7 @@
             </div>
 
             <div class="social-login">
-                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/Test1/JobSeeker/jobseeker-login&response_type=code&client_id=230394299471-ku7egp89t4ns22tqj5uhdcvtrvlqqgji.apps.googleusercontent.com&prompt=consent" class="social-btn google-btn">
+                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/1_TopCV/JobSeeker/jobseeker-login&response_type=code&client_id=230394299471-ku7egp89t4ns22tqj5uhdcvtrvlqqgji.apps.googleusercontent.com&prompt=consent" class="social-btn google-btn">
                     <span class="social-icon google-icon"></span>
                     Google
                 </a>

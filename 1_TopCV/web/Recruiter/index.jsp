@@ -60,13 +60,13 @@
                             Đăng Tuyển Dụng <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="${pageContext.request.contextPath}/jobposting">Tạo tin tuyển dụng mới</a> 
+                            <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp">Tạo tin tuyển dụng mới</a> 
                             <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                              
                         </div>
                     </div>
                     <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/candidate-search'">Tìm Ứng Viên</button>
-                    <button class="btn btn-white">Mua</button>
+                    <button class="btn btn-white" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-package.jsp'">Mua</button>
                 </div>
                 <div class="nav-icons">
                     <i class="fas fa-star"></i>
@@ -100,7 +100,7 @@
                                     <i class="fas fa-cog"></i>
                                     <span>Quản lý tài khoản</span>
                                 </a>
-                                <a href="company-info.jsp" class="menu-item highlighted">
+                                <a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="menu-item highlighted">
                                     <i class="fas fa-building"></i>
                                     <span>Thông tin công ty</span>
                                 </a>

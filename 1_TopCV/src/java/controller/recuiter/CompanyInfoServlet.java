@@ -81,16 +81,58 @@ public class CompanyInfoServlet extends HttpServlet {
             String companyDescription = request.getParameter("companyDescription");
             String companyVideoURL = request.getParameter("companyVideoURL");
             String website = request.getParameter("website");
+            String taxCode = request.getParameter("taxCode");
             
             // Get removal flags
             String removedLogo = request.getParameter("removedLogo");
             String removedImages = request.getParameter("removedImages");
+            
+            // ========================================
+            // VALIDATION BEFORE PROCESSING
+            // ========================================
+            
+            // Validate phone number
+            if (phone != null && !phone.trim().isEmpty()) {
+                if (!isValidPhoneFormat(phone.trim())) {
+                    response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=phone_format_invalid");
+                    return;
+                }
+                
+                // Check if phone already exists for other recruiters
+                RecruiterDAO recruiterDAO = new RecruiterDAO();
+                if (recruiterDAO.isPhoneExistsForOtherRecruiter(phone.trim(), recruiter.getRecruiterID())) {
+                    response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=phone_exists");
+                    return;
+                }
+            }
+            
+            // Validate tax code
+            if (taxCode != null && !taxCode.trim().isEmpty()) {
+                if (!isValidTaxCodeFormat(taxCode.trim())) {
+                    response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=taxcode_format_invalid");
+                    return;
+                }
+            }
+            
+            // Validate uploaded files
+            String fileValidationError = validateUploadedFiles(request);
+            if (fileValidationError != null) {
+                response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=" + fileValidationError);
+                return;
+            }
+            
+            // ========================================
+            // FILE PROCESSING
+            // ========================================
             
             // Handle logo upload (single file)
             String logoPath = handleLogoUpload(request, recruiter.getRecruiterID());
             
             // Handle company images upload (multiple files)
             String companyImagesPath = handleCompanyImagesUpload(request, recruiter.getRecruiterID());
+            
+            // Handle registration certificate upload
+            String registrationCertPath = handleRegistrationCertUpload(request, recruiter.getRecruiterID());
             
             // Handle image removal
             handleImageRemoval(request, removedLogo, removedImages);
@@ -150,7 +192,7 @@ public class CompanyInfoServlet extends HttpServlet {
             // Update recruiter info
             RecruiterDAO recruiterDAO = new RecruiterDAO();
             
-            boolean success = recruiterDAO.updateCompanyInfo(
+            boolean success = recruiterDAO.updateCompanyInfoWithTaxAndCert(
                 recruiter.getRecruiterID(),
                 companyName,
                 phone,
@@ -162,7 +204,9 @@ public class CompanyInfoServlet extends HttpServlet {
                 companyVideoURL,
                 website,
                 finalLogoPath,
-                finalImagesPath
+                finalImagesPath,
+                taxCode,
+                registrationCertPath
             );
             
             if (success) {
@@ -369,5 +413,178 @@ public class CompanyInfoServlet extends HttpServlet {
         }
         
         return result.length() > 0 ? result.toString() : null;
+    }
+    
+    // ========================================
+    // VALIDATION METHODS
+    // ========================================
+    
+    /**
+     * Kiểm tra định dạng số điện thoại Việt Nam
+     * Phải có 10 số, bắt đầu bằng 03, 08, 09 và không có khoảng cách
+     */
+    private boolean isValidPhoneFormat(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        
+        // Loại bỏ tất cả khoảng trắng
+        String cleanPhone = phone.replaceAll("\\s+", "");
+        
+        // Kiểm tra định dạng: 10 số, bắt đầu bằng 03, 08, 09
+        return cleanPhone.matches("^(03|08|09)[0-9]{8}$");
+    }
+    
+    /**
+     * Kiểm tra định dạng mã số thuế
+     * Phải có 10 số, không có khoảng cách và chữ cái
+     */
+    private boolean isValidTaxCodeFormat(String taxCode) {
+        if (taxCode == null || taxCode.trim().isEmpty()) {
+            return false;
+        }
+        
+        // Loại bỏ tất cả khoảng trắng
+        String cleanTaxCode = taxCode.replaceAll("\\s+", "");
+        
+        // Kiểm tra định dạng: 10 số
+        return cleanTaxCode.matches("^[0-9]{10}$");
+    }
+    
+    /**
+     * Validate tất cả files được upload
+     */
+    private String validateUploadedFiles(HttpServletRequest request) throws ServletException, IOException {
+        // Validate logo file
+        Part logoPart = request.getPart("companyLogo");
+        if (logoPart != null && logoPart.getSize() > 0) {
+            String logoError = validateSingleFile(logoPart, "logo");
+            if (logoError != null) {
+                return logoError;
+            }
+        }
+        
+        // Validate company images
+        int imageCount = 0;
+        for (Part part : request.getParts()) {
+            if (part.getName().equals("companyImages") && part.getSize() > 0) {
+                imageCount++;
+                if (imageCount > 5) {
+                    return "max_images_exceeded";
+                }
+                String imageError = validateSingleFile(part, "image");
+                if (imageError != null) {
+                    return imageError;
+                }
+            }
+        }
+        
+        // Validate registration certificate
+        Part certPart = request.getPart("registrationCert");
+        if (certPart != null && certPart.getSize() > 0) {
+            String certError = validateSingleFile(certPart, "certificate");
+            if (certError != null) {
+                return certError;
+            }
+        }
+        
+        return null; // No errors
+    }
+    
+    /**
+     * Validate một file đơn lẻ
+     */
+    private String validateSingleFile(Part filePart, String fileType) {
+        if (filePart == null || filePart.getSize() == 0) {
+            return null;
+        }
+        
+        String contentType = filePart.getContentType();
+        long fileSize = filePart.getSize();
+        
+        switch (fileType) {
+            case "logo":
+                if (!isValidImageType(contentType)) {
+                    return "logo_invalid_type";
+                }
+                if (fileSize > 1024 * 1024) { // 1MB
+                    return "logo_too_large";
+                }
+                break;
+                
+            case "image":
+                if (!isValidImageType(contentType)) {
+                    return "image_invalid_type";
+                }
+                if (fileSize > 1024 * 1024) { // 1MB
+                    return "image_too_large";
+                }
+                break;
+                
+            case "certificate":
+                if (!isValidDocumentType(contentType)) {
+                    return "cert_invalid_type";
+                }
+                if (fileSize > 5 * 1024 * 1024) { // 5MB
+                    return "cert_too_large";
+                }
+                break;
+        }
+        
+        return null; // No errors
+    }
+    
+    /**
+     * Kiểm tra loại file hình ảnh hợp lệ
+     */
+    private boolean isValidImageType(String contentType) {
+        return "image/jpeg".equals(contentType) || 
+               "image/jpg".equals(contentType) || 
+               "image/png".equals(contentType) || 
+               "image/gif".equals(contentType);
+    }
+    
+    /**
+     * Kiểm tra loại file tài liệu hợp lệ
+     */
+    private boolean isValidDocumentType(String contentType) {
+        return "application/pdf".equals(contentType) || 
+               "image/jpeg".equals(contentType) || 
+               "image/jpg".equals(contentType) || 
+               "image/png".equals(contentType);
+    }
+    
+    /**
+     * Handle registration certificate upload
+     */
+    private String handleRegistrationCertUpload(HttpServletRequest request, int recruiterId) throws IOException, ServletException {
+        Part certPart = request.getPart("registrationCert");
+        
+        if (certPart != null && certPart.getSize() > 0) {
+            String fileName = getFileName(certPart);
+            if (fileName != null && !fileName.isEmpty()) {
+                // Create upload directory if not exists
+                String uploadDir = getServletContext().getRealPath("/uploads/certificates");
+                File uploadDirFile = new File(uploadDir);
+                if (!uploadDirFile.exists()) {
+                    uploadDirFile.mkdirs();
+                }
+                
+                // Generate unique filename
+                String fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                String uniqueFileName = "cert_" + recruiterId + "_" + System.currentTimeMillis() + fileExtension;
+                
+                // Save file
+                File file = new File(uploadDir, uniqueFileName);
+                try (InputStream input = certPart.getInputStream()) {
+                    Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                
+                String certPath = "/uploads/certificates/" + uniqueFileName;
+                return certPath;
+            }
+        }
+        
+        return null;
     }
 }
