@@ -947,7 +947,7 @@ body {
 
 /* Right Sidebar */
 .right-sidebar {
-    width: 350px;
+    width: 450px;
     background: rgba(255,255,255,0.95);
     border-radius: var(--border-radius-lg);
     padding: 1.5rem;
@@ -1104,7 +1104,7 @@ body {
 }
 
 .job-detail-sidebar {
-    width: 400px;
+    width: 450px;
     background: white;
     border-radius: 10px;
     padding: 1.5rem;

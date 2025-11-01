@@ -900,7 +900,7 @@
                     <span>Danh mục</span>
                 </div>
                 
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
@@ -1017,8 +1017,9 @@
         </c:if>
 
         <!-- Job Cards -->
-        <c:forEach var="app" items="${applications}">
-            <div class="job-card">
+        <div id="appliedJobsList">
+        <c:forEach var="app" items="${applications}" varStatus="loop">
+            <div class="job-card" data-index="${loop.index}">
                 <div class="job-title">${app.jobTitle}</div>
                 <div class="company">${app.companyName}</div>
                 
@@ -1088,6 +1089,13 @@
                 </div>
             </div>
         </c:forEach>
+        </div>
+        <!-- Pagination (JS) -->
+        <div id="pagination" style="display:flex; justify-content:center; gap:0.5rem; margin-top:1.5rem; align-items:center;">
+            <button id="prevPage" class="action-btn"><i class="fas fa-chevron-left"></i></button>
+            <span id="pageInfo" style="color:#fff; min-width:48px; text-align:center;"></span>
+            <button id="nextPage" class="action-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
     </div>
 
     <!-- ========== CANCEL MODAL ========== -->
@@ -1112,6 +1120,30 @@
     <!-- ========== JAVASCRIPT ========== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Simple JS Pagination for applied jobs ---
+            const jobsList = document.getElementById('appliedJobsList');
+            const cards = Array.from(jobsList.querySelectorAll('.job-card'));
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const JOBS_PER_PAGE = 10;
+            let currentPage = 1;
+            const totalPages = Math.max(1, Math.ceil(cards.length / JOBS_PER_PAGE));
+
+            function renderPage(page) {
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+                currentPage = page;
+                cards.forEach((card, idx) => {
+                    card.style.display = (idx >= (currentPage-1)*JOBS_PER_PAGE && idx < currentPage*JOBS_PER_PAGE) ? '' : 'none';
+                });
+                pageInfo.textContent = currentPage + ' / ' + totalPages;
+                prevBtn.disabled = (currentPage === 1);
+                nextBtn.disabled = (currentPage === totalPages);
+            }
+            prevBtn.addEventListener('click', () => renderPage(currentPage-1));
+            nextBtn.addEventListener('click', () => renderPage(currentPage+1));
+            renderPage(1);
             const menuToggle = document.getElementById('menuToggle');
             const megaMenu = document.getElementById('megaMenu');
             

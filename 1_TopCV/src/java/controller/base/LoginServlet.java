@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import util.LoginService;
 import util.LoginService.LoginResult;
-import util.SessionManager;
 
 /**
  * Servlet for handling user authentication
@@ -45,45 +44,51 @@ public class LoginServlet extends HttpServlet {
         LoginResult result = loginService.authenticateUser(email, password, loginType);
         
         if (result.isSuccess()) {
-            // Sử dụng SessionManager để tạo session isolated
-            try {
-                switch (result.getUserType()) {
-                    case "admin":
-                        model.AdminWithRole adminWithRole = (model.AdminWithRole) result.getUser();
-                        model.Admin admin = adminWithRole.getAdmin();
-                        model.Role role = adminWithRole.getRole();
-                        
-                        // Tạo session isolated với role
-                        SessionManager.createIsolatedSession(request, response, "admin", admin, role);
-                        
-                        // Redirect dựa trên role
-                        String roleName = (role != null) ? role.getName() : null;
-                        String redirectPath = getRedirectPathByRole(roleName);
-                        System.out.println("DEBUG: Admin role = " + roleName + ", redirect to = " + redirectPath);
-                        response.sendRedirect(request.getContextPath() + redirectPath);
-                        break;
-                        
-                    case "jobseeker":
-                        model.JobSeeker jobSeeker = (model.JobSeeker) result.getUser();
-                        SessionManager.createIsolatedSession(request, response, "jobseeker", jobSeeker);
-                        response.sendRedirect(request.getContextPath() + "/JobSeeker/index.jsp");
-                        break;
-                        
-                    case "recruiter":
-                        model.Recruiter recruiter = (model.Recruiter) result.getUser();
-                        SessionManager.createIsolatedSession(request, response, "recruiter", recruiter);
-                        response.sendRedirect(request.getContextPath() + "/Recruiter/index.jsp");
-                        break;
-                        
-                    default:
-                        request.setAttribute("error", "Unknown user type");
-                        forwardToLoginPage(request, response, loginType);
-                        break;
-                }
-            } catch (IOException e) {
-                System.err.println("Error creating isolated session: " + e.getMessage());
-                request.setAttribute("error", "Lỗi hệ thống khi tạo session. Vui lòng thử lại.");
-                forwardToLoginPage(request, response, loginType);
+            // Tạo session và lưu thông tin user
+            HttpSession session = request.getSession();
+            session.setAttribute("user", result.getUser());
+            session.setAttribute("userType", result.getUserType());
+            
+            // Lưu thông tin cụ thể theo loại user
+            switch (result.getUserType()) {
+                case "admin":
+                    model.AdminWithRole adminWithRole = (model.AdminWithRole) result.getUser();
+                    model.Admin admin = adminWithRole.getAdmin();
+                    model.Role role = adminWithRole.getRole();
+                    
+                    // Store admin object for JSPs that check sessionScope.admin
+                    session.setAttribute("admin", admin);
+                    session.setAttribute("adminRole", role);
+                    session.setAttribute("userID", admin.getAdminId());
+                    session.setAttribute("userName", admin.getFullName());
+                    
+                    // Redirect dựa trên role
+                    String roleName = (role != null) ? role.getName() : null;
+                    String redirectPath = getRedirectPathByRole(roleName);
+                    System.out.println("DEBUG: Admin role = " + roleName + ", redirect to = " + redirectPath);
+                    response.sendRedirect(request.getContextPath() + redirectPath);
+                    break;
+                    
+                case "jobseeker":
+                    model.JobSeeker jobSeeker = (model.JobSeeker) result.getUser();
+                    session.setAttribute("jobseeker", jobSeeker);
+                    session.setAttribute("userID", jobSeeker.getJobSeekerId());
+                    session.setAttribute("userName", jobSeeker.getFullName());
+                    response.sendRedirect(request.getContextPath() + "/JobSeeker/index.jsp");
+                    break;
+                    
+                case "recruiter":
+                    model.Recruiter recruiter = (model.Recruiter) result.getUser();
+                    session.setAttribute("recruiter", recruiter);
+                    session.setAttribute("userID", recruiter.getRecruiterID());
+                    session.setAttribute("userName", recruiter.getCompanyName());
+                    response.sendRedirect(request.getContextPath() + "/Recruiter/index.jsp");
+                    break;
+                    
+                default:
+                    request.setAttribute("error", "Unknown user type");
+                    forwardToLoginPage(request, response, loginType);
+                    break;
             }
         } else {
             // Đăng nhập thất bại

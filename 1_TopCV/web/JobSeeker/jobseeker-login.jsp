@@ -20,6 +20,19 @@
                 <h2>JobSeeker Login</h2>
                 <p>Sign in to your jobseeker account</p>
                 
+                <!-- Success Messages -->
+                <%
+                    String success = (String) session.getAttribute("success");
+                    if (success != null) {
+                        session.removeAttribute("success");
+                %>
+                <div style="background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    <i class="fas fa-check-circle"></i> <%= success %>
+                </div>
+                <%
+                    }
+                %>
+                
                 <!-- Error Messages -->
                 <%
                     String error = (String) request.getAttribute("error");
@@ -93,7 +106,7 @@
             </div>
 
             <div class="signup-link">
-                <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+                <p>Don't have an account? <a href="${pageContext.request.contextPath}/JobSeeker/signup.jsp">Sign up</a></p>
             </div>
 
             <div class="success-message" id="successMessage">

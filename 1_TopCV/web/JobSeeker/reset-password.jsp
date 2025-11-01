@@ -35,7 +35,7 @@
                     %>
                 </div>
 
-                <form id="resetForm" class="login-form" action="/Test_ResetPassword/resetPassword" method="POST">
+                <form id="resetForm" class="login-form" action="/1_TopCV/resetPassword" method="POST">
                     <input type="hidden" name="userType" value="jobseeker">
                     <input type="hidden" name="email" value="${email}">
                     
