@@ -17,7 +17,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import util.SessionManager;
 
 /**
  *
@@ -96,6 +95,24 @@ public class AuthenticationFilter implements Filter {
         if (debug) {
             log("AuthenticationFilter:DoAfterProcessing");
         }
+
+        // Write code here to process the request and/or response after
+        // the rest of the filter chain is invoked.
+        // For example, a logging filter might log the attributes on the
+        // request object after the request has been processed. 
+        /*
+	for (Enumeration en = request.getAttributeNames(); en.hasMoreElements(); ) {
+	    String name = (String)en.nextElement();
+	    Object value = request.getAttribute(name);
+	    log("attribute: " + name + "=" + value.toString());
+
+	}
+         */
+        // For example, a filter might append something to the response.
+        /*
+	PrintWriter respOut = new PrintWriter(response.getWriter());
+	respOut.println("<P><B>This has been appended by an intrusive filter.</B>");
+         */
     }
 
     /**
@@ -143,128 +160,45 @@ public class AuthenticationFilter implements Filter {
             return;
         }
         
-        // Check for session conflicts and invalid sessions first
-        if (SessionManager.checkAndClearSessionIfNeeded(httpRequest)) {
-            System.out.println("SESSION CLEARED in AuthenticationFilter - Redirecting to login");
-            httpResponse.sendRedirect(contextPath + "/JobSeeker/jobseeker-login.jsp");
-            return;
-        }
+        String userType = session != null ? (String) session.getAttribute("userType") : null;
         
-        // Check role-based access using SessionManager
-        if (!SessionManager.checkRoleConflict(httpRequest, httpResponse, requestPath)) {
-            return; // Already redirected to access-denied
-        }
-        
-        // Additional security checks for specific paths
-        String userType = SessionManager.getCurrentUserType(httpRequest);
-        
-        // Admin area access control - enhanced
+        // Admin area access control
         if (requestPath.startsWith("/Admin/") || "/Admin/admin-dashboard.jsp".equals(requestPath)) {
-            if (!"admin".equals(userType)) {
-                // Set detailed error message
-                HttpSession currentSession = httpRequest.getSession();
-                String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-                String roleDisplay = (currentRole != null) ? currentRole : "Unknown";
-                
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào khu vực Admin. " +
-                    "Vai trò hiện tại: " + roleDisplay + ". " +
-                    "Chỉ có Admin mới có thể truy cập khu vực này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
+            if ("admin".equals(userType)) {
+                proceed(chain, request, response);
+            } else {
+                httpResponse.sendRedirect(contextPath + "/Admin/admin-login.jsp");
             }
-            proceed(chain, request, response);
             return;
         }
         
         // Jobseeker area access control
         if (requestPath.startsWith("/JobSeeker/")) {
-            if (!"jobseeker".equals(userType)) {
-                HttpSession currentSession = httpRequest.getSession();
-                String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-                String roleDisplay = (currentRole != null) ? currentRole : "Unknown";
-                
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào khu vực JobSeeker. " +
-                    "Vai trò hiện tại: " + roleDisplay + ". " +
-                    "Chỉ có JobSeeker mới có thể truy cập khu vực này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
+            if ("jobseeker".equals(userType)) {
+                proceed(chain, request, response);
+            } else {
+                httpResponse.sendRedirect(contextPath + "/JobSeeker/jobseeker-login.jsp");
             }
-            proceed(chain, request, response);
             return;
         }
         
         // Recruiter area access control
         if (requestPath.startsWith("/Recruiter/")) {
-            if (!"recruiter".equals(userType)) {
-                HttpSession currentSession = httpRequest.getSession();
-                String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-                String roleDisplay = (currentRole != null) ? currentRole : "Unknown";
-                
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào khu vực Recruiter. " +
-                    "Vai trò hiện tại: " + roleDisplay + ". " +
-                    "Chỉ có Recruiter mới có thể truy cập khu vực này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
+            if ("recruiter".equals(userType)) {
+                proceed(chain, request, response);
+            } else {
+                httpResponse.sendRedirect(contextPath + "/Recruiter/recruiter-login.jsp");
             }
-            proceed(chain, request, response);
-            return;
-        }
-        
-        // Staff area access control (for Marketing Staff and Sales)
-        if (requestPath.startsWith("/Staff/")) {
-            if (!"admin".equals(userType)) {
-                HttpSession currentSession = httpRequest.getSession();
-                String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-                String roleDisplay = (currentRole != null) ? currentRole : "Unknown";
-                
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào khu vực Staff. " +
-                    "Vai trò hiện tại: " + roleDisplay + ". " +
-                    "Chỉ có Marketing Staff hoặc Sales mới có thể truy cập khu vực này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
-            }
-            
-            // Additional role check for Staff area
-            HttpSession currentSession = httpRequest.getSession();
-            String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-            if (currentRole == null || (!"Marketing Staff".equals(currentRole) && !"Sales".equals(currentRole))) {
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào khu vực Staff. " +
-                    "Vai trò hiện tại: " + (currentRole != null ? currentRole : "Unknown") + ". " +
-                    "Chỉ có Marketing Staff hoặc Sales mới có thể truy cập khu vực này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
-            }
-            
-            proceed(chain, request, response);
             return;
         }
         
         // CompanyInfoServlet access control (for recruiters only)
         if ("/CompanyInfoServlet".equals(requestPath)) {
-            if (!"recruiter".equals(userType)) {
-                HttpSession currentSession = httpRequest.getSession();
-                String currentRole = SessionManager.getCurrentRoleName(httpRequest);
-                String roleDisplay = (currentRole != null) ? currentRole : "Unknown";
-                
-                currentSession.setAttribute("accessDeniedMessage", 
-                    "Bạn không có quyền truy cập vào CompanyInfoServlet. " +
-                    "Vai trò hiện tại: " + roleDisplay + ". " +
-                    "Chỉ có Recruiter mới có thể truy cập chức năng này.");
-                
-                httpResponse.sendRedirect(contextPath + "/access-denied.jsp");
-                return;
+            if ("recruiter".equals(userType)) {
+                proceed(chain, request, response);
+            } else {
+                httpResponse.sendRedirect(contextPath + "/Recruiter/recruiter-login.jsp");
             }
-            proceed(chain, request, response);
             return;
         }
         

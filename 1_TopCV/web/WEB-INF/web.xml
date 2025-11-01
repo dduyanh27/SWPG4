@@ -1,34 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"> 
-    
-    <!-- Enhanced Authentication Filter -->
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
         <filter-class>filter.AuthenticationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>AuthenticationFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
-    <!-- Role-Based Access Control Filter -->
-    <filter>
-        <filter-name>RoleBasedAccessControlFilter</filter-name>
-        <filter-class>filter.RoleBasedAccessControlFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>RoleBasedAccessControlFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    
-    <!-- Legacy Role-Based Access Filter (for Admin area) -->
-    <filter>
-        <filter-name>RoleBasedAccessFilter</filter-name>
-        <filter-class>filter.RoleBasedAccessFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>RoleBasedAccessFilter</filter-name>
-        <url-pattern>/Admin/*</url-pattern>
+        <url-pattern>/LoginServlet</url-pattern>
     </filter-mapping>
     
     <!-- Base/Login -->
@@ -39,16 +17,6 @@
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
-    </servlet-mapping>
-    
-    <!-- Clear Session Servlet -->
-    <servlet>
-        <servlet-name>ClearSessionServlet</servlet-name>
-        <servlet-class>controller.base.ClearSessionServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ClearSessionServlet</servlet-name>
-        <url-pattern>/ClearSessionServlet</url-pattern>
     </servlet-mapping>
     
     <!-- Jobseeker -->
@@ -118,16 +86,6 @@
     <servlet-mapping>
         <servlet-name>UpdateAdminProfile</servlet-name>
         <url-pattern>/updateadminprofile</url-pattern>
-    </servlet-mapping>
-    
-    <!-- Staff Profile Update -->
-    <servlet>
-        <servlet-name>UpdateStaffProfile</servlet-name>
-        <servlet-class>controller.staff.UpdateStaffProfile</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>UpdateStaffProfile</servlet-name>
-        <url-pattern>/updatestaffprofile</url-pattern>
     </servlet-mapping>
     
     <!-- Recruiter (package 'recuiter' in sources) -->
@@ -221,5 +179,21 @@
         <servlet-name>CandidateSearchProfileServlet</servlet-name>
         <url-pattern>/candidate-profile</url-pattern>
     </servlet-mapping>
-    
+    <!-- Reset password -->
+    <servlet-mapping>
+        <servlet-name>RequestPasswordServlet</servlet-name>
+        <url-pattern>/requestPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <url-pattern>/resetPassword</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>RequestPasswordServlet</servlet-name>
+        <servlet-class>controller.base.RequestPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-class>controller.base.ResetPasswordServlet</servlet-class>
+    </servlet>
 </web-app>

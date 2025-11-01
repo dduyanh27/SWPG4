@@ -70,7 +70,7 @@
                 Didn’t receive the email? Check your spam folder or 
                 <a href="contact.html">contact support</a>
             </p>
-            <a href="/Test_ResetPassword/JobSeeker/jobseeker-login.jsp" class="back-link" id="backLink">← Back to Log in</a>
+            <a href="/1_TopCV/JobSeeker/jobseeker-login.jsp" class="back-link" id="backLink">← Back to Log in</a>
         </div>
 
         <script>

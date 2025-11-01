@@ -344,7 +344,7 @@
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
@@ -373,7 +373,7 @@
                 </div>
                 <div class="mega-col">
                     <h4>Việc của tôi</h4>
-                    <a href="#">Việc đã lưu</a>
+                    <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
                     <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                     <a href="#">Thông báo việc làm</a>
                     <a href="#">Việc dành cho bạn</a>

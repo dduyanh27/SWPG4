@@ -80,7 +80,19 @@
                 padding: 0.4rem 0.6rem;
                 border-radius: 999px;
                 font-size: 0.85rem;
+                cursor: pointer;
+                transition: background 0.2s, color 0.2s, border 0.2s;
             }
+            .chip.selected {
+                background: #3157d6;
+                color: #fff;
+                border: 1px solid #3157d6;
+            }
+            .chip:hover {
+                background: #e6ecff;
+                color: #1d3bb8;
+            }
+            
             .filter-dropdown {
                 position: absolute;
                 left: 12px;
@@ -175,6 +187,10 @@
             }
             .jobs-results {
                 margin-top: 0;
+                position: relative;
+            }
+            .jobs-right {
+                margin-top: 73px; /* đẩy cột phải xuống dưới thanh tab để thẳng hàng với bảng */
             }
             .result-card, .right-card {
                 background: #fff;
@@ -187,6 +203,7 @@
                 align-items: center;
                 gap: 0.5rem;
                 margin: 0;
+                /* trở lại luồng bình thường để không đẩy filter lên */
             }
             .toolbar .tabs {
                 display: flex;
@@ -329,7 +346,48 @@
             .results-grid {
                 display: grid;
                 gap: 0.5rem;
-                margin-top: -20px;
+                margin-top: 0;
+            }
+            /* Table list styles */
+            .jobs-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #fff;
+                border: 1px solid #f0f0f0;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+            .jobs-table thead th {
+                background: #f9fafb;
+                color: #374151;
+                text-align: left;
+                font-weight: 600;
+                padding: 0.75rem 0.75rem;
+                border-bottom: 1px solid #eef1f5;
+            }
+            .jobs-table tbody td {
+                padding: 0.75rem 0.75rem;
+                border-bottom: 1px solid #f3f4f6;
+                color: #111827;
+                vertical-align: top;
+            }
+            .jobs-table tbody tr:hover {
+                background: #fafbff;
+            }
+            .jobs-table .job-title {
+                font-size: 1rem;
+                margin: 0;
+                color: #111827;
+            }
+            .jobs-table .company {
+                color: #6b7280;
+                font-size: 0.9rem;
+                margin-top: 0.15rem;
+            }
+            .jobs-table .actions {
+                display: flex;
+                gap: 0.5rem;
+                justify-content: flex-end;
             }
             @media (max-width: 1100px) {
                 .jobs-container {
@@ -414,7 +472,7 @@
             .logo:hover .tagline {
                 color: rgba(255, 255, 255, 0.9);
             }
-            
+
         </style>
     </head>
     <body>
@@ -448,21 +506,21 @@
                         <i class="fas fa-bars"></i>
                         <span>Tất cả danh mục</span>
                     </div>
-                    <button class="recruiter-btn">Nhà tuyển dụng</button>
-                <div class="user-actions">
-                    <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
-                        <i class="fas fa-user"></i>
-                    </a>
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
+                    <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
+                    <div class="user-actions">
+                        <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <div class="notification-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="message-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
                     </div>
-                    <div class="message-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
-                </div>
                 </div>
             </div>
         </header>
@@ -564,8 +622,26 @@
         <div class="summary-wrapper">
             <div class="summary-box">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
-                    <div class="summary-count">${totalJobs} việc làm phù hợp</div>
+                    <div class="summary-count" id="jobCount">${totalJobs} việc làm phù hợp</div>
                     <i class="fas fa-angle-down summary-right"></i>
+                </div>
+                <!-- Keyword filter chips -->
+                <div class="chips" id="keywordChips">
+                    <span class="chip" data-keyword="Kinh Doanh">Kinh Doanh</span>
+                    <span class="chip" data-keyword="AutoCAD">AutoCAD</span>
+                    <span class="chip" data-keyword="Tiếng Anh">Tiếng Anh</span>
+                    <span class="chip" data-keyword="Giao Tiếp">Giao Tiếp</span>
+                    <span class="chip" data-keyword="Communication Skills">Communication Skills</span>
+                    <span class="chip" data-keyword="Tài Chính">Tài Chính</span>
+                    <span class="chip" data-keyword="Kế Toán">Kế Toán</span>
+                    <span class="chip" data-keyword="Chăm Sóc Khách Hàng">Chăm Sóc Khách Hàng</span>
+                    <span class="chip" data-keyword="Business Development">Business Development</span>
+                    <span class="chip" data-keyword="Sales">Sales</span>
+                    <span class="chip" data-keyword="Project Management">Project Management</span>
+                    <span class="chip" data-keyword="Quản Lý Dự Án">Quản Lý Dự Án</span>
+                    <span class="chip" data-keyword="Communication">Communication</span>
+                    <span class="chip" data-keyword="Data Analysis">Data Analysis</span>
+                    <span class="chip" data-keyword="Cơ Khí">Cơ Khí</span>
                 </div>
             </div>
 
@@ -583,315 +659,481 @@
                     </div>
 
                     <div class="results-grid">
-                        <c:forEach var="job" items="${jobList}">
-                            <div class="result-card">
-                                <!-- Tạm thời logo-square hiển thị JobID -->
-                                <div class="logo-square">${job.jobID}</div>
-                                <div>
-                                    <h3 class="job-title">${job.jobTitle}</h3>
-                                    <div class="company">${job.companyName}</div>
-                                    <div class="meta">
-                                        <span class="salary">${job.salaryRange}</span>
-                                        <span class="location">${job.locationName}</span>
-                                        <span class="posted">
-                                            <c:choose>
-                                                <c:when test="${job.postingDate != null}">
-                                                    ${job.postingDate}
-                                                </c:when>
-                                                <c:otherwise>Chưa có</c:otherwise>
-                                            </c:choose>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="actions">
-                                    <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="btn-primary">Xem chi tiết</a>
-                                    <button class="btn-outline save-job-btn" data-job-id="${job.jobID}" title="Lưu công việc">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </c:forEach>
+                        <table class="jobs-table">
+                            <thead>
+                                <tr>
+                                    <th>Công việc</th>
+                                    <th>Công ty</th>
+                                    <th>Địa điểm</th>
+                                    <th>Lương</th>
+                                    <th>Ngày đăng</th>
+                                    <th style="text-align:right;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsTableBody">
+                                <c:forEach var="job" items="${jobList}" varStatus="loop">
+                                    <tr class="job-row" data-index="${loop.index}">
+                                        <td>
+                                            <h3 class="job-title">${job.jobTitle}</h3>
+                                        </td>
+                                        <td>
+                                            <div class="company">${job.companyName}</div>
+                                        </td>
+                                        <td>
+                                            <span class="location">${job.locationName}</span>
+                                        </td>
+                                        <td>
+                                            <span class="salary">${job.salaryRange}</span>
+                                        </td>
+                                        <td>
+                                            <span class="posted">
+                                                <c:choose>
+                                                    <c:when test="${job.postingDate != null}">
+                                                        ${job.postingDate}
+                                                    </c:when>
+                                                    <c:otherwise>Chưa có</c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="actions">
+                                                <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="btn-primary">Xem chi tiết</a>
+                                                <button class="btn-outline save-job-btn" data-job-id="${job.jobID}" title="Lưu công việc">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <!-- Pagination-->
-                    <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:1rem;">
-                        <button class="btn-outline" disabled><i class="fas fa-chevron-left"></i></button>
-                        <span style="display:flex; align-items:center; color:#666;">1/50</span>
-                        <button class="btn-outline"><i class="fas fa-chevron-right"></i></button>
+                    <!-- Pagination (JS) -->
+                    <div id="pagination" style="display:flex; justify-content:center; gap:0.5rem; margin-top:1rem; align-items:center;">
+                        <button id="prevPage" class="btn-outline"><i class="fas fa-chevron-left"></i></button>
+                        <span id="pageInfo" style="color:#666; min-width:48px; text-align:center;"></span>
+                        <button id="nextPage" class="btn-outline"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </main>
+                <aside class="jobs-right">
+                    <div class="right-card">
+                        <div class="right-list">
+                            <div class="right-job">
+                                <div class="logo-square">HEI</div>
+                                <div>
+                                    <h4>Trade Marketing</h4>
+                                    <div class="company">HEINEKEN Vietnam</div>
+                                    <div class="meta">
+                                        <span class="pill">Thương lượng</span>
+                                        <span class="pill">Hà Nội</span>
+                                    </div>
+                                </div>
+                                <a href="job-detail.html" class="btn-mini">Xem</a>
+                            </div>
+                            <div class="right-job">
+                                <div class="logo-square">CHL</div>
+                                <div>
+                                    <h4>Chuyên Viên Thực Tập</h4>
+                                    <div class="company">Chuỗi Thực Phẩm</div>
+                                    <div class="meta">
+                                        <span class="pill">Thương lượng</span>
+                                        <span class="pill">Hà Nội</span>
+                                    </div>
+                                </div>
+                                <a href="job-detail.html" class="btn-mini">Xem</a>
+                            </div>
+                            <div class="right-job">
+                                <div class="logo-square">AFC</div>
+                                <div>
+                                    <h4>Purchasing Officer</h4>
+                                    <div class="company">AFChem</div>
+                                    <div class="meta">
+                                        <span class="pill">10-20tr</span>
+                                        <span class="pill">Hà Nội</span>
+                                    </div>
+                                </div>
+                                <a href="job-detail.html" class="btn-mini">Xem</a>
+                            </div>
+                            <div class="right-job">
+                                <div class="logo-square">CAP</div>
+                                <div>
+                                    <h4>Kiến Trúc Sư</h4>
+                                    <div class="company">Capital House</div>
+                                    <div class="meta">
+                                        <span class="pill">Thương lượng</span>
+                                        <span class="pill">Hà Nội</span>
+                                    </div>
+                                </div>
+                                <a href="job-detail.html" class="btn-mini">Xem</a>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
             </div>
+
         </div>
-            <script src="${pageContext.request.contextPath}/JobSeeker/script.js"></script>
-<script>
-// Lấy DOM
-const industryFilter = document.getElementById("industryFilter");
-const locationFilter = document.getElementById("locationFilter");
-const industryDropdown = document.getElementById("industryDropdown");
-const locationDropdown = document.getElementById("locationDropdown");
-const jobsGrid = document.querySelector('.results-grid');
-const resetFilterBtn = document.getElementById("resetFilter");
+        <script src="${pageContext.request.contextPath}/JobSeeker/script.js"></script>
+        <script>
+        // --- Keyword filter ---
+        document.addEventListener('DOMContentLoaded', function () {
+            const chips = document.querySelectorAll('#keywordChips .chip');
+            const jobRows = document.querySelectorAll('tr.job-row');
+            const jobCount = document.getElementById('jobCount');
+            let selectedKeywords = [];
 
-// Thêm data-index cho mỗi job-card để reset thứ tự gốc
-Array.from(jobsGrid.children).forEach((card, idx) => card.dataset.index = idx);
+            chips.forEach(chip => {
+                chip.addEventListener('click', function () {
+                    const keyword = chip.getAttribute('data-keyword');
+                    chip.classList.toggle('selected');
+                    // Cập nhật danh sách keyword đã chọn
+                    selectedKeywords = Array.from(chips)
+                        .filter(c => c.classList.contains('selected'))
+                        .map(c => c.getAttribute('data-keyword'));
+                    filterJobsByKeywords();
+                });
+            });
 
-// --- Dropdown ---
-industryFilter.addEventListener("click", function(e) {
-    e.stopPropagation();
-    industryDropdown.classList.toggle("active");
-    locationDropdown.classList.remove("active");
-});
-
-locationFilter.addEventListener("click", function(e) {
-    e.stopPropagation();
-    locationDropdown.classList.toggle("active");
-    industryDropdown.classList.remove("active");
-});
-
-industryDropdown.addEventListener("click", e => e.stopPropagation());
-locationDropdown.addEventListener("click", e => e.stopPropagation());
-
-document.addEventListener("click", () => {
-    industryDropdown.classList.remove("active");
-    locationDropdown.classList.remove("active");
-});
-
-// --- Reset Filter ---
-resetFilterBtn.addEventListener("click", () => {
-    const form = resetFilterBtn.closest("form");
-    form.querySelectorAll("input[type=checkbox], input[type=radio]").forEach(el => el.checked = false);
-    form.submit();
-});
-
-// --- Sorting Tabs ---
-const sortAllBtn = document.getElementById('sortAll');
-const sortSalaryBtn = document.getElementById('sortSalary');
-const sortDateBtn = document.getElementById('sortDate');
-
-// Hàm để set active tab
-function setActiveTab(activeBtn) {
-    [sortAllBtn, sortSalaryBtn, sortDateBtn].forEach(btn => btn.classList.remove('active'));
-    activeBtn.classList.add('active');
-}
-
-// Hàm lấy job-cards hiện tại
-function getJobCards() {
-    return Array.from(jobsGrid.children);
-}
-
-// Hàm parse date từ string format YYYY-MM-DD
-function parseDate(dateString) {
-    // Nếu dateString là "Chưa có" hoặc empty, return date rất cũ để đẩy xuống cuối
-    if (!dateString || dateString.trim() === "Chưa có" || dateString.trim() === "" || dateString.trim() === "null") {
-        return new Date(0); // 1/1/1970
-    }
-    
-    const trimmed = dateString.trim();
-    console.log('Parsing date string:', `"${trimmed}"`);
-    
-    // Parse format YYYY-MM-DD (ISO format)
-    let date = new Date(trimmed + 'T00:00:00'); // Thêm time để đảm bảo parse đúng timezone
-    
-    // Kiểm tra xem date có hợp lệ không
-    if (isNaN(date.getTime())) {
-        console.warn('Could not parse date:', dateString);
-        return new Date(0); // Return date cũ để đẩy xuống cuối
-    }
-    
-    console.log('Parsed date result:', date);
-    return date;
-}
-
-sortAllBtn.addEventListener('click', () => {
-    console.log('Sorting by: All (original order)');
-    setActiveTab(sortAllBtn);
-    
-    getJobCards()
-        .sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index))
-        .forEach(card => jobsGrid.appendChild(card));
-});
-
-sortSalaryBtn.addEventListener('click', () => {
-    console.log('Sorting by: Salary');
-    setActiveTab(sortSalaryBtn);
-    
-    getJobCards()
-        .sort((a, b) => {
-            const salaryElementA = a.querySelector('.salary');
-            const salaryElementB = b.querySelector('.salary');
-            
-            if (!salaryElementA || !salaryElementB) return 0;
-            
-            const salA = parseInt(salaryElementA.textContent.replace(/\D/g,'') || '0');
-            const salB = parseInt(salaryElementB.textContent.replace(/\D/g,'') || '0');
-            
-            return salB - salA; // Cao xuống thấp
-        })
-        .forEach(card => jobsGrid.appendChild(card));
-});
-
-sortDateBtn.addEventListener('click', () => {
-    console.log('Sorting by: Date');
-    setActiveTab(sortDateBtn);
-    
-    getJobCards()
-        .sort((a, b) => {
-            const dateElementA = a.querySelector('.posted');
-            const dateElementB = b.querySelector('.posted');
-            
-            if (!dateElementA || !dateElementB) {
-                console.warn('Date element not found');
-                return 0;
+            function filterJobsByKeywords() {
+                let visibleCount = 0;
+                jobRows.forEach(row => {
+                    // Lấy text để search
+                    const text = (
+                        row.querySelector('.job-title')?.textContent + ' ' +
+                        row.querySelector('.company')?.textContent + ' ' +
+                        row.querySelector('.location')?.textContent + ' ' +
+                        row.querySelector('.salary')?.textContent
+                    ).toLowerCase();
+                    // Nếu không chọn keyword nào thì hiện tất cả
+                    if (selectedKeywords.length === 0 || selectedKeywords.some(kw => text.includes(kw.toLowerCase()))) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                jobCount.textContent = visibleCount + ' việc làm phù hợp';
             }
-            
-            const dateTextA = dateElementA.textContent;
-            const dateTextB = dateElementB.textContent;
-            const dateA = parseDate(dateTextA);
-            const dateB = parseDate(dateTextB);
-            
-            console.log('Comparing dates:', dateTextA, 'vs', dateTextB);
-            console.log('Parsed dates:', dateA, 'vs', dateB);
-            
-            // So sánh ngày
-            const timeDiff = dateB.getTime() - dateA.getTime();
-            
-            // Nếu ngày giống nhau, sắp xếp theo index gốc để đảm bảo thứ tự ổn định
-            if (timeDiff === 0) {
-                return parseInt(a.dataset.index) - parseInt(b.dataset.index);
+        });
+        // --- Simple JS Pagination ---
+            document.addEventListener('DOMContentLoaded', function () {
+                const jobsGrid = document.getElementById('jobsTableBody');
+                const rows = Array.from(jobsGrid.querySelectorAll('tr.job-row'));
+                const pageInfo = document.getElementById('pageInfo');
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                const JOBS_PER_PAGE = 10; // Số job mỗi trang
+                let currentPage = 1;
+                const totalPages = Math.max(1, Math.ceil(rows.length / JOBS_PER_PAGE));
+
+                function renderPage(page) {
+                    // Giới hạn trang
+                    if (page < 1)
+                        page = 1;
+                    if (page > totalPages)
+                        page = totalPages;
+                    currentPage = page;
+                    // Ẩn/hiện các dòng job
+                    rows.forEach((row, idx) => {
+                        row.style.display = (idx >= (currentPage - 1) * JOBS_PER_PAGE && idx < currentPage * JOBS_PER_PAGE) ? '' : 'none';
+                    });
+                    // Cập nhật số trang
+                    pageInfo.textContent = currentPage + ' / ' + totalPages;
+                    // Disable nút nếu ở đầu/cuối
+                    prevBtn.disabled = (currentPage === 1);
+                    nextBtn.disabled = (currentPage === totalPages);
+                }
+                // Sự kiện nút
+                prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+                nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+                // Khởi tạo
+                renderPage(1);
+            });
+        // Lấy DOM
+            const industryFilter = document.getElementById("industryFilter");
+            const locationFilter = document.getElementById("locationFilter");
+            const industryDropdown = document.getElementById("industryDropdown");
+            const locationDropdown = document.getElementById("locationDropdown");
+            const jobsGrid = document.querySelector('#jobsTableBody');
+            const resetFilterBtn = document.getElementById("resetFilter");
+
+        // Thêm data-index cho mỗi hàng (nếu chưa có) để reset thứ tự gốc
+            Array.from(jobsGrid.querySelectorAll('tr.job-row')).forEach((row, idx) => {
+                if (!row.dataset.index)
+                    row.dataset.index = idx;
+            });
+
+        // --- Dropdown ---
+            industryFilter.addEventListener("click", function (e) {
+                e.stopPropagation();
+                industryDropdown.classList.toggle("active");
+                locationDropdown.classList.remove("active");
+            });
+
+            locationFilter.addEventListener("click", function (e) {
+                e.stopPropagation();
+                locationDropdown.classList.toggle("active");
+                industryDropdown.classList.remove("active");
+            });
+
+            industryDropdown.addEventListener("click", e => e.stopPropagation());
+            locationDropdown.addEventListener("click", e => e.stopPropagation());
+
+            document.addEventListener("click", () => {
+                industryDropdown.classList.remove("active");
+                locationDropdown.classList.remove("active");
+            });
+
+        // --- Reset Filter ---
+            resetFilterBtn.addEventListener("click", () => {
+                const form = resetFilterBtn.closest("form");
+                form.querySelectorAll("input[type=checkbox], input[type=radio]").forEach(el => el.checked = false);
+                form.submit();
+            });
+
+        // --- Sorting Tabs ---
+            const sortAllBtn = document.getElementById('sortAll');
+            const sortSalaryBtn = document.getElementById('sortSalary');
+            const sortDateBtn = document.getElementById('sortDate');
+
+        // Hàm để set active tab
+            function setActiveTab(activeBtn) {
+                [sortAllBtn, sortSalaryBtn, sortDateBtn].forEach(btn => btn.classList.remove('active'));
+                activeBtn.classList.add('active');
             }
-            
-            return timeDiff; // Mới nhất trước (số dương nếu B mới hơn A)
-        })
-        .forEach(card => jobsGrid.appendChild(card));
-});
 
-// Set tab "Tất cả" làm active mặc định
-setActiveTab(sortAllBtn);
-
-// --- Save Job Functionality ---
-document.querySelectorAll('.save-job-btn').forEach(btn => {
-    const jobId = btn.getAttribute('data-job-id');
-    
-    // Check if job is already saved
-    checkIfSaved(jobId, btn);
-    
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        toggleSaveJob(jobId, btn);
-    });
-});
-
-function checkIfSaved(jobId, btn) {
-    fetch('${pageContext.request.contextPath}/saved-jobs', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=check&jobId=' + jobId
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.isSaved) {
-            btn.classList.add('saved');
-            btn.querySelector('i').classList.remove('far');
-            btn.querySelector('i').classList.add('fas');
-            btn.title = 'Bỏ lưu công việc';
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function toggleSaveJob(jobId, btn) {
-    const isSaved = btn.classList.contains('saved');
-    const action = isSaved ? 'unsave' : 'save';
-    
-    fetch('${pageContext.request.contextPath}/saved-jobs', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=' + action + '&jobId=' + jobId
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (action === 'save') {
-                btn.classList.add('saved');
-                btn.querySelector('i').classList.remove('far');
-                btn.querySelector('i').classList.add('fas');
-                btn.title = 'Bỏ lưu công việc';
-            } else {
-                btn.classList.remove('saved');
-                btn.querySelector('i').classList.remove('fas');
-                btn.querySelector('i').classList.add('far');
-                btn.title = 'Lưu công việc';
+        // Hàm lấy job-cards hiện tại
+            function getJobCards() {
+                return Array.from(jobsGrid.querySelectorAll('tr.job-row'));
             }
-            
-            // Optional: show a subtle notification
-            const notification = document.createElement('div');
-            notification.textContent = data.message;
-            notification.style.cssText = 'position:fixed;top:80px;right:20px;background:#10b981;color:#fff;padding:12px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;animation:slideIn 0.3s ease;';
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
-        } else {
-            alert(data.message || 'Có lỗi xảy ra');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra khi lưu công việc');
-    });
-}
-</script>
-<style>
-@keyframes slideIn {
-    from { transform: translateX(400px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-@keyframes slideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(400px); opacity: 0; }
-}
-</style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggle = document.getElementById('menuToggle');
-    const panel = document.getElementById('megaMenu');
-    
-    console.log('Toggle element:', toggle);
-    console.log('Panel element:', panel);
-    
-    if(!toggle || !panel) {
-        console.error('Menu elements not found!');
-        return;
-    }
-    
-    function closeOnOutside(e){
-        if(!panel.contains(e.target) && !toggle.contains(e.target)){
-            panel.classList.remove('open');
-            document.removeEventListener('click', closeOnOutside);
-        }
-    }
-    
-    toggle.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Menu toggle clicked!');
-        panel.classList.toggle('open');
-        console.log('Panel classes:', panel.className);
-        if(panel.classList.contains('open')){
-            document.addEventListener('click', closeOnOutside);
-        }
-    });
-});
-</script>
+
+        // Hàm parse date từ string format YYYY-MM-DD
+            function parseDate(dateString) {
+                // Nếu dateString là "Chưa có" hoặc empty, return date rất cũ để đẩy xuống cuối
+                if (!dateString || dateString.trim() === "Chưa có" || dateString.trim() === "" || dateString.trim() === "null") {
+                    return new Date(0); // 1/1/1970
+                }
+
+                const trimmed = dateString.trim();
+                console.log('Parsing date string:', `"${trimmed}"`);
+
+                // Parse format YYYY-MM-DD (ISO format)
+                let date = new Date(trimmed + 'T00:00:00'); // Thêm time để đảm bảo parse đúng timezone
+
+                // Kiểm tra xem date có hợp lệ không
+                if (isNaN(date.getTime())) {
+                    console.warn('Could not parse date:', dateString);
+                    return new Date(0); // Return date cũ để đẩy xuống cuối
+                }
+
+                console.log('Parsed date result:', date);
+                return date;
+            }
+
+            sortAllBtn.addEventListener('click', () => {
+                console.log('Sorting by: All (original order)');
+                setActiveTab(sortAllBtn);
+
+                getJobCards()
+                        .sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index))
+                        .forEach(card => jobsGrid.appendChild(card));
+            });
+
+            sortSalaryBtn.addEventListener('click', () => {
+                console.log('Sorting by: Salary');
+                setActiveTab(sortSalaryBtn);
+
+                getJobCards()
+                        .sort((a, b) => {
+                            const salaryElementA = a.querySelector('.salary');
+                            const salaryElementB = b.querySelector('.salary');
+
+                            if (!salaryElementA || !salaryElementB)
+                                return 0;
+
+                            const salA = parseInt(salaryElementA.textContent.replace(/\D/g, '') || '0');
+                            const salB = parseInt(salaryElementB.textContent.replace(/\D/g, '') || '0');
+
+                            return salB - salA; // Cao xuống thấp
+                        })
+                        .forEach(card => jobsGrid.appendChild(card));
+            });
+
+            sortDateBtn.addEventListener('click', () => {
+                console.log('Sorting by: Date');
+                setActiveTab(sortDateBtn);
+
+                getJobCards()
+                        .sort((a, b) => {
+                            const dateElementA = a.querySelector('.posted');
+                            const dateElementB = b.querySelector('.posted');
+
+                            if (!dateElementA || !dateElementB) {
+                                console.warn('Date element not found');
+                                return 0;
+                            }
+
+                            const dateTextA = dateElementA.textContent;
+                            const dateTextB = dateElementB.textContent;
+                            const dateA = parseDate(dateTextA);
+                            const dateB = parseDate(dateTextB);
+
+                            console.log('Comparing dates:', dateTextA, 'vs', dateTextB);
+                            console.log('Parsed dates:', dateA, 'vs', dateB);
+
+                            // So sánh ngày
+                            const timeDiff = dateB.getTime() - dateA.getTime();
+
+                            // Nếu ngày giống nhau, sắp xếp theo index gốc để đảm bảo thứ tự ổn định
+                            if (timeDiff === 0) {
+                                return parseInt(a.dataset.index) - parseInt(b.dataset.index);
+                            }
+
+                            return timeDiff; // Mới nhất trước (số dương nếu B mới hơn A)
+                        })
+                        .forEach(card => jobsGrid.appendChild(card));
+            });
+
+        // Set tab "Tất cả" làm active mặc định
+            setActiveTab(sortAllBtn);
+
+        // --- Save Job Functionality ---
+            document.querySelectorAll('.save-job-btn').forEach(btn => {
+                const jobId = btn.getAttribute('data-job-id');
+
+                // Check if job is already saved
+                checkIfSaved(jobId, btn);
+
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    toggleSaveJob(jobId, btn);
+                });
+            });
+
+            function checkIfSaved(jobId, btn) {
+                fetch('${pageContext.request.contextPath}/saved-jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=check&jobId=' + jobId
+                })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.isSaved) {
+                                btn.classList.add('saved');
+                                btn.querySelector('i').classList.remove('far');
+                                btn.querySelector('i').classList.add('fas');
+                                btn.title = 'Bỏ lưu công việc';
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+            }
+
+            function toggleSaveJob(jobId, btn) {
+                const isSaved = btn.classList.contains('saved');
+                const action = isSaved ? 'unsave' : 'save';
+
+                fetch('${pageContext.request.contextPath}/saved-jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=' + action + '&jobId=' + jobId
+                })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (action === 'save') {
+                                    btn.classList.add('saved');
+                                    btn.querySelector('i').classList.remove('far');
+                                    btn.querySelector('i').classList.add('fas');
+                                    btn.title = 'Bỏ lưu công việc';
+                                } else {
+                                    btn.classList.remove('saved');
+                                    btn.querySelector('i').classList.remove('fas');
+                                    btn.querySelector('i').classList.add('far');
+                                    btn.title = 'Lưu công việc';
+                                }
+
+                                // Optional: show a subtle notification
+                                const notification = document.createElement('div');
+                                notification.textContent = data.message;
+                                notification.style.cssText = 'position:fixed;top:80px;right:20px;background:#10b981;color:#fff;padding:12px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;animation:slideIn 0.3s ease;';
+                                document.body.appendChild(notification);
+
+                                setTimeout(() => {
+                                    notification.style.animation = 'slideOut 0.3s ease';
+                                    setTimeout(() => notification.remove(), 300);
+                                }, 2000);
+                            } else {
+                                alert(data.message || 'Có lỗi xảy ra');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra khi lưu công việc');
+                        });
+            }
+        </script>
+        <style>
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const toggle = document.getElementById('menuToggle');
+                const panel = document.getElementById('megaMenu');
+
+                console.log('Toggle element:', toggle);
+                console.log('Panel element:', panel);
+
+                if (!toggle || !panel) {
+                    console.error('Menu elements not found!');
+                    return;
+                }
+
+                function closeOnOutside(e) {
+                    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+                        panel.classList.remove('open');
+                        document.removeEventListener('click', closeOnOutside);
+                    }
+                }
+
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Menu toggle clicked!');
+                    panel.classList.toggle('open');
+                    console.log('Panel classes:', panel.className);
+                    if (panel.classList.contains('open')) {
+                        document.addEventListener('click', closeOnOutside);
+                    }
+                });
+            });
+        </script>
 
 
-            <!-- Reuses the same topbar markup as other pages like profile-overview.html and job-detail.html -->
+        <!-- Reuses the same topbar markup as other pages like profile-overview.html and job-detail.html -->
     </body>
 </html>
 
