@@ -1,5 +1,29 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page import="model.Role"%>
+<%
+    // Xác định dashboard URL dựa trên role
+    String dashboardUrl = "";
+    String roleName = "";
+    
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj != null) {
+        Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+        if (adminRole != null) {
+            roleName = adminRole.getName();
+            if ("Admin".equals(roleName)) {
+                dashboardUrl = request.getContextPath() + "/Admin/admin-dashboard.jsp";
+            } else if ("Marketing Staff".equals(roleName)) {
+                dashboardUrl = request.getContextPath() + "/Staff/marketinghome.jsp";
+            } else if ("Sales".equals(roleName)) {
+                dashboardUrl = request.getContextPath() + "/Staff/salehome.jsp";
+            }
+        }
+    }
+    
+    request.setAttribute("dashboardUrl", dashboardUrl);
+    request.setAttribute("roleName", roleName);
+%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -192,30 +216,38 @@
         
         <div class="action-buttons">
             <c:choose>
-                <c:when test="${not empty sessionScope.admin}">
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.adminRole && (sessionScope.adminRole.name == 'Marketing Staff' || sessionScope.adminRole.name == 'Sales')}">
-                            <a href="${pageContext.request.contextPath}/Staff/marketinghome.jsp" class="btn btn-primary">
+                <c:when test="${not empty dashboardUrl}">
+                    <!-- Có role và có dashboard URL -->
+                    <a href="${dashboardUrl}" class="btn btn-primary">
+                        <c:choose>
+                            <c:when test="${roleName == 'Admin'}">
+                                🏠 Về Dashboard Admin
+                            </c:when>
+                            <c:when test="${roleName == 'Marketing Staff'}">
+                                📊 Về Dashboard Marketing
+                            </c:when>
+                            <c:when test="${roleName == 'Sales'}">
+                                💼 Về Dashboard Sales
+                            </c:when>
+                            <c:otherwise>
                                 📊 Về Dashboard
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <a href="${pageContext.request.contextPath}/Admin/admin-dashboard.jsp" class="btn btn-primary">
-                                🏠 Về Trang chủ
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </a>
                 </c:when>
                 <c:otherwise>
+                    <!-- Không có role hoặc không có session -->
                     <a href="${pageContext.request.contextPath}/Admin/admin-login.jsp" class="btn btn-primary">
                         🔐 Đăng nhập
                     </a>
                 </c:otherwise>
             </c:choose>
             
-            <a href="${pageContext.request.contextPath}/ClearSessionServlet" class="btn btn-primary">
-                🔄 Đăng nhập lại
-            </a>
+            <c:if test="${not empty dashboardUrl}">
+                <a href="${pageContext.request.contextPath}/ClearSessionServlet" class="btn btn-secondary">
+                    🔄 Đăng nhập lại
+                </a>
+            </c:if>
             
             <a href="${pageContext.request.contextPath}/index.html" class="btn btn-secondary">
                 🏠 Về trang chủ

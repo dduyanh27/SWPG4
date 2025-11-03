@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO, dal.ApplicationDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Application, model.Recruiter, model.JobSeeker" %>
+<%@ page import="dal.AdminDAO, dal.ApplicationDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Application, model.Recruiter, model.JobSeeker, model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="java.util.List" %>
@@ -8,6 +8,26 @@
 <%@ page import="model.AdminJobDetail" %>
 
 <%
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
     // Only load data if not already loaded by controller
     if (request.getAttribute("jobList") == null) {
         AdminJobDAO ajd = new AdminJobDAO();

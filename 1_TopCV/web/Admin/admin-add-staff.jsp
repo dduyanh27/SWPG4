@@ -4,6 +4,26 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
     AdminDAO adminDAO = new AdminDAO();
     List<Role> roleList = adminDAO.getAllRoles();
     request.setAttribute("roleList", roleList);
