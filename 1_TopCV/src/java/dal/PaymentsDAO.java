@@ -148,9 +148,17 @@ public class PaymentsDAO extends DBContext {
                     "LEFT JOIN Recruiter r ON p.RecruiterID = r.RecruiterID " +
                     "ORDER BY p.PaymentDate DESC";
         
+        System.out.println("=== DEBUG: getAllPaymentsWithRecruiterInfo() ===");
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Connection status: " + (c != null ? "Connected" : "NULL"));
+        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
                 while (rs.next()) {
+                    count++;
+                    System.out.println("Processing payment #" + count);
+                    
                     PaymentWithRecruiterInfo payment = new PaymentWithRecruiterInfo();
                     payment.setPaymentID(rs.getInt("PaymentID"));
                     payment.setRecruiterID(rs.getInt("RecruiterID"));
@@ -164,9 +172,13 @@ public class PaymentsDAO extends DBContext {
                     payment.setRecruiterEmail(rs.getString("Email"));
                     payment.setContactPerson(rs.getString("ContactPerson"));
                     paymentList.add(payment);
+                    
+                    System.out.println("Added payment: " + payment.getPaymentID() + " - " + payment.getCompanyName());
                 }
+                System.out.println("Total payments loaded: " + count);
             }
         } catch (SQLException e) {
+            System.out.println("SQL Error in getAllPaymentsWithRecruiterInfo: " + e.getMessage());
             e.printStackTrace();
         }
         return paymentList;
@@ -182,6 +194,10 @@ public class PaymentsDAO extends DBContext {
                     "SUM(CASE WHEN PaymentStatus = 'success' THEN Amount ELSE 0 END) as totalRevenue " +
                     "FROM Payments";
         
+        System.out.println("=== DEBUG: getPaymentStatistics() ===");
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Connection status: " + (c != null ? "Connected" : "NULL"));
+        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -191,12 +207,18 @@ public class PaymentsDAO extends DBContext {
                     stats.setPendingPayments(rs.getInt("pendingPayments"));
                     stats.setFailedPayments(rs.getInt("failedPayments"));
                     stats.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
+                    
+                    System.out.println("Statistics loaded: " + stats.getTotalPayments() + " total, " + 
+                                     stats.getCompletedPayments() + " completed, " + 
+                                     stats.getTotalRevenue() + " revenue");
                     return stats;
                 }
             }
         } catch (SQLException e) {
+            System.out.println("SQL Error in getPaymentStatistics: " + e.getMessage());
             e.printStackTrace();
         }
+        System.out.println("Returning empty statistics");
         return new PaymentStatistics(); // Return empty stats if error
     }
     //duy anh

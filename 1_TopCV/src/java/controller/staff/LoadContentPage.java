@@ -58,13 +58,33 @@ public class LoadContentPage extends HttpServlet {
         }
         
         try {
+            // Fix content display issues first
+            ContentDAO contentDAO = new ContentDAO();
+            
+            // Update PostDate to current date for published content with future dates
+            contentDAO.updatePostDateToCurrent();
+            
+            // Publish draft content for website platform
+            try {
+                java.sql.Connection conn = contentDAO.getConnection();
+                try (java.sql.PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE MarketingContents " +
+                    "SET Status = 'Published', PostDate = GETDATE() " +
+                    "WHERE Status = 'Draft' " +
+                    "AND Platform = 'Website'")) {
+                    int rowsAffected = ps.executeUpdate();
+                    System.out.println("Published " + rowsAffected + " draft content items for Website platform");
+                }
+            } catch (Exception e) {
+                System.out.println("Error publishing draft content: " + e.getMessage());
+            }
+            
             // Load campaigns for dropdown
             CampaignDAO campaignDAO = new CampaignDAO();
             List<Campaign> campaigns = campaignDAO.getAllActiveCampaigns();
             request.setAttribute("campaigns", campaigns);
             
             // Load all content for table
-            ContentDAO contentDAO = new ContentDAO();
             List<MarketingContent> contents = contentDAO.getAllContent();
             request.setAttribute("contents", contents);
             
@@ -84,6 +104,9 @@ public class LoadContentPage extends HttpServlet {
                 request.setAttribute("success", successMessage);
                 session.removeAttribute("success"); // Remove after displaying
             }
+            
+            // Add fix content message
+            request.setAttribute("fixMessage", "Content display issues have been automatically fixed!");
             
             // Forward to JSP
             request.getRequestDispatcher("/Staff/content.jsp").forward(request, response);

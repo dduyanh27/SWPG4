@@ -21,12 +21,16 @@ public class AdminPaymentServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
+            System.out.println("=== AdminPaymentServlet.doGet() DEBUG ===");
+            
             // Load all payments with recruiter information - Traditional DAO approach
             List<PaymentWithRecruiterInfo> paymentList = paymentsDAO.getAllPaymentsWithRecruiterInfo();
+            System.out.println("Payment list size: " + (paymentList != null ? paymentList.size() : "NULL"));
             request.setAttribute("paymentList", paymentList);
             
             // Load payment statistics - Traditional DAO approach
             PaymentStatistics stats = paymentsDAO.getPaymentStatistics();
+            System.out.println("Statistics loaded: " + (stats != null ? "YES" : "NULL"));
             request.setAttribute("paymentStats", stats);
             
             // Forward to JSP page

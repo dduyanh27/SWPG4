@@ -77,6 +77,18 @@
                 </header>
 
                 <main class="content">
+                    <!-- Debug Information -->
+                    <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+                        <strong>Debug Info:</strong><br>
+                        Payment List Size: ${paymentList != null ? paymentList.size() : 'NULL'}<br>
+                        Payment Stats: ${paymentStats != null ? 'Loaded' : 'NULL'}<br>
+                        <c:if test="${paymentStats != null}">
+                            Total Payments: ${paymentStats.totalPayments}<br>
+                            Completed: ${paymentStats.completedPayments}<br>
+                            Revenue: ${paymentStats.totalRevenue}
+                        </c:if>
+                    </div>
+                    
                     <!-- Error Message -->
                     <c:if test="${not empty error}">
                         <div class="alert alert-error" style="background-color: #fee; color: #c33; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #fcc;">
