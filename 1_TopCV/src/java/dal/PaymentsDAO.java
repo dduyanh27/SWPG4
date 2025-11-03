@@ -188,10 +188,10 @@ public class PaymentsDAO extends DBContext {
     public PaymentStatistics getPaymentStatistics() {
         String sql = "SELECT " +
                     "COUNT(*) as totalPayments, " +
-                    "SUM(CASE WHEN PaymentStatus = 'success' THEN 1 ELSE 0 END) as completedPayments, " +
-                    "SUM(CASE WHEN PaymentStatus = 'pending' THEN 1 ELSE 0 END) as pendingPayments, " +
-                    "SUM(CASE WHEN PaymentStatus = 'failed' THEN 1 ELSE 0 END) as failedPayments, " +
-                    "SUM(CASE WHEN PaymentStatus = 'success' THEN Amount ELSE 0 END) as totalRevenue " +
+                    "SUM(CASE WHEN LOWER(PaymentStatus) IN ('success', 'completed') THEN 1 ELSE 0 END) as completedPayments, " +
+                    "SUM(CASE WHEN LOWER(PaymentStatus) = 'pending' THEN 1 ELSE 0 END) as pendingPayments, " +
+                    "SUM(CASE WHEN LOWER(PaymentStatus) = 'failed' THEN 1 ELSE 0 END) as failedPayments, " +
+                    "SUM(CASE WHEN LOWER(PaymentStatus) IN ('success', 'completed') THEN Amount ELSE 0 END) as totalRevenue " +
                     "FROM Payments";
         
         System.out.println("=== DEBUG: getPaymentStatistics() ===");
@@ -206,7 +206,8 @@ public class PaymentsDAO extends DBContext {
                     stats.setCompletedPayments(rs.getInt("completedPayments"));
                     stats.setPendingPayments(rs.getInt("pendingPayments"));
                     stats.setFailedPayments(rs.getInt("failedPayments"));
-                    stats.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
+                    java.math.BigDecimal revenue = rs.getBigDecimal("totalRevenue");
+                    stats.setTotalRevenue(revenue != null ? revenue : java.math.BigDecimal.ZERO);
                     
                     System.out.println("Statistics loaded: " + stats.getTotalPayments() + " total, " + 
                                      stats.getCompletedPayments() + " completed, " + 
@@ -219,7 +220,9 @@ public class PaymentsDAO extends DBContext {
             e.printStackTrace();
         }
         System.out.println("Returning empty statistics");
-        return new PaymentStatistics(); // Return empty stats if error
+        PaymentStatistics emptyStats = new PaymentStatistics();
+        emptyStats.setTotalRevenue(java.math.BigDecimal.ZERO);
+        return emptyStats; // Return empty stats if error
     }
     //duy anh
 }
