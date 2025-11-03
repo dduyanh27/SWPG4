@@ -88,6 +88,15 @@
         <url-pattern>/updateadminprofile</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <servlet-class>controller.staff.UpdateStaffProfile</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <url-pattern>/updatestaffprofile</url-pattern>
+    </servlet-mapping>
+    
     <!-- Recruiter (package 'recuiter' in sources) -->
     <servlet>
         <servlet-name>HomeRecuiterServlet</servlet-name>

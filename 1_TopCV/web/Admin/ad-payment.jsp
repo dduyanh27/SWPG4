@@ -2,6 +2,7 @@
 <%@ page import="java.util.List, java.util.ArrayList, java.util.Date, java.text.SimpleDateFormat, model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
     // Authentication check - chỉ Admin mới được truy cập
@@ -97,18 +98,6 @@
                 </header>
 
                 <main class="content">
-                    <!-- Debug Information -->
-                    <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
-                        <strong>Debug Info:</strong><br>
-                        Payment List Size: ${paymentList != null ? paymentList.size() : 'NULL'}<br>
-                        Payment Stats: ${paymentStats != null ? 'Loaded' : 'NULL'}<br>
-                        <c:if test="${paymentStats != null}">
-                            Total Payments: ${paymentStats.totalPayments}<br>
-                            Completed: ${paymentStats.completedPayments}<br>
-                            Revenue: ${paymentStats.totalRevenue}
-                        </c:if>
-                    </div>
-                    
                     <!-- Error Message -->
                     <c:if test="${not empty error}">
                         <div class="alert alert-error" style="background-color: #fee; color: #c33; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #fcc;">
@@ -123,7 +112,25 @@
                                 <div class="stat-icon">💰</div>
                                 <div class="stat-trend trend-up">↗️ +12.5%</div>
                             </div>
-                            <div class="stat-value">₫${paymentStats.totalRevenue/1000}K</div>
+                            <c:choose>
+                                <c:when test="${paymentStats.totalRevenue != null && paymentStats.totalRevenue > 0}">
+                                    <c:set var="revenueValue" value="${paymentStats.totalRevenue}" />
+                                    <c:choose>
+                                        <c:when test="${revenueValue >= 1000000}">
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue/1000000}" maxFractionDigits="1" />M</div>
+                                        </c:when>
+                                        <c:when test="${revenueValue >= 1000}">
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue/1000}" maxFractionDigits="1" />K</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue}" maxFractionDigits="0" /></div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="stat-value">₫0</div>
+                                </c:otherwise>
+                            </c:choose>
                             <div class="stat-label">Tổng doanh thu</div>
                         </div>
 
@@ -211,7 +218,14 @@
                                             </td>
                                             <td>
                                                 <div class="amount-info">
-                                                    <span class="amount">₫${payment.amount}</span>
+                                                    <c:choose>
+                                                        <c:when test="${payment.amount != null}">
+                                                            <span class="amount">₫<fmt:formatNumber value="${payment.amount}" maxFractionDigits="0" groupingUsed="true" /></span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="amount">₫0</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                     <span class="currency">VND</span>
                                                 </div>
                                             </td>
@@ -220,17 +234,17 @@
                                             </td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${payment.paymentStatus eq 'success'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'success' or fn:toLowerCase(payment.paymentStatus) eq 'completed'}">
                                                         <span class="status-badge status-completed">✅ Thành công</span>
                                                     </c:when>
-                                                    <c:when test="${payment.paymentStatus eq 'pending'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'pending'}">
                                                         <span class="status-badge status-pending">⏳ Đang chờ</span>
                                                     </c:when>
-                                                    <c:when test="${payment.paymentStatus eq 'failed'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'failed'}">
                                                         <span class="status-badge status-failed">❌ Thất bại</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="status-badge status-unknown">❓ ${payment.paymentStatus}</span>
+                                                        <span class="status-badge status-unknown">⚠️ ${payment.paymentStatus}</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -250,7 +264,7 @@
                                                     <button class="btn-action btn-view" onclick="viewPayment('${payment.paymentID}')" title="Xem chi tiết">
                                                         👁️
                                                     </button>
-                                                    <c:if test="${payment.paymentStatus eq 'pending'}">
+                                                    <c:if test="${fn:toLowerCase(payment.paymentStatus) eq 'pending'}">
                                                         <button class="btn-action btn-approve" onclick="approvePayment('${payment.paymentID}')" title="Duyệt">
                                                             ✅
                                                         </button>
@@ -391,16 +405,23 @@
                 const rows = document.querySelectorAll('.payment-row');
                 
                 rows.forEach(row => {
-                    const status = row.getAttribute('data-status');
-                    const method = row.getAttribute('data-method');
+                    const status = (row.getAttribute('data-status') || '').toLowerCase();
+                    const method = (row.getAttribute('data-method') || '').toLowerCase();
                     
                     let showRow = true;
                     
-                    if (statusFilter && status !== statusFilter) {
-                        showRow = false;
+                    if (statusFilter) {
+                        const filterStatus = statusFilter.toLowerCase();
+                        // Handle both 'success' and 'completed' as completed
+                        const isCompleted = status === 'success' || status === 'completed';
+                        if (filterStatus === 'success' && !isCompleted) {
+                            showRow = false;
+                        } else if (filterStatus !== 'success' && status !== filterStatus) {
+                            showRow = false;
+                        }
                     }
                     
-                    if (methodFilter && method !== methodFilter) {
+                    if (methodFilter && method !== methodFilter.toLowerCase()) {
                         showRow = false;
                     }
                     

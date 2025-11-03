@@ -6,6 +6,7 @@ package controller.admin;
 
 import dal.AdminDAO;
 import model.Admin;
+import model.Role;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -58,6 +59,22 @@ public class UploadAvatar extends HttpServlet {
             return;
         }
 
+        // Xác định user type: Admin hay Staff (Marketing Staff, Sales)
+        Role adminRole = (Role) session.getAttribute("adminRole");
+        String roleName = (adminRole != null) ? adminRole.getName() : "";
+        boolean isAdmin = "Admin".equals(roleName);
+        boolean isStaff = "Marketing Staff".equals(roleName) || "Sales".equals(roleName);
+        
+        // Xác định thư mục lưu file và trang redirect
+        String imgFolder = isAdmin ? "admin" : "staff";
+        String redirectPage = isAdmin ? "/Admin/admin-profile.jsp" : "/Staff/staff-profile.jsp";
+        
+        // Xác định staffRole nếu là Staff
+        String staffRole = null;
+        if (isStaff) {
+            staffRole = "Marketing Staff".equals(roleName) ? "marketing" : "sales";
+        }
+
         try {
             Part filePart = request.getPart("avatar");
             if (filePart != null && filePart.getSize() > 0) {
@@ -66,7 +83,10 @@ public class UploadAvatar extends HttpServlet {
                 // Kiểm tra định dạng file
                 if (!isValidImageFile(originalFileName)) {
                     request.setAttribute("errorMessage", "Chỉ chấp nhận file ảnh (.jpg, .jpeg, .png, .gif)");
-                    request.getRequestDispatcher("/Admin/admin-profile.jsp").forward(request, response);
+                    if (isStaff && staffRole != null) {
+                        redirectPage = "/Staff/staff-profile.jsp?role=" + staffRole;
+                    }
+                    request.getRequestDispatcher(redirectPage).forward(request, response);
                     return;
                 }
                 
@@ -75,14 +95,14 @@ public class UploadAvatar extends HttpServlet {
                 String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
                 
                 // Lưu file vào thư mục build (để server có thể serve)
-                String buildPath = getServletContext().getRealPath("/assets/img/admin/");
+                String buildPath = getServletContext().getRealPath("/assets/img/" + imgFolder + "/");
                 File buildDir = new File(buildPath);
                 if (!buildDir.exists()) {
                     buildDir.mkdirs();
                 }
                 
                 // Lưu file vào thư mục web (để không bị mất khi rebuild)
-                String webPath = getServletContext().getRealPath("") + File.separator + ".." + File.separator + "web" + File.separator + "assets" + File.separator + "img" + File.separator + "admin" + File.separator;
+                String webPath = getServletContext().getRealPath("") + File.separator + ".." + File.separator + "web" + File.separator + "assets" + File.separator + "img" + File.separator + imgFolder + File.separator;
                 File webDir = new File(webPath);
                 if (!webDir.exists()) {
                     webDir.mkdirs();
@@ -121,7 +141,11 @@ public class UploadAvatar extends HttpServlet {
             request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
         }
 
-        request.getRequestDispatcher("/Admin/admin-profile.jsp").forward(request, response);
+        // Redirect về đúng trang với role parameter nếu là Staff
+        if (isStaff && staffRole != null) {
+            redirectPage = "/Staff/staff-profile.jsp?role=" + staffRole;
+        }
+        request.getRequestDispatcher(redirectPage).forward(request, response);
     }
     
     /**
