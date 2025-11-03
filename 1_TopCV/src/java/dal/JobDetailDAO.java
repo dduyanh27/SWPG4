@@ -33,7 +33,7 @@ public class JobDetailDAO extends DBContext {
                 -- Recruiter info
                 r.RecruiterID, r.CompanyName, r.CompanyDescription, r.CompanyLogoURL,
                 r.Website, r.CompanyAddress, r.CompanySize, r.ContactPerson, 
-                r.CompanyBenefits, r.CompanyVideoURL,
+                r.CompanyBenefits, r.CompanyVideoURL, r.Phone,
                 
                 -- Location info
                 l.LocationID, l.LocationName,
@@ -104,16 +104,17 @@ public class JobDetailDAO extends DBContext {
         
         // Recruiter info
         Recruiter recruiter = new Recruiter();
-        recruiter.setRecruiterID(rs.getInt("RecruiterID"));
-        recruiter.setCompanyName(rs.getString("CompanyName"));
-        recruiter.setCompanyDescription(rs.getString("CompanyDescription"));
-        recruiter.setCompanyLogoURL(rs.getString("CompanyLogoURL"));
-        recruiter.setWebsite(rs.getString("Website"));
-        recruiter.setCompanyAddress(rs.getString("CompanyAddress"));
-        recruiter.setCompanySize(rs.getString("CompanySize"));
-        recruiter.setContactPerson(rs.getString("ContactPerson"));
-        recruiter.setCompanyBenefits(rs.getString("CompanyBenefits"));
-        recruiter.setCompanyVideoURL(rs.getString("CompanyVideoURL"));
+    recruiter.setRecruiterID(rs.getInt("RecruiterID"));
+    recruiter.setCompanyName(rs.getString("CompanyName"));
+    recruiter.setCompanyDescription(rs.getString("CompanyDescription"));
+    recruiter.setCompanyLogoURL(rs.getString("CompanyLogoURL"));
+    recruiter.setWebsite(rs.getString("Website"));
+    recruiter.setCompanyAddress(rs.getString("CompanyAddress"));
+    recruiter.setCompanySize(rs.getString("CompanySize"));
+    recruiter.setContactPerson(rs.getString("ContactPerson"));
+    recruiter.setCompanyBenefits(rs.getString("CompanyBenefits"));
+    recruiter.setCompanyVideoURL(rs.getString("CompanyVideoURL"));
+    recruiter.setPhone(rs.getString("Phone"));
         jobDetail.setRecruiter(recruiter);
         
         // Location info

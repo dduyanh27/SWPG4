@@ -368,6 +368,7 @@
         border-radius: 18px;
         padding: 32px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        width: 450px;
     }
 
     .right-sidebar::-webkit-scrollbar {
@@ -2175,7 +2176,7 @@
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
