@@ -77,6 +77,18 @@
                 </header>
 
                 <main class="content">
+                    <!-- Debug Information -->
+                    <div style="background-color: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+                        <strong>Debug Info:</strong><br>
+                        Payment List Size: ${paymentList != null ? paymentList.size() : 'NULL'}<br>
+                        Payment Stats: ${paymentStats != null ? 'Loaded' : 'NULL'}<br>
+                        <c:if test="${paymentStats != null}">
+                            Total Payments: ${paymentStats.totalPayments}<br>
+                            Completed: ${paymentStats.completedPayments}<br>
+                            Revenue: ${paymentStats.totalRevenue}
+                        </c:if>
+                    </div>
+                    
                     <!-- Error Message -->
                     <c:if test="${not empty error}">
                         <div class="alert alert-error" style="background-color: #fee; color: #c33; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #fcc;">
@@ -91,7 +103,7 @@
                                 <div class="stat-icon">💰</div>
                                 <div class="stat-trend trend-up">↗️ +12.5%</div>
                             </div>
-                            <div class="stat-value">₫${totalRevenue/1000}K</div>
+                            <div class="stat-value">₫${paymentStats.totalRevenue/1000}K</div>
                             <div class="stat-label">Tổng doanh thu</div>
                         </div>
 
@@ -100,7 +112,7 @@
                                 <div class="stat-icon">✅</div>
                                 <div class="stat-trend trend-up">↗️ +8.3%</div>
                             </div>
-                            <div class="stat-value">${completedPayments}</div>
+                            <div class="stat-value">${paymentStats.completedPayments}</div>
                             <div class="stat-label">Giao dịch thành công</div>
                         </div>
 
@@ -109,7 +121,7 @@
                                 <div class="stat-icon">⏳</div>
                                 <div class="stat-trend trend-neutral">→ 0%</div>
                             </div>
-                            <div class="stat-value">${pendingPayments}</div>
+                            <div class="stat-value">${paymentStats.pendingPayments}</div>
                             <div class="stat-label">Đang chờ xử lý</div>
                         </div>
 
@@ -118,7 +130,7 @@
                                 <div class="stat-icon">❌</div>
                                 <div class="stat-trend trend-down">↘️ -2.1%</div>
                             </div>
-                            <div class="stat-value">${failedPayments}</div>
+                            <div class="stat-value">${paymentStats.failedPayments}</div>
                             <div class="stat-label">Giao dịch thất bại</div>
                         </div>
                     </div>
@@ -165,22 +177,22 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach var="payment" items="${paymentList}">
-                                        <tr class="payment-row" data-status="${payment.status}" data-method="${payment.paymentMethod}">
+                                        <tr class="payment-row" data-status="${payment.paymentStatus}" data-method="${payment.paymentMethod}">
                                             <td>
                                                 <div class="payment-id">
-                                                    <span class="id-badge">${payment.id}</span>
+                                                    <span class="id-badge">PAY${payment.paymentID}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="recruiter-info">
-                                                    <div class="recruiter-name">${payment.recruiterName}</div>
+                                                    <div class="recruiter-name">${payment.companyName}</div>
                                                     <div class="recruiter-email">${payment.recruiterEmail}</div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="amount-info">
                                                     <span class="amount">₫${payment.amount}</span>
-                                                    <span class="currency">${payment.currency}</span>
+                                                    <span class="currency">VND</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -188,37 +200,37 @@
                                             </td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${payment.status eq 'success'}">
+                                                    <c:when test="${payment.paymentStatus eq 'success'}">
                                                         <span class="status-badge status-completed">✅ Thành công</span>
                                                     </c:when>
-                                                    <c:when test="${payment.status eq 'pending'}">
+                                                    <c:when test="${payment.paymentStatus eq 'pending'}">
                                                         <span class="status-badge status-pending">⏳ Đang chờ</span>
                                                     </c:when>
-                                                    <c:when test="${payment.status eq 'failed'}">
+                                                    <c:when test="${payment.paymentStatus eq 'failed'}">
                                                         <span class="status-badge status-failed">❌ Thất bại</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="status-badge status-unknown">❓ ${payment.status}</span>
+                                                        <span class="status-badge status-unknown">❓ ${payment.paymentStatus}</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
                                             <td>
                                                 <div class="date-info">
-                                                    <span class="date">${payment.transactionDate}</span>
+                                                    <span class="date">${payment.paymentDate}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="description">
-                                                    <span class="desc-text">${payment.description}</span>
-                                                    <span class="invoice">${payment.invoiceNumber}</span>
+                                                    <span class="desc-text">${payment.notes}</span>
+                                                    <span class="invoice">INV-${payment.transactionCode}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="btn-action btn-view" onclick="viewPayment('${payment.id}')" title="Xem chi tiết">
+                                                    <button class="btn-action btn-view" onclick="viewPayment('${payment.paymentID}')" title="Xem chi tiết">
                                                         👁️
                                                     </button>
-                                                    <c:if test="${payment.status eq 'pending'}">
+                                                    <c:if test="${payment.paymentStatus eq 'pending'}">
                                                         <button class="btn-action btn-approve" onclick="approvePayment('${payment.paymentID}')" title="Duyệt">
                                                             ✅
                                                         </button>
@@ -226,7 +238,7 @@
                                                             ❌
                                                         </button>
                                                     </c:if>
-                                                    <button class="btn-action btn-download" onclick="downloadInvoice('${payment.invoiceNumber}')" title="Tải hóa đơn">
+                                                    <button class="btn-action btn-download" onclick="downloadInvoice('INV-${payment.transactionCode}')" title="Tải hóa đơn">
                                                         📄
                                                     </button>
                                                 </div>
@@ -239,7 +251,7 @@
 
                         <div class="table-footer">
                             <div class="pagination-info">
-                                Hiển thị ${totalPayments} giao dịch
+                                Hiển thị ${paymentStats.totalPayments} giao dịch
                                 <c:if test="${empty paymentList}">
                                     <span style="color: #999; font-style: italic;">(Chưa có giao dịch nào)</span>
                                 </c:if>

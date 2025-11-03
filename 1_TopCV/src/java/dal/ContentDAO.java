@@ -6,6 +6,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContentDAO extends DBContext {
+    
+    // Get database connection
+    public java.sql.Connection getConnection() {
+        return c;
+    }
+    
+    // Simple method to get all website content (for debugging)
+    public List<MarketingContent> getAllWebsiteContent() {
+        List<MarketingContent> list = new ArrayList<>();
+        String sql = "SELECT * FROM MarketingContents WHERE Platform = 'Website' ORDER BY PostDate DESC";
+        
+        System.out.println("=== DEBUG: getAllWebsiteContent() ===");
+        System.out.println("SQL: " + sql);
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    MarketingContent content = new MarketingContent();
+                    content.setContentID(rs.getInt("ContentID"));
+                    content.setTitle(rs.getString("Title"));
+                    content.setStatus(rs.getString("Status"));
+                    content.setPlatform(rs.getString("Platform"));
+                    content.setPostDate(rs.getTimestamp("PostDate"));
+                    content.setContentText(rs.getString("ContentText"));
+                    list.add(content);
+                    
+                    System.out.println("Website content #" + count + ": " + content.getTitle() + " - " + content.getStatus());
+                }
+                System.out.println("Total website content found: " + count);
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error in getAllWebsiteContent: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return list;
+    }
 
     // Insert new content
     public boolean insertContent(MarketingContent content) {
@@ -261,6 +300,82 @@ public class ContentDAO extends DBContext {
             ps.setInt(1, contentID);
             ps.executeUpdate();
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Get published content for website (public display)
+    public List<MarketingContent> getPublishedContentForWebsite() {
+        List<MarketingContent> list = new ArrayList<>();
+        String sql = "SELECT mc.*, c.CampaignName, a.FullName as CreatorName "
+                + "FROM MarketingContents mc "
+                + "LEFT JOIN Campaigns c ON mc.CampaignID = c.CampaignID "
+                + "LEFT JOIN Admins a ON mc.CreatedBy = a.AdminID "
+                + "WHERE mc.Status = 'Published' "
+                + "AND mc.Platform = 'Website' "
+                + "AND mc.PostDate <= GETDATE() "
+                + "ORDER BY mc.PostDate DESC";
+
+        System.out.println("=== DEBUG: getPublishedContentForWebsite() ===");
+        System.out.println("SQL: " + sql);
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    System.out.println("Processing website content #" + count);
+                    
+                    MarketingContent content = new MarketingContent();
+                    content.setContentID(rs.getInt("ContentID"));
+                    content.setCampaignID(rs.getInt("CampaignID"));
+                    content.setTitle(rs.getString("Title"));
+                    content.setContentText(rs.getString("ContentText"));
+                    content.setMediaURL(rs.getString("MediaURL"));
+                    content.setPostDate(rs.getTimestamp("PostDate"));
+                    content.setPlatform(rs.getString("Platform"));
+                    content.setStatus(rs.getString("Status"));
+                    content.setCreatedBy(rs.getInt("CreatedBy"));
+                    
+                    // Handle ViewCount safely
+                    try {
+                        content.setViewCount(rs.getInt("ViewCount"));
+                    } catch (Exception e) {
+                        content.setViewCount(0); // Default value
+                    }
+                    
+                    content.setCampaignName(rs.getString("CampaignName"));
+                    content.setCreatorName(rs.getString("CreatorName"));
+                    list.add(content);
+                    
+                    System.out.println("Added: " + content.getTitle() + " - " + content.getStatus());
+                }
+                System.out.println("Total website content loaded: " + count);
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL Error in getPublishedContentForWebsite: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    // Update PostDate to current date for published content
+    public void updatePostDateToCurrent() {
+        String sql = "UPDATE MarketingContents " +
+                    "SET PostDate = GETDATE() " +
+                    "WHERE Status = 'Published' " +
+                    "AND Platform = 'Website' " +
+                    "AND PostDate > GETDATE()";
+
+        System.out.println("=== DEBUG: updatePostDateToCurrent() ===");
+        System.out.println("SQL: " + sql);
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("Updated " + rowsAffected + " content items to current date");
+        } catch (SQLException e) {
+            System.out.println("SQL Error in updatePostDateToCurrent: " + e.getMessage());
             e.printStackTrace();
         }
     }

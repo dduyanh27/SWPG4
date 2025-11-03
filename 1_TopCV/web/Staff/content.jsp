@@ -134,6 +134,11 @@
                             ✅ ${success}
                         </div>
                     </c:if>
+                    <c:if test="${not empty fixMessage}">
+                        <div style="background-color: #e6f3ff; color: #1e40af; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #93c5fd;">
+                            🔧 ${fixMessage}
+                        </div>
+                    </c:if>
                 </div>
 
                 <%-- Các thẻ thống kê (Stats grid) - Giữ nguyên không thay đổi --%>

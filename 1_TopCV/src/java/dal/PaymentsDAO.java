@@ -1,6 +1,8 @@
 package dal;
 
 import model.Payments;
+import model.PaymentWithRecruiterInfo;
+import model.PaymentStatistics;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -138,43 +140,52 @@ public class PaymentsDAO extends DBContext {
     }
     //duy anh
     
-    // Get all payments with recruiter information for admin
-    public List<java.util.Map<String, Object>> getAllPaymentsWithRecruiterInfo() {
-        List<java.util.Map<String, Object>> paymentList = new ArrayList<>();
+    // Get all payments with recruiter information for admin - Traditional DAO approach
+    public List<PaymentWithRecruiterInfo> getAllPaymentsWithRecruiterInfo() {
+        List<PaymentWithRecruiterInfo> paymentList = new ArrayList<>();
         String sql = "SELECT p.*, r.CompanyName, r.Email, r.ContactPerson " +
                     "FROM Payments p " +
                     "LEFT JOIN Recruiter r ON p.RecruiterID = r.RecruiterID " +
                     "ORDER BY p.PaymentDate DESC";
         
+        System.out.println("=== DEBUG: getAllPaymentsWithRecruiterInfo() ===");
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Connection status: " + (c != null ? "Connected" : "NULL"));
+        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
                 while (rs.next()) {
-                    java.util.Map<String, Object> payment = new java.util.HashMap<>();
-                    payment.put("id", "PAY" + String.format("%03d", rs.getInt("PaymentID")));
-                    payment.put("paymentID", rs.getInt("PaymentID"));
-                    payment.put("recruiterName", rs.getString("CompanyName"));
-                    payment.put("recruiterEmail", rs.getString("Email"));
-                    payment.put("contactPerson", rs.getString("ContactPerson"));
-                    payment.put("amount", rs.getBigDecimal("Amount"));
-                    payment.put("currency", "VND");
-                    payment.put("paymentMethod", rs.getString("PaymentMethod"));
-                    payment.put("status", rs.getString("PaymentStatus"));
-                    payment.put("transactionDate", rs.getTimestamp("PaymentDate").toString());
-                    payment.put("description", rs.getString("Notes"));
-                    payment.put("invoiceNumber", "INV-" + rs.getString("TransactionCode"));
-                    payment.put("transactionCode", rs.getString("TransactionCode"));
+                    count++;
+                    System.out.println("Processing payment #" + count);
+                    
+                    PaymentWithRecruiterInfo payment = new PaymentWithRecruiterInfo();
+                    payment.setPaymentID(rs.getInt("PaymentID"));
+                    payment.setRecruiterID(rs.getInt("RecruiterID"));
+                    payment.setAmount(rs.getBigDecimal("Amount"));
+                    payment.setPaymentMethod(rs.getString("PaymentMethod"));
+                    payment.setPaymentStatus(rs.getString("PaymentStatus"));
+                    payment.setTransactionCode(rs.getString("TransactionCode"));
+                    payment.setPaymentDate(rs.getTimestamp("PaymentDate").toLocalDateTime());
+                    payment.setNotes(rs.getString("Notes"));
+                    payment.setCompanyName(rs.getString("CompanyName"));
+                    payment.setRecruiterEmail(rs.getString("Email"));
+                    payment.setContactPerson(rs.getString("ContactPerson"));
                     paymentList.add(payment);
+                    
+                    System.out.println("Added payment: " + payment.getPaymentID() + " - " + payment.getCompanyName());
                 }
+                System.out.println("Total payments loaded: " + count);
             }
         } catch (SQLException e) {
+            System.out.println("SQL Error in getAllPaymentsWithRecruiterInfo: " + e.getMessage());
             e.printStackTrace();
         }
         return paymentList;
     }
     
-    // Get payment statistics for admin dashboard
-    public java.util.Map<String, Object> getPaymentStatistics() {
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+    // Get payment statistics for admin dashboard - Traditional DAO approach
+    public PaymentStatistics getPaymentStatistics() {
         String sql = "SELECT " +
                     "COUNT(*) as totalPayments, " +
                     "SUM(CASE WHEN PaymentStatus = 'success' THEN 1 ELSE 0 END) as completedPayments, " +
@@ -183,20 +194,32 @@ public class PaymentsDAO extends DBContext {
                     "SUM(CASE WHEN PaymentStatus = 'success' THEN Amount ELSE 0 END) as totalRevenue " +
                     "FROM Payments";
         
+        System.out.println("=== DEBUG: getPaymentStatistics() ===");
+        System.out.println("SQL Query: " + sql);
+        System.out.println("Connection status: " + (c != null ? "Connected" : "NULL"));
+        
         try (PreparedStatement ps = c.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    stats.put("totalPayments", rs.getInt("totalPayments"));
-                    stats.put("completedPayments", rs.getInt("completedPayments"));
-                    stats.put("pendingPayments", rs.getInt("pendingPayments"));
-                    stats.put("failedPayments", rs.getInt("failedPayments"));
-                    stats.put("totalRevenue", rs.getBigDecimal("totalRevenue"));
+                    PaymentStatistics stats = new PaymentStatistics();
+                    stats.setTotalPayments(rs.getInt("totalPayments"));
+                    stats.setCompletedPayments(rs.getInt("completedPayments"));
+                    stats.setPendingPayments(rs.getInt("pendingPayments"));
+                    stats.setFailedPayments(rs.getInt("failedPayments"));
+                    stats.setTotalRevenue(rs.getBigDecimal("totalRevenue"));
+                    
+                    System.out.println("Statistics loaded: " + stats.getTotalPayments() + " total, " + 
+                                     stats.getCompletedPayments() + " completed, " + 
+                                     stats.getTotalRevenue() + " revenue");
+                    return stats;
                 }
             }
         } catch (SQLException e) {
+            System.out.println("SQL Error in getPaymentStatistics: " + e.getMessage());
             e.printStackTrace();
         }
-        return stats;
+        System.out.println("Returning empty statistics");
+        return new PaymentStatistics(); // Return empty stats if error
     }
     //duy anh
 }
