@@ -67,7 +67,7 @@
         <div class="container">
             <h2>Forgot your password?</h2>
             <p>Enter email address to receive password reset link</p>
-            <form action="/Test_ResetPassword/requestPassword" method="POST">
+            <form action="${pageContext.request.contextPath}/requestPassword" method="POST">
                 <input type="hidden" name="userType" value="recruiter">
                 <input type="email" name="email" placeholder="Email" required>
                 <button type="submit">Reset password</button>

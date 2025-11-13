@@ -1,8 +1,20 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.Recruiter" %>
+<%@ page import="model.Job" %>
+<%@ page import="dal.RecruiterPackagesDAO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%
     Recruiter recruiter = (Recruiter) session.getAttribute("recruiter");
     String userName = (recruiter != null) ? recruiter.getContactPerson() : "User";
+    
+    Job job = (Job) request.getAttribute("job");
+    List<RecruiterPackagesDAO.RecruiterPackagesWithDetails> postingPackages = 
+        (List<RecruiterPackagesDAO.RecruiterPackagesWithDetails>) request.getAttribute("postingPackages");
+    
+    if (postingPackages == null) postingPackages = new java.util.ArrayList<>();
+    
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -28,7 +40,7 @@
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
                             <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
@@ -39,7 +51,7 @@
                             <a href="#">Tài liệu hướng dẫn</a>
                         </div>
                     </li>
-                    <li><a href="#">Đơn hàng</a></li>
+                    <li><a href="${pageContext.request.contextPath}/recruiter/purchase-history">Đơn hàng</a></li>
                     <li><a href="#">Báo cáo</a></li>
                     <li><a href="#" class="company-link">Công ty</a></li>
                 </ul>
@@ -144,14 +156,9 @@
                         <div class="step-number">1</div>
                         <div class="step-title">Chỉnh sửa việc làm</div>
                     </div>
-                    <div class="progress-line completed"></div>
-                    <div class="progress-step completed">
-                        <div class="step-number">2</div>
-                        <div class="step-title">Thiết lập quy trình tuyển dụng</div>
-                    </div>
                     <div class="progress-line active"></div>
                     <div class="progress-step active">
-                        <div class="step-number">3</div>
+                        <div class="step-number">2</div>
                         <div class="step-title">Đăng tuyển dụng</div>
                     </div>
                 </div>
@@ -170,240 +177,74 @@
                     <div class="service-summary">
                         <div class="summary-item">
                             <span class="label">Chức Danh:</span>
-                            <span class="value">Chuyên Viên Kiểm Thử Và Vận Hành Phần Mềm (Ba/tester)</span>
+                            <span class="value"><%= job != null && job.getJobTitle() != null ? job.getJobTitle() : "N/A" %></span>
                         </div>
                         <div class="summary-item">
                             <span class="label">Mã Công Việc:</span>
-                            <span class="value">1700080</span>
+                            <span class="value"><%= job != null && job.getJobCode() != null ? job.getJobCode() : "N/A" %></span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Service Package Selection -->
-            <div class="form-section">
-                <div class="form-content">
-                    <div class="section-header">
-                        <i class="fas fa-box"></i>
-                        <h3>Chọn Gói Dịch Vụ Phù Hợp Để Đăng Tuyển Dụng</h3>
-                    </div>
-                    <div class="service-packages">
+            <form action="${pageContext.request.contextPath}/jobfinal" method="POST" id="job-final-form">
+                <input type="hidden" name="jobID" value="<%= job != null ? job.getJobID() : "" %>">
+                <div class="form-section">
+                    <div class="form-content">
+                        <div class="section-header">
+                            <i class="fas fa-box"></i>
+                            <h3>Chọn Gói Dịch Vụ Phù Hợp Để Đăng Tuyển Dụng</h3>
+                        </div>
+                        <div class="service-packages">
+                        <% if (postingPackages != null && !postingPackages.isEmpty()) { 
+                            int packageIndex = 0;
+                            for (RecruiterPackagesDAO.RecruiterPackagesWithDetails pkg : postingPackages) {
+                                packageIndex++;
+                                int remainingQty = pkg.getRemainingQuantity();
+                                String dateStr = pkg.purchaseDate.format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+                                String orderCode = "ORD-" + pkg.recruiterPackageID + "-" + 
+                                    (dateStr.length() >= 6 ? dateStr.substring(0, 6) : dateStr);
+                        %>
                         <div class="package-item">
                             <div class="package-radio">
-                                <input type="radio" id="package1" name="package" value="basic" checked>
-                                <label for="package1">Đăng Tuyển 30-Ngày - Cơ Bản</label>
+                                <input type="radio" id="package<%= packageIndex %>" name="package" 
+                                       value="<%= pkg.recruiterPackageID %>" <%= packageIndex == 1 ? "checked" : "" %>>
+                                <label for="package<%= packageIndex %>"><%= pkg.packageName != null ? pkg.packageName : "Gói dịch vụ" %></label>
                             </div>
                             <div class="package-details">
                                 <div class="order-info">
-                                    <select class="order-select">
-                                        <option>ORD-2742737-X0H3F2 - 14-10-2023</option>
+                                    <select class="order-select" name="package-<%= pkg.recruiterPackageID %>">
+                                        <option value="<%= pkg.recruiterPackageID %>">
+                                            <%= orderCode %> - <%= pkg.purchaseDate.format(dateFormatter) %>
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="quantity">
-                                    <span>Số lượng: 1</span>
+                                    <span>Số lượng: <%= remainingQty %></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="package-item">
-                            <div class="package-radio">
-                                <input type="radio" id="package2" name="package" value="premium">
-                                <label for="package2">Đăng Tuyển 30-Ngày - M</label>
-                            </div>
-                            <div class="package-details">
-                                <div class="order-info">
-                                    <select class="order-select">
-                                        <option>ORD-2745446-H4L2J2 - 17-10-2023</option>
-                                    </select>
-                                </div>
-                                <div class="quantity">
-                                    <span>Số lượng: 1</span>
-                                </div>
-                            </div>
+                        <% } 
+                        } else { %>
+                        <div class="no-packages">
+                            <p>Bạn chưa có gói đăng tuyển dụng nào. Vui lòng <a href="#">mua gói</a> để tiếp tục.</p>
+                        </div>
+                        <% } %>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Additional Services -->
-            <div class="form-section">
-                <div class="form-content">
-                    <div class="section-header">
-                        <i class="fas fa-star"></i>
-                        <h3>Các Dịch Vụ Thêm</h3>
-                    </div>
-                    <div class="additional-services">
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service1" name="additional_services">
-                                <label for="service1">Việc Làm Tuyển Gấp - M</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2965687-R1P3Q7 - 23-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <span>Ngay</span>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service2" name="additional_services">
-                                <label for="service2">Việc Cần Tuyển Gấp</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2807790-X0Q3P2 - 01-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <span>Ngay</span>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service3" name="additional_services">
-                                <label for="service3">Thêm - Ưu Tiên Hàng Đầu 30 Ngày - M</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2771105-R8Q9N3 - 02-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <span>Ngay</span>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service4" name="additional_services">
-                                <label for="service4">Thêm - Ưu Tiên Hàng Đầu 30 Ngày</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2771105-R8Q9N3 - 02-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <span>Ngay</span>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service5" name="additional_services">
-                                <label for="service5">Thêm - Ưu Tiên Hàng Đầu 15 Ngày - M</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2766646-R7T4S6 - 31-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <select class="date-select">
-                                        <option>Tuần 1</option>
-                                    </select>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="service-item">
-                            <div class="service-checkbox">
-                                <input type="checkbox" id="service6" name="additional_services">
-                                <label for="service6">B - Thêm - Ưu Tiên Hàng Đầu 15 Ngày - M</label>
-                            </div>
-                            <div class="service-details">
-                                <div class="order-info">
-                                    <span>ORD-2933817-F5B6X0 - 05-...</span>
-                                </div>
-                                <div class="quantity">
-                                    <span>1</span>
-                                </div>
-                                <div class="apply-date">
-                                    <select class="date-select">
-                                        <option>Tuần 1</option>
-                                    </select>
-                                </div>
-                                <div class="start-time">
-                                    <span>-</span>
-                                </div>
-                                <div class="industry">
-                                    <span>Công Nghệ Thông Tin/Viễn Thông: QA/QC/Software Testing</span>
-                                </div>
-                                <div class="field">
-                                    <span>Cung cấp nhân lực</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/jobposting'">Quay lại</button>
+                    <button type="submit" class="btn btn-primary">Đăng tuyển dụng</button>
                 </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/recruitment-process.jsp'">Quay lại</button>
-                <button class="btn btn-primary">Đăng tuyển dụng</button>
-            </div>
+            </form>
         </div>
     </div>
 
     <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
 </body>
 </html>
+

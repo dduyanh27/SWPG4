@@ -386,7 +386,7 @@ public class ApplicationDAO extends DBContext {
         }
         return appList;
     }
-    
+  
     /**
      * Update application status (for recruiter) and send notification to jobseeker
      * @param applicationId
@@ -453,5 +453,148 @@ public class ApplicationDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
+
+    /**
+     * Get all applications for a specific job (for recruiter to view candidates)
+     * Joins with JobSeeker, CV, Job to get full candidate information
+     */
+    public List<model.CandidateApplication> getApplicationsByJobID(int jobID, int recruiterID) {
+        List<model.CandidateApplication> candidates = new ArrayList<>();
+        // Simplified query - bỏ DateOfBirth và Ratings table (có thể không tồn tại)
+        String sql = "SELECT " +
+                    "a.ApplicationID, a.JobID, a.CVID, a.ApplicationDate, a.Status, " +
+                    "js.JobSeekerID, js.FullName as CandidateName, js.Email as CandidateEmail, " +
+                    "js.Phone as CandidatePhone, " +
+                    "cv.CVTitle, " +
+                    "j.JobTitle, " +
+                    "0 as ExperienceYears, " +
+                    "0.0 as Rating " +
+                    "FROM Applications a " +
+                    "INNER JOIN CVs cv ON a.CVID = cv.CVID " +
+                    "INNER JOIN JobSeeker js ON cv.JobSeekerID = js.JobSeekerID " +
+                    "INNER JOIN Jobs j ON a.JobID = j.JobID " +
+                    "WHERE a.JobID = ? AND j.RecruiterID = ? " +
+                    "ORDER BY a.ApplicationDate DESC";
+        
+        System.out.println("DEBUG ApplicationDAO: Getting applications for JobID: " + jobID + ", RecruiterID: " + recruiterID);
+        System.out.println("DEBUG ApplicationDAO: SQL: " + sql);
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, jobID);
+            ps.setInt(2, recruiterID);
+            ResultSet rs = ps.executeQuery();
+            
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                model.CandidateApplication candidate = new model.CandidateApplication();
+                
+                candidate.setApplicationID(rs.getInt("ApplicationID"));
+                candidate.setJobID(rs.getInt("JobID"));
+                candidate.setCvID(rs.getInt("CVID"));
+                candidate.setJobSeekerID(rs.getInt("JobSeekerID"));
+                
+                Timestamp appDate = rs.getTimestamp("ApplicationDate");
+                if (appDate != null) {
+                    candidate.setApplicationDate(appDate.toLocalDateTime());
+                } else {
+                    System.out.println("DEBUG ApplicationDAO: Warning - ApplicationDate is null for ApplicationID: " + candidate.getApplicationID());
+                }
+                
+                candidate.setStatus(rs.getString("Status"));
+                candidate.setCandidateName(rs.getString("CandidateName"));
+                candidate.setCandidateEmail(rs.getString("CandidateEmail"));
+                candidate.setCandidatePhone(rs.getString("CandidatePhone"));
+                candidate.setCvTitle(rs.getString("CVTitle"));
+                candidate.setJobTitle(rs.getString("JobTitle"));
+                
+                // Experience years - set default 0
+                candidate.setExperienceYears(0);
+                
+                // Rating - set default 0.0
+                candidate.setRating(0.0);
+                
+                candidates.add(candidate);
+                System.out.println("DEBUG ApplicationDAO: Found candidate #" + count + 
+                                 " - Name: " + candidate.getCandidateName() + 
+                                 ", ApplicationID: " + candidate.getApplicationID() +
+                                 ", Status: " + candidate.getStatus());
+            }
+            
+            System.out.println("DEBUG ApplicationDAO: Total candidates found: " + candidates.size());
+            
+            if (candidates.isEmpty()) {
+                System.out.println("DEBUG ApplicationDAO: WARNING - No candidates found for JobID: " + jobID + ", RecruiterID: " + recruiterID);
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("DEBUG ApplicationDAO: SQL Error getting applications by jobID!");
+            System.out.println("DEBUG ApplicationDAO: Error Message: " + e.getMessage());
+            System.out.println("DEBUG ApplicationDAO: SQL State: " + e.getSQLState());
+            System.out.println("DEBUG ApplicationDAO: Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("DEBUG ApplicationDAO: General Error getting applications by jobID!");
+            System.out.println("DEBUG ApplicationDAO: Error Message: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return candidates;
+    }
+
+    /**
+     * Update application status (Accept or Reject)
+     */
+    public boolean updateApplicationStatus(int applicationID, int jobID, int recruiterID, String newStatus) {
+        // Verify that the application belongs to the recruiter's job
+        String verifySql = "SELECT COUNT(*) FROM Applications a " +
+                          "INNER JOIN Jobs j ON a.JobID = j.JobID " +
+                          "WHERE a.ApplicationID = ? AND a.JobID = ? AND j.RecruiterID = ?";
+        
+        try (PreparedStatement verifyPs = c.prepareStatement(verifySql)) {
+            verifyPs.setInt(1, applicationID);
+            verifyPs.setInt(2, jobID);
+            verifyPs.setInt(3, recruiterID);
+            
+            ResultSet rs = verifyPs.executeQuery();
+            if (rs.next() && rs.getInt(1) == 0) {
+                System.out.println("DEBUG ApplicationDAO: Application does not belong to recruiter");
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("DEBUG ApplicationDAO: Error verifying application: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        
+        // Update status
+        String updateSql = "UPDATE Applications SET Status = ? WHERE ApplicationID = ?";
+        
+        System.out.println("DEBUG ApplicationDAO: Updating ApplicationID: " + applicationID + " to Status: '" + newStatus + "'");
+        System.out.println("DEBUG ApplicationDAO: SQL: " + updateSql);
+        
+        try (PreparedStatement ps = c.prepareStatement(updateSql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, applicationID);
+            
+            int rowsAffected = ps.executeUpdate();
+            System.out.println("DEBUG ApplicationDAO: Updated application " + applicationID + 
+                             " status to '" + newStatus + "', rows affected: " + rowsAffected);
+            
+            if (rowsAffected > 0) {
+                System.out.println("DEBUG ApplicationDAO: SUCCESS - Application status updated to: '" + newStatus + "'");
+            } else {
+                System.out.println("DEBUG ApplicationDAO: WARNING - No rows affected! ApplicationID might not exist: " + applicationID);
+            }
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("DEBUG ApplicationDAO: SQL Error updating application status!");
+            System.out.println("DEBUG ApplicationDAO: Error Message: " + e.getMessage());
+            System.out.println("DEBUG ApplicationDAO: SQL State: " + e.getSQLState());
+            System.out.println("DEBUG ApplicationDAO: Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

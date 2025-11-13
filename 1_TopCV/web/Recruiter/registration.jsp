@@ -1160,6 +1160,7 @@
         // Validation state variables
         let phoneValidationState = 'none'; // none, checking, valid, invalid, exists
         let emailValidationState = 'none';
+        let taxCodeValidationState = 'none'; // none, checking, valid, invalid, exists
         let phoneValidationTimeout = null;
         let emailValidationTimeout = null;
 
@@ -1542,13 +1543,27 @@
             // Optional field AJAX validations
             const taxCodeInput = document.getElementById('taxCode');
             if (taxCodeInput) {
+                let taxDebounce;
                 taxCodeInput.addEventListener('input', () => {
                     const value = taxCodeInput.value.trim();
-                    if (value.length > 0) {
-                        ajaxValidateTaxCode(value);
-                    } else {
+                    if (taxDebounce) clearTimeout(taxDebounce);
+                    if (value.length === 0) {
+                        taxCodeValidationState = 'none';
                         clearFieldError('taxCode');
+                        checkStep2Validity();
+                        return;
                     }
+                    // format check first
+                    const taxRegex = /^[0-9]{10}$/;
+                    if (!taxRegex.test(value)) {
+                        taxCodeValidationState = 'invalid';
+                        setFieldError('taxCode', 'Vui lòng nhập mã số thuế hợp lệ (10 số)');
+                        checkStep2Validity();
+                        return;
+                    }
+                    taxCodeValidationState = 'checking';
+                    setFieldError('taxCode', 'Đang kiểm tra mã số thuế...');
+                    taxDebounce = setTimeout(() => ajaxValidateTaxCode(value), 500);
                 });
             }
             const regCertInput = document.getElementById('registrationCert');
@@ -1629,8 +1644,15 @@
                 return field.value.trim() !== '' && !field.classList.contains('error');
             });
 
+            // Tax code is optional, but if provided it must be valid and not exists
+            const taxInput = document.getElementById('taxCode');
+            let taxOk = true;
+            if (taxInput && taxInput.value.trim().length > 0) {
+                taxOk = taxCodeValidationState === 'valid';
+            }
+
             const continueBtn = document.getElementById('step2ContinueBtn');
-            continueBtn.disabled = !allValid;
+            continueBtn.disabled = !(allValid && taxOk);
             
             if (allValid) {
                 continueBtn.style.opacity = '1';
@@ -1666,15 +1688,22 @@
             fetch(url)
                 .then(r => r.json())
                 .then(data => {
-                    if (data && data.valid === true) {
-                        clearFieldError('taxCode');
-                    } else {
+                    if (!data || data.valid !== true) {
+                        taxCodeValidationState = 'invalid';
                         setFieldError('taxCode', 'Vui lòng nhập mã số thuế hợp lệ (10 số)');
+                    } else if (data.exists === true) {
+                        taxCodeValidationState = 'exists';
+                        setFieldError('taxCode', 'Mã số thuế này đã được sử dụng');
+                    } else {
+                        taxCodeValidationState = 'valid';
+                        clearFieldError('taxCode');
                     }
+                    checkStep2Validity();
                 })
                 .catch(() => {
-                    // On error, do not block but show generic error
+                    taxCodeValidationState = 'invalid';
                     setFieldError('taxCode', 'Không thể kiểm tra mã số thuế lúc này');
+                    checkStep2Validity();
                 });
         }
 

@@ -1,9 +1,30 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List, java.util.ArrayList, java.util.Date, java.text.SimpleDateFormat" %>
+<%@ page import="java.util.List, java.util.ArrayList, java.util.Date, java.text.SimpleDateFormat, model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <%
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
     // Check if paymentList is already loaded from servlet
     if (request.getAttribute("paymentList") == null) {
         // If not loaded, redirect to servlet to load data
@@ -91,7 +112,25 @@
                                 <div class="stat-icon">💰</div>
                                 <div class="stat-trend trend-up">↗️ +12.5%</div>
                             </div>
-                            <div class="stat-value">₫${totalRevenue/1000}K</div>
+                            <c:choose>
+                                <c:when test="${paymentStats.totalRevenue != null && paymentStats.totalRevenue > 0}">
+                                    <c:set var="revenueValue" value="${paymentStats.totalRevenue}" />
+                                    <c:choose>
+                                        <c:when test="${revenueValue >= 1000000}">
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue/1000000}" maxFractionDigits="1" />M</div>
+                                        </c:when>
+                                        <c:when test="${revenueValue >= 1000}">
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue/1000}" maxFractionDigits="1" />K</div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="stat-value">₫<fmt:formatNumber value="${revenueValue}" maxFractionDigits="0" /></div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="stat-value">₫0</div>
+                                </c:otherwise>
+                            </c:choose>
                             <div class="stat-label">Tổng doanh thu</div>
                         </div>
 
@@ -100,7 +139,7 @@
                                 <div class="stat-icon">✅</div>
                                 <div class="stat-trend trend-up">↗️ +8.3%</div>
                             </div>
-                            <div class="stat-value">${completedPayments}</div>
+                            <div class="stat-value">${paymentStats.completedPayments}</div>
                             <div class="stat-label">Giao dịch thành công</div>
                         </div>
 
@@ -109,7 +148,7 @@
                                 <div class="stat-icon">⏳</div>
                                 <div class="stat-trend trend-neutral">→ 0%</div>
                             </div>
-                            <div class="stat-value">${pendingPayments}</div>
+                            <div class="stat-value">${paymentStats.pendingPayments}</div>
                             <div class="stat-label">Đang chờ xử lý</div>
                         </div>
 
@@ -118,7 +157,7 @@
                                 <div class="stat-icon">❌</div>
                                 <div class="stat-trend trend-down">↘️ -2.1%</div>
                             </div>
-                            <div class="stat-value">${failedPayments}</div>
+                            <div class="stat-value">${paymentStats.failedPayments}</div>
                             <div class="stat-label">Giao dịch thất bại</div>
                         </div>
                     </div>
@@ -165,22 +204,29 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach var="payment" items="${paymentList}">
-                                        <tr class="payment-row" data-status="${payment.status}" data-method="${payment.paymentMethod}">
+                                        <tr class="payment-row" data-status="${payment.paymentStatus}" data-method="${payment.paymentMethod}">
                                             <td>
                                                 <div class="payment-id">
-                                                    <span class="id-badge">${payment.id}</span>
+                                                    <span class="id-badge">PAY${payment.paymentID}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="recruiter-info">
-                                                    <div class="recruiter-name">${payment.recruiterName}</div>
+                                                    <div class="recruiter-name">${payment.companyName}</div>
                                                     <div class="recruiter-email">${payment.recruiterEmail}</div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="amount-info">
-                                                    <span class="amount">₫${payment.amount}</span>
-                                                    <span class="currency">${payment.currency}</span>
+                                                    <c:choose>
+                                                        <c:when test="${payment.amount != null}">
+                                                            <span class="amount">₫<fmt:formatNumber value="${payment.amount}" maxFractionDigits="0" groupingUsed="true" /></span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="amount">₫0</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <span class="currency">VND</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -188,37 +234,37 @@
                                             </td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${payment.status eq 'success'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'success' or fn:toLowerCase(payment.paymentStatus) eq 'completed'}">
                                                         <span class="status-badge status-completed">✅ Thành công</span>
                                                     </c:when>
-                                                    <c:when test="${payment.status eq 'pending'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'pending'}">
                                                         <span class="status-badge status-pending">⏳ Đang chờ</span>
                                                     </c:when>
-                                                    <c:when test="${payment.status eq 'failed'}">
+                                                    <c:when test="${fn:toLowerCase(payment.paymentStatus) eq 'failed'}">
                                                         <span class="status-badge status-failed">❌ Thất bại</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="status-badge status-unknown">❓ ${payment.status}</span>
+                                                        <span class="status-badge status-unknown">⚠️ ${payment.paymentStatus}</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
                                             <td>
                                                 <div class="date-info">
-                                                    <span class="date">${payment.transactionDate}</span>
+                                                    <span class="date">${payment.paymentDate}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="description">
-                                                    <span class="desc-text">${payment.description}</span>
-                                                    <span class="invoice">${payment.invoiceNumber}</span>
+                                                    <span class="desc-text">${payment.notes}</span>
+                                                    <span class="invoice">INV-${payment.transactionCode}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button class="btn-action btn-view" onclick="viewPayment('${payment.id}')" title="Xem chi tiết">
+                                                    <button class="btn-action btn-view" onclick="viewPayment('${payment.paymentID}')" title="Xem chi tiết">
                                                         👁️
                                                     </button>
-                                                    <c:if test="${payment.status eq 'pending'}">
+                                                    <c:if test="${fn:toLowerCase(payment.paymentStatus) eq 'pending'}">
                                                         <button class="btn-action btn-approve" onclick="approvePayment('${payment.paymentID}')" title="Duyệt">
                                                             ✅
                                                         </button>
@@ -226,7 +272,7 @@
                                                             ❌
                                                         </button>
                                                     </c:if>
-                                                    <button class="btn-action btn-download" onclick="downloadInvoice('${payment.invoiceNumber}')" title="Tải hóa đơn">
+                                                    <button class="btn-action btn-download" onclick="downloadInvoice('INV-${payment.transactionCode}')" title="Tải hóa đơn">
                                                         📄
                                                     </button>
                                                 </div>
@@ -239,7 +285,7 @@
 
                         <div class="table-footer">
                             <div class="pagination-info">
-                                Hiển thị ${totalPayments} giao dịch
+                                Hiển thị ${paymentStats.totalPayments} giao dịch
                                 <c:if test="${empty paymentList}">
                                     <span style="color: #999; font-style: italic;">(Chưa có giao dịch nào)</span>
                                 </c:if>
@@ -359,16 +405,23 @@
                 const rows = document.querySelectorAll('.payment-row');
                 
                 rows.forEach(row => {
-                    const status = row.getAttribute('data-status');
-                    const method = row.getAttribute('data-method');
+                    const status = (row.getAttribute('data-status') || '').toLowerCase();
+                    const method = (row.getAttribute('data-method') || '').toLowerCase();
                     
                     let showRow = true;
                     
-                    if (statusFilter && status !== statusFilter) {
-                        showRow = false;
+                    if (statusFilter) {
+                        const filterStatus = statusFilter.toLowerCase();
+                        // Handle both 'success' and 'completed' as completed
+                        const isCompleted = status === 'success' || status === 'completed';
+                        if (filterStatus === 'success' && !isCompleted) {
+                            showRow = false;
+                        } else if (filterStatus !== 'success' && status !== filterStatus) {
+                            showRow = false;
+                        }
                     }
                     
-                    if (methodFilter && method !== methodFilter) {
+                    if (methodFilter && method !== methodFilter.toLowerCase()) {
                         showRow = false;
                     }
                     

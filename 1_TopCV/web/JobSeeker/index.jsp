@@ -16,9 +16,9 @@
     List<Location> locations = ldao.getAllLocations();
     request.setAttribute("locations", locations);
     
-    // Load marketing content
+    // Load marketing content for website (only published, website platform, current date)
     ContentDAO contentDAO = new ContentDAO();
-    List<MarketingContent> marketingContents = contentDAO.getContentByStatus("Published");
+    List<MarketingContent> marketingContents = contentDAO.getPublishedContentForWebsite();
     request.setAttribute("marketingContents", marketingContents);
     
     // Set login status for use in JSP

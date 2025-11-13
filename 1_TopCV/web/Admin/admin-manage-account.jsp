@@ -1,9 +1,29 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.RecruiterDAO, java.util.List, model.Recruiter" %>
+<%@ page import="dal.RecruiterDAO, java.util.List, model.Recruiter, model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
     // Load danh sách Recruiter nếu chưa có
     if (request.getAttribute("recruiterList") == null) {
         try {
@@ -150,7 +170,7 @@
                                                       <td>${recruiter.phone}</td>
                                                       <td><span class="status ${recruiter.status}">${recruiter.status}</span></td>
                                                       <td>
-                                                          <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${recruiter.recruiterID}&type=recruiter" class="btn outline">Chi tiết</a>
+                                                          <a href="${pageContext.request.contextPath}/admin-view-recruiter-company?id=${recruiter.recruiterID}" class="btn outline">Chi tiết</a>
                                                           <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${recruiter.recruiterID}&type=recruiter" class="btn danger" 
                                                              onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
                                                       </td>

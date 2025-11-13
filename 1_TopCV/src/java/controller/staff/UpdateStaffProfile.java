@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Admin;
+import model.Role;
 
 public class UpdateStaffProfile extends HttpServlet {
 
@@ -30,7 +31,12 @@ public class UpdateStaffProfile extends HttpServlet {
 
         if (adminIdRaw == null || adminIdRaw.isEmpty()) {
             request.setAttribute("errorMessage", "Thiếu thông tin adminId.");
-            request.getRequestDispatcher("Staff/staff-profile.jsp").forward(request, response);
+            // Lấy role từ session để redirect đúng
+            HttpSession sessionCheck = request.getSession();
+            Role adminRole = (Role) sessionCheck.getAttribute("adminRole");
+            String roleName = (adminRole != null) ? adminRole.getName() : "";
+            String staffRole = "Marketing Staff".equals(roleName) ? "marketing" : "sales";
+            request.getRequestDispatcher("Staff/staff-profile.jsp?role=" + staffRole).forward(request, response);
             return;
         }
 
@@ -53,33 +59,53 @@ public class UpdateStaffProfile extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("admin", refreshed);
                 
-                // Xác định role để redirect về đúng dashboard
+                // Xác định role từ session (ưu tiên hơn email/name)
+                Role adminRole = (Role) session.getAttribute("adminRole");
+                String roleName = (adminRole != null) ? adminRole.getName() : "";
                 String staffRole = "sales"; // Mặc định là sales
-                if (refreshed.getEmail() != null && 
-                    (refreshed.getEmail().toLowerCase().contains("marketing") || 
-                     refreshed.getFullName() != null && refreshed.getFullName().toLowerCase().contains("marketing"))) {
-                    staffRole = "marketing";
-                }
                 
-                // Debug: In ra console để kiểm tra
-                System.out.println("UpdateStaffProfile - Staff Role Detection:");
-                System.out.println("Email: " + refreshed.getEmail());
-                System.out.println("FullName: " + refreshed.getFullName());
-                System.out.println("Detected Role: " + staffRole);
+                if ("Marketing Staff".equals(roleName)) {
+                    staffRole = "marketing";
+                } else if ("Sales".equals(roleName)) {
+                    staffRole = "sales";
+                } else {
+                    // Fallback: Kiểm tra email hoặc name nếu không có role trong session
+                    if (refreshed.getEmail() != null && 
+                        (refreshed.getEmail().toLowerCase().contains("marketing") || 
+                         refreshed.getFullName() != null && refreshed.getFullName().toLowerCase().contains("marketing"))) {
+                        staffRole = "marketing";
+                    }
+                }
                 
                 request.setAttribute("successMessage", "Cập nhật hồ sơ thành công.");
                 request.setAttribute("staffRole", staffRole);
-                request.getRequestDispatcher("Staff/staff-profile.jsp").forward(request, response);
+                // Redirect với role parameter
+                request.getRequestDispatcher("Staff/staff-profile.jsp?role=" + staffRole).forward(request, response);
             } else {
                 request.setAttribute("errorMessage", "Không thể cập nhật thông tin session.");
-                request.getRequestDispatcher("Staff/staff-profile.jsp").forward(request, response);
+                // Lấy role từ session để redirect đúng
+                HttpSession sessionError = request.getSession();
+                Role adminRole = (Role) sessionError.getAttribute("adminRole");
+                String roleName = (adminRole != null) ? adminRole.getName() : "";
+                String staffRole = "Marketing Staff".equals(roleName) ? "marketing" : "sales";
+                request.getRequestDispatcher("Staff/staff-profile.jsp?role=" + staffRole).forward(request, response);
             }
         } catch (NumberFormatException ex) {
             request.setAttribute("errorMessage", "adminId không hợp lệ.");
-            request.getRequestDispatcher("Staff/staff-profile.jsp").forward(request, response);
+            // Lấy role từ session để redirect đúng
+            HttpSession sessionError = request.getSession();
+            Role adminRole = (Role) sessionError.getAttribute("adminRole");
+            String roleName = (adminRole != null) ? adminRole.getName() : "";
+            String staffRole = "Marketing Staff".equals(roleName) ? "marketing" : "sales";
+            request.getRequestDispatcher("Staff/staff-profile.jsp?role=" + staffRole).forward(request, response);
         } catch (Exception ex) {
             request.setAttribute("errorMessage", "Có lỗi xảy ra khi cập nhật hồ sơ.");
-            request.getRequestDispatcher("Staff/staff-profile.jsp").forward(request, response);
+            // Lấy role từ session để redirect đúng
+            HttpSession sessionError = request.getSession();
+            Role adminRole = (Role) sessionError.getAttribute("adminRole");
+            String roleName = (adminRole != null) ? adminRole.getName() : "";
+            String staffRole = "Marketing Staff".equals(roleName) ? "marketing" : "sales";
+            request.getRequestDispatcher("Staff/staff-profile.jsp?role=" + staffRole).forward(request, response);
         }
     }
 }

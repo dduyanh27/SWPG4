@@ -56,6 +56,25 @@ public class PaymentServlet extends HttpServlet {
                 response.getWriter().println("Lỗi: Giỏ hàng trống!");
                 return;
             }
+            // VALIDATION: chỉ cho phép mua 1 loại gói (có thể nhiều số lượng)
+            Set<String> uniqueTitles = new HashSet<>();
+            int mergedQuantity = 0;
+            String mergedTitle = null;
+            int mergedPrice = 0;
+            for (Map<String, Object> item : cart) {
+                String title = (String) item.get("title");
+                uniqueTitles.add(title);
+            }
+            if (uniqueTitles.size() > 1) {
+                response.getWriter().println("Lỗi: Chỉ được phép mua 1 gói duy nhất trong một đơn hàng.");
+                return;
+            }
+            // Gộp số lượng cho cùng một gói (đề phòng dữ liệu trùng)
+            mergedTitle = (String) cart.get(0).get("title");
+            for (Map<String, Object> item : cart) {
+                mergedQuantity += (Integer) item.get("quantity");
+                mergedPrice = Integer.parseInt(item.get("price").toString());
+            }
             
             // Get recruiter from session
             Recruiter recruiter = SessionHelper.getCurrentRecruiter(request);
@@ -89,31 +108,25 @@ public class PaymentServlet extends HttpServlet {
             List<PaymentDetails> paymentDetails = new ArrayList<>();
             System.out.println("Creating payment details for " + cart.size() + " items");
             
-            for (Map<String, Object> item : cart) {
-                String packageName = (String) item.get("title");
-                int quantity = (Integer) item.get("quantity");
-                BigDecimal price = new BigDecimal(item.get("price").toString());
-                
-                System.out.println("Processing item: " + packageName + ", quantity: " + quantity + ", price: " + price);
-                
-                // Get package ID by name
+            // Dùng bản ghi duy nhất với tổng số lượng
+            {
+                String packageName = mergedTitle;
+                int quantity = mergedQuantity;
+                BigDecimal price = new BigDecimal(String.valueOf(mergedPrice));
+                System.out.println("Processing merged item: " + packageName + ", quantity: " + quantity + ", price: " + price);
                 int packageID = getPackageIdByName(packageName);
                 if (packageID == -1) {
                     System.out.println("Package not found: " + packageName);
                     response.getWriter().println("Lỗi: Không tìm thấy gói dịch vụ: " + packageName);
                     return;
                 }
-                
-                System.out.println("Found package ID: " + packageID + " for: " + packageName);
-                
                 PaymentDetails detail = new PaymentDetails();
                 detail.setPaymentID(paymentID);
                 detail.setPackageID(packageID);
                 detail.setQuantity(quantity);
                 detail.setUnitPrice(price);
                 paymentDetails.add(detail);
-                
-                System.out.println("Added payment detail: PaymentID=" + paymentID + ", PackageID=" + packageID + ", Quantity=" + quantity);
+                System.out.println("Added merged payment detail: PaymentID=" + paymentID + ", PackageID=" + packageID + ", Quantity=" + quantity);
             }
             
             System.out.println("Total payment details to create: " + paymentDetails.size());

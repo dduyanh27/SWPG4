@@ -170,7 +170,7 @@ public class ResetPasswordServlet extends HttpServlet {
         }
 
         String hashedNewPassword = MD5Util.getMD5Hash(password);
-        if (hashedNewPassword.equals(currentPassword)) {
+        if (hashedNewPassword.equalsIgnoreCase(currentPassword)) {
             request.setAttribute("mess", "Mật khẩu mới không được trùng với mật khẩu hiện tại");
             request.setAttribute("email", email);
             request.setAttribute("userType", userType);
@@ -179,7 +179,7 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        // Update password - DAO will handle MD5 hashing
+        // Update based on user type (DAOs will hash to MD5, lowercase)
         tokenForgetPassword.setUsed(true);
 
         switch (userType.toLowerCase()) {
