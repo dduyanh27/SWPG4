@@ -1,6 +1,7 @@
 package controller.jobseeker;
 
 import dal.JobSeekerDAO;
+import dal.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -123,7 +124,7 @@ public class ChangePasswordServlet extends HttpServlet {
             
             // Kiểm tra mật khẩu hiện tại có đúng không
             String hashedCurrentPassword = MD5Util.getMD5Hash(currentPassword);
-            if (!hashedCurrentPassword.equals(jobSeeker.getPassword())) {
+            if (!hashedCurrentPassword.equalsIgnoreCase(jobSeeker.getPassword())) {
                 jsonResponse.addProperty("success", false);
                 jsonResponse.addProperty("message", "Mật khẩu hiện tại không đúng.");
                 out.print(jsonResponse.toString());
@@ -134,6 +135,19 @@ public class ChangePasswordServlet extends HttpServlet {
             boolean success = dao.updatePassword(userId, newPassword);
             
             if (success) {
+                // Tạo thông báo đổi mật khẩu thành công
+                NotificationDAO.sendNotification(
+                    userId,
+                    "jobseeker",
+                    "system",
+                    "Đổi mật khẩu thành công",
+                    "Mật khẩu của bạn đã được thay đổi thành công. Nếu bạn không thực hiện hành động này, vui lòng liên hệ với chúng tôi ngay lập tức.",
+                    userId,
+                    "user",
+                    "/JobSeeker/profile.jsp",
+                    1
+                );
+                
                 jsonResponse.addProperty("success", true);
                 jsonResponse.addProperty("message", "Thay đổi mật khẩu thành công!");
             } else {

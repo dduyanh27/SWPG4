@@ -24,7 +24,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
         const contextPath = '${pageContext.request.contextPath}';
-        // const isLoggedIn = ${isLoggedIn};
+        const isLoggedIn = ${isLoggedIn};
     </script>
     <script>
     // Save Job on job-detail: sync behavior with job-list
@@ -263,9 +263,7 @@
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
                     </a>
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
+                    <%@ include file="/shared/notification-dropdown.jsp" %>
                     <div class="message-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
@@ -295,7 +293,7 @@
             </div>
             <div class="mega-col">
                 <h4>Công ty</h4>
-                <a href="#">Tất cả công ty</a>
+                <a href="${pageContext.request.contextPath}/company-culture">Tất cả công ty</a>
             </div>
         </div>
     </div>
@@ -352,15 +350,17 @@
                 <h2>Các phúc lợi dành cho bạn</h2>
                 <div class="benefits-grid">
                     <c:if test="${job.recruiter.companyBenefits != null}">
-                        <div class="benefit-item">
-                            <div class="benefit-icon">
-                                <i class="fas fa-gift"></i>
+                        <c:forTokens var="benefit" items="${job.recruiter.companyBenefits}" delims="|">
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <div class="benefit-content">
+                                    <h3>Phúc lợi</h3>
+                                    <p>${benefit}</p>
+                                </div>
                             </div>
-                            <div class="benefit-content">
-                                <h3>Phúc lợi công ty</h3>
-                                <p>${job.recruiter.companyBenefits}</p>
-                            </div>
-                        </div>
+                        </c:forTokens>
                     </c:if>
                     <div class="benefit-item">
                         <div class="benefit-icon">
@@ -455,7 +455,9 @@
                         </div>
                     </div>
                 </div>
-                <a href="#" class="view-more-link">Xem thêm</a>
+                <a href="${pageContext.request.contextPath}/company-profile?id=${job.recruiter.recruiterID}" class="view-more-link" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-building"></i> Xem thông tin công ty
+                </a>
             </div>
 
             <!-- Work Location Section -->
@@ -489,12 +491,25 @@
         <aside class="job-detail-sidebar">
             <!-- Company Info -->
             <div class="company-card">
-                <div class="company-logo">
-                    <div class="logo-placeholder">AFCHEM</div>
-                </div>
+                <a href="${pageContext.request.contextPath}/company-profile?id=${job.recruiter.recruiterID}" style="text-decoration: none; color: inherit;">
+                    <div class="company-logo">
+                        <c:choose>
+                            <c:when test="${not empty job.recruiter.companyLogoURL}">
+                                <img src="${job.recruiter.companyLogoURL}" alt="${job.recruiter.companyName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="logo-placeholder">
+                                    ${job.recruiter.companyName.substring(0, job.recruiter.companyName.length() >= 3 ? 3 : job.recruiter.companyName.length()).toUpperCase()}
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </a>
                 <div class="company-info">
-                    <h3>Công Ty Cổ Phần Hóa Chất Thực Phẩm Châu Á</h3>
-                    <p class="company-address">Hà Nội</p>
+                    <a href="${pageContext.request.contextPath}/company-profile?id=${job.recruiter.recruiterID}" style="text-decoration: none; color: inherit;">
+                        <h3 style="transition: color 0.2s;" onmouseover="this.style.color='#0b5bd3'" onmouseout="this.style.color=''">${job.recruiter.companyName}</h3>
+                    </a>
+                    <p class="company-address">${job.location.locationName}</p>
                     <a href="#" class="view-map-link" id="viewMapLink">Xem bản đồ</a>
                     <div class="recruitment-contact">
                         <i class="fas fa-phone"></i>

@@ -511,9 +511,7 @@
                         <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                             <i class="fas fa-user"></i>
                         </a>
-                        <div class="notification-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
+                        <%@ include file="/shared/notification-dropdown.jsp" %>
                         <div class="message-icon">
                             <i class="fas fa-envelope"></i>
                         </div>
@@ -543,7 +541,7 @@
                 </div>
                 <div class="mega-col">
                     <h4>Công ty</h4>
-                    <a href="#">Tất cả công ty</a>
+                    <a href="${pageContext.request.contextPath}/company-culture">Tất cả công ty</a>
                 </div>
             </div>
         </div>
@@ -677,7 +675,7 @@
                                             <h3 class="job-title">${job.jobTitle}</h3>
                                         </td>
                                         <td>
-                                            <div class="company">${job.companyName}</div>
+                                            <a href="${pageContext.request.contextPath}/company-profile?id=${job.recruiterID}" class="company" style="color: inherit; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#0b5bd3'" onmouseout="this.style.color='inherit'">${job.companyName}</a>
                                         </td>
                                         <td>
                                             <span class="location">${job.locationName}</span>

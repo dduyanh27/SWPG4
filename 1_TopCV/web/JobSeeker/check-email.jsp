@@ -89,7 +89,7 @@
                     
                     if (countdown < 0) {
                         clearInterval(timer);
-                        window.location.href = '/1_TopCV/JobSeeker/jobseeker-login.jsp';
+                        window.location.href = '${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp';
                     }
                 }, 1000);
             });

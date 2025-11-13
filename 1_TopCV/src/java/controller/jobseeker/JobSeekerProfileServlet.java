@@ -6,6 +6,7 @@ import dal.TypeDAO;
 import dal.CVDAO;
 import dal.ApplicationDAO;
 import dal.SavedJobDAO;
+import dal.SkillDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import model.Type;
 import model.CV;
 import model.ApplicationView;
 import model.SavedJob;
+import model.Skill;
 import util.SessionHelper;
 import jakarta.servlet.annotation.WebServlet;
 
@@ -30,6 +32,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
     private CVDAO cvDAO;
     private ApplicationDAO appDAO;
     private SavedJobDAO savedJobDAO;
+    private SkillDAO skillDAO;
     
     public JobSeekerProfileServlet() {
         try {
@@ -39,6 +42,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
             this.cvDAO = new CVDAO();
             this.appDAO = new ApplicationDAO();
             this.savedJobDAO = new SavedJobDAO();
+            this.skillDAO = new SkillDAO();
         } catch (Exception e) {
             System.err.println("Error initializing DAOs in JobSeekerProfileServlet: " + e.getMessage());
             e.printStackTrace();
@@ -153,6 +157,12 @@ public class JobSeekerProfileServlet extends HttpServlet {
             
             request.setAttribute("recentApplications", recentApplications);
             request.setAttribute("recentSavedJobs", recentSavedJobs);
+            
+            // Load skills for the JobSeeker
+            List<Skill> jobSeekerSkills = skillDAO.getSkillsByJobSeekerId(id);
+            List<Skill> allSkills = skillDAO.getAllSkills();
+            request.setAttribute("jobSeekerSkills", jobSeekerSkills);
+            request.setAttribute("allSkills", allSkills);
             
             request.getRequestDispatcher("JobSeeker/profile.jsp").forward(request, response);
         } catch (Exception e) {

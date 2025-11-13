@@ -2,6 +2,7 @@ package controller.jobseeker;
 
 import dal.ApplicationDAO;
 import dal.CVDAO;
+import dal.NotificationDAO;
 import model.Application;
 import model.CV;
 import model.JobSeeker;
@@ -29,12 +30,14 @@ public class JobApplicationServlet extends HttpServlet {
     
     private ApplicationDAO applicationDAO;
     private CVDAO cvDAO;
+    private NotificationDAO notificationDAO;
     
     @Override
     public void init() throws ServletException {
         super.init();
         applicationDAO = new ApplicationDAO();
         cvDAO = new CVDAO();
+        notificationDAO = new NotificationDAO();
     }
     
     @Override
@@ -135,6 +138,19 @@ public class JobApplicationServlet extends HttpServlet {
             boolean success = applicationDAO.insertApplication(application);
             
             if (success) {
+                // Tạo thông báo ứng tuyển thành công
+                NotificationDAO.sendNotification(
+                    jobSeeker.getJobSeekerId(),
+                    "jobseeker",
+                    "application",
+                    "Ứng tuyển thành công",
+                    "Đơn ứng tuyển của bạn đã được gửi thành công. Nhà tuyển dụng sẽ xem xét trong thời gian sớm nhất.",
+                    jobId,
+                    "job",
+                    "/JobSeeker/applied-jobs.jsp",
+                    1
+                );
+                
                 response.setContentType("application/json");
                 response.getWriter().write("{\"success\": true, \"message\": \"Ứng tuyển thành công!\"}");
             } else {

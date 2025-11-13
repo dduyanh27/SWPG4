@@ -906,9 +906,7 @@
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
                     </a>
-                    <div class="notification-icon" title="Thông báo">
-                        <i class="fas fa-bell"></i>
-                    </div>
+                    <%@ include file="/shared/notification-dropdown.jsp" %>
                     <div class="message-icon" title="Tin nhắn">
                         <i class="fas fa-envelope"></i>
                     </div>

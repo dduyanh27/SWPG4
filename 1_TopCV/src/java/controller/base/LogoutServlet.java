@@ -35,17 +35,17 @@ public class LogoutServlet extends HttpServlet {
             String userType = (String) session.getAttribute("userType");
             session.invalidate();
             
-            // Redirect to appropriate login page based on user type
+            // Redirect to appropriate page based on user type
             if (userType != null && userType.equals("admin")) {
                 response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
-            } else if (userType != null && userType.equals("jobseeker")) {
-                response.sendRedirect(request.getContextPath() + "/JobSeeker/jobseeker-login.jsp");
             } else if (userType != null && userType.equals("recruiter")) {
                 response.sendRedirect(request.getContextPath() + "/Recruiter/recruiter-login.jsp");
             } else {
+                // For jobseeker or unknown type, redirect to homepage (which guests can view)
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
             }
         } else {
+            // Session is null (expired), redirect to homepage (which guests can view)
             response.sendRedirect(request.getContextPath() + "/index.jsp");
         }
     } 
