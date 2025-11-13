@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VietnamWorks - Chi tiết việc làm</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/owl.carousel.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/flaticon.css">
@@ -25,7 +24,138 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
         const contextPath = '${pageContext.request.contextPath}';
-        const isLoggedIn = ${isLoggedIn};
+        // const isLoggedIn = ${isLoggedIn};
+    </script>
+    <script>
+    // Save Job on job-detail: sync behavior with job-list
+    document.addEventListener('DOMContentLoaded', function () {
+        const saveButtons = document.querySelectorAll('.save-btn[data-job-id]');
+
+        saveButtons.forEach(btn => {
+            const jobId = btn.getAttribute('data-job-id');
+            checkIfSaved(jobId, btn);
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSaveJob(jobId, btn);
+            });
+        });
+
+        function setSavedUI(btn, saved) {
+            const icon = btn.querySelector('i');
+            const textSpan = btn.querySelector('span');
+            if (saved) {
+                btn.classList.add('saved');
+                if (icon) { icon.classList.remove('far'); icon.classList.add('fas'); }
+                if (textSpan) { textSpan.textContent = 'Đã lưu'; }
+                btn.title = 'Bỏ lưu công việc';
+            } else {
+                btn.classList.remove('saved');
+                if (icon) { icon.classList.remove('fas'); icon.classList.add('far'); }
+                if (textSpan) { textSpan.textContent = 'Chưa lưu'; }
+                btn.title = 'Lưu công việc';
+            }
+        }
+
+        function setSavedUIForAll(jobId, saved) {
+            document.querySelectorAll('.save-btn[data-job-id="' + jobId + '"]').forEach(b => setSavedUI(b, saved));
+        }
+
+        function showNotification(message, isError) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = 'position:fixed;top:80px;right:20px;'
+                + (isError ? 'background:#ef4444;' : 'background:#10b981;')
+                + 'color:#fff;padding:12px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;animation:slideIn 0.3s ease;';
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+
+        function parseJsonSafe(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                return Promise.resolve({ success: false, message: 'NOT_JSON', status: response.status });
+            }
+            return response.json().catch(() => ({ success: false, message: 'INVALID_JSON', status: response.status }));
+        }
+
+        function checkIfSaved(jobId, btn) {
+            fetch(contextPath + '/saved-jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                credentials: 'same-origin',
+                body: 'action=check&jobId=' + encodeURIComponent(jobId)
+            })
+                .then(r => parseJsonSafe(r))
+                .then(data => {
+                    if (data.success && data.isSaved) {
+                        setSavedUI(btn, true);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        }
+
+        function toggleSaveJob(jobId, btn, oneRetry) {
+            if (btn.dataset.loading === '1') return; // chặn spam
+            btn.dataset.loading = '1';
+            // B1: hỏi trạng thái thật từ server
+            fetch(contextPath + '/saved-jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                credentials: 'same-origin',
+                body: 'action=check&jobId=' + encodeURIComponent(jobId)
+            })
+            .then(r => parseJsonSafe(r))
+            .then(checkData => {
+                if (checkData && (checkData.status === 401 || checkData.message === 'NOT_JSON' || checkData.message === 'INVALID_JSON')) {
+                    window.location.href = contextPath + '/JobSeeker/jobseeker-login.jsp';
+                    return Promise.reject('AUTH');
+                }
+                const serverSaysSaved = !!(checkData && checkData.isSaved);
+                const action = serverSaysSaved ? 'unsave' : 'save';
+                // B2: gửi hành động ngược với trạng thái hiện tại để toggle
+                return fetch(contextPath + '/saved-jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                credentials: 'same-origin',
+                body: 'action=' + action + '&jobId=' + encodeURIComponent(jobId)
+                }).then(r => parseJsonSafe(r));
+            })
+            .then(data => {
+                    if (data && data.success) {
+                        const nextSaved = (typeof data.isSaved === 'boolean') ? data.isSaved : undefined;
+                        if (typeof nextSaved === 'boolean') {
+                            setSavedUIForAll(jobId, nextSaved);
+                        } else {
+                            // Nếu server không trả isSaved, hỏi lại để đồng bộ tuyệt đối
+                            checkIfSaved(jobId, btn);
+                        }
+                        showNotification(data.message || (nextSaved ? 'Đã lưu công việc' : 'Đã bỏ lưu công việc'), false);
+                    } else if (data && (data.status === 401 || data.message === 'NOT_JSON' || data.message === 'INVALID_JSON')) {
+                        // Có thể bị redirect về trang login hoặc không đăng nhập
+                        window.location.href = contextPath + '/JobSeeker/jobseeker-login.jsp';
+                    } else {
+                        const msg = (data && data.message ? String(data.message) : '').toLowerCase();
+                        const alreadySaved = msg.includes('đã được lưu trước đó');
+                        const alreadyUnsaved = msg.includes('đã được bỏ lưu trước đó') || msg.includes('chưa lưu trước đó');
+                        // Với flow mới (check trước), các thông điệp này hiếm khi xảy ra, nhưng nếu có thì đồng bộ lại
+                        // Thông báo lỗi nhẹ và đồng bộ lại UI theo server
+                        showNotification(data && data.message ? data.message : 'Có lỗi xảy ra', true);
+                        checkIfSaved(jobId, btn);
+                    }
+            })
+            .catch(err => {
+                    console.error('Error:', err);
+                    showNotification('Có lỗi xảy ra khi lưu công việc', true);
+                    checkIfSaved(jobId, btn);
+            })
+            .finally(() => {
+                    delete btn.dataset.loading;
+            });
+        }
+    });
     </script>
     <style>
         /* Mega Menu Styles */
@@ -128,7 +258,7 @@
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
@@ -171,8 +301,8 @@
     </div>
 
     <div class="job-detail-container">
-        <!-- Main Content -->
-        <main class="job-detail-content">
+    <!-- Main Content -->
+    <main class="job-detail-content">
             <!-- Job Header -->
             <div class="job-header">
                 <div class="job-title-section">
@@ -191,10 +321,10 @@
                                     <a href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp" class="apply-btn">Đăng nhập để ứng tuyển</a>
                                 </c:otherwise>
                             </c:choose>
-<!--                            <button class="save-btn" data-job-id="${job.jobID}">
+                            <button class="save-btn" data-job-id="${job.jobID}">
                                 <i class="far fa-heart"></i>
                                 <span>Chưa lưu</span>
-                            </button>-->
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -355,33 +485,20 @@
             </div>-->
         </main>
 
-        <!-- Right Sidebar -->
+<!-- Right Sidebar -->
         <aside class="job-detail-sidebar">
             <!-- Company Info -->
             <div class="company-card">
                 <div class="company-logo">
-                    <c:choose>
-                        <c:when test="${job.recruiter.companyLogoURL != null}">
-                            <img src="${job.recruiter.companyLogoURL}" alt="${job.recruiter.companyName}">
-                        </c:when>
-                        <c:otherwise>
-                            <div class="logo-placeholder">${job.recruiter.companyName.substring(0, job.recruiter.companyName.length() > 6 ? 6 : job.recruiter.companyName.length())}</div>
-                        </c:otherwise>
-                    </c:choose>
+                    <div class="logo-placeholder">AFCHEM</div>
                 </div>
                 <div class="company-info">
-                    <h3>${job.recruiter.companyName}</h3>
-                    <p class="company-address">${job.recruiter.companyAddress != null ? job.recruiter.companyAddress : job.location.locationName}</p>
-                    <c:if test="${job.recruiter.companySize != null}">
-                        <p class="company-size"><i class="fas fa-users"></i> Quy mô: ${job.recruiter.companySize}</p>
-                    </c:if>
-                    <c:if test="${job.recruiter.contactPerson != null}">
-                        <p class="contact-person"><i class="fas fa-user-tie"></i> Người liên hệ: ${job.recruiter.contactPerson}</p>
-                    </c:if>
-                    <a href="#" class="view-map-link">Xem bản đồ</a>
+                    <h3>Công Ty Cổ Phần Hóa Chất Thực Phẩm Châu Á</h3>
+                    <p class="company-address">Hà Nội</p>
+                    <a href="#" class="view-map-link" id="viewMapLink">Xem bản đồ</a>
                     <div class="recruitment-contact">
                         <i class="fas fa-phone"></i>
-                        <span>Bộ phận Tuyển dụng</span>
+                        <span>${job.recruiter.phone}</span>
                     </div>
                 </div>
             </div>
@@ -471,9 +588,9 @@
                         <a href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp" class="apply-btn">Đăng nhập để ứng tuyển</a>
                     </c:otherwise>
                 </c:choose>
-<!--                <button class="save-btn" data-job-id="${job.jobID}">
+                <button class="save-btn" data-job-id="${job.jobID}">
                     <i class="far fa-heart"></i>
-                </button>-->
+                </button>
             </div>
         </div>
     </div>
@@ -584,8 +701,30 @@
     <script src="${pageContext.request.contextPath}/assets/js/jquery.slicknav.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/jquery.magnific-popup.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/plugins.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/slick.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
     <script src="${pageContext.request.contextPath}/JobSeeker/script.js"></script>
+    
+    <!-- View map: open Google Maps with work location -->
+    <script>
+    (function() {
+        const workAddress = '${job.recruiter.companyAddress != null ? job.recruiter.companyAddress : job.location.locationName}';
+        document.addEventListener('DOMContentLoaded', function () {
+            var link = document.getElementById('viewMapLink');
+            if (!link) return;
+            var mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(workAddress || '');
+            // Set real href so user can copy/open in new tab
+            link.setAttribute('href', mapsUrl);
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener');
+            link.addEventListener('click', function (e) {
+                // In case some browsers block without target
+                e.preventDefault();
+                window.open(mapsUrl, '_blank');
+            });
+        });
+    })();
+    </script>
     
     <!-- Mega menu JavaScript -->
     <script>

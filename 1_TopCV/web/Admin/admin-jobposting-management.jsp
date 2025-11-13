@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO, dal.ApplicationDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Application, model.Recruiter, model.JobSeeker" %>
+<%@ page import="dal.AdminDAO, dal.ApplicationDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Application, model.Recruiter, model.JobSeeker, model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="java.util.List" %>
@@ -8,13 +8,31 @@
 <%@ page import="model.AdminJobDetail" %>
 
 <%
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
     // Only load data if not already loaded by controller
     if (request.getAttribute("jobList") == null) {
         AdminJobDAO ajd = new AdminJobDAO();
         List<Job> jobList = ajd.getAllJobs();
         request.setAttribute("jobList", jobList);
-        List<Job> pendingJobs = ajd.getJobsByStatus("Pending");
-        request.setAttribute("pendingJobs", pendingJobs);
         List<Job> publishedJobs = ajd.getJobsByStatus("Published");
         request.setAttribute("publishedJobs", publishedJobs);
         
@@ -28,12 +46,6 @@
     int totalApplications = appList.size();
     request.setAttribute("totalApplications",totalApplications);
 
-    String view = request.getParameter("view");
-    boolean showingPending = "pending".equalsIgnoreCase(view);
-    request.setAttribute("showingPending", showingPending);
-    if (showingPending && request.getAttribute("pendingJobs") != null) {
-        request.setAttribute("jobList", request.getAttribute("pendingJobs"));
-    }
 %>
 <!doctype html>
 <html lang="vi">
@@ -79,7 +91,7 @@
                     <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
                     <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
                     <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
-                    <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
+                    <a href="${pageContext.request.contextPath}/Admin/ad-payment.jsp" class="nav-item">💳 Quản lý thanh toán</a>
                 </nav>
 
                 <div class="sidebar-actions">
@@ -114,14 +126,6 @@
                             <div class="stat-label">Đã duyệt</div>
                         </div>
 
-                        <div class="stat-card">
-                            <div class="stat-header">
-                                <div class="stat-icon">⏳</div>
-                                <div class="stat-trend trend-down">↘️ -5%</div>
-                            </div>
-                            <div class="stat-value">${fn:length(pendingJobs)}</div>
-                            <div class="stat-label">Chờ duyệt</div>
-                        </div>
 
                         <div class="stat-card">
                             <div class="stat-header">
@@ -181,7 +185,6 @@
                                     <select class="filter-input" name="status">
                                         <option value="" ${empty status ? "selected" : ""}>Tất cả trạng thái</option>
                                         <option value="Published" ${status eq 'Published' ? "selected" : ""}>Đã xuất bản</option>
-                                        <option value="Pending" ${status eq 'Pending' ? "selected" : ""}>Chờ duyệt</option>
                                         <option value="Closed" ${status eq 'Closed' ? "selected" : ""}>Đã đóng</option>
                                         <option value="Draft" ${status eq 'Draft' ? "selected" : ""}>Bản nháp</option>
                                     </select>
@@ -229,8 +232,6 @@
                             <div class="table-title">📋 Danh sách công việc</div>
                             <div class="table-actions">
                                 <a class="btn btn-ghost btn-sm" href="adminjobfilter">📋 Tất cả</a>
-                                <a class="btn btn-ghost btn-sm" href="adminjobfilter?status=Pending">📤 Chờ duyệt</a>
-                                <button class="btn btn-success btn-sm" onclick="bulkApprove()">✅ Duyệt hàng loạt</button>
                             </div>
                         </div>
 
@@ -278,15 +279,11 @@
                                                     <td>-</td>
                                                     <td>
                                                         <div class="action-buttons">
-                                                            <button class="btn btn-ghost btn-sm" onclick="viewJob('${jobDetail.jobId}')">👁️</button>
-                                                            <button class="btn btn-primary btn-sm" onclick="editJob('${jobDetail.jobId}')">✏️</button>
+                                                            <form action="${pageContext.request.contextPath}/adminviewjob" method="get" style="display:inline-block;">
+                                                                <input type="hidden" name="jobId" value="${jobDetail.jobId}">
+                                                                <button type="submit" class="btn btn-ghost btn-sm">👁️</button>
+                                                            </form>
                                                             <button class="btn btn-danger btn-sm" onclick="deleteJob('${jobDetail.jobId}')">🗑️</button>
-                                                            <c:if test="${jobDetail.status eq 'Pending'}">
-                                                                <form action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:inline-block;">
-                                                                    <input type="hidden" name="jobId" value="${jobDetail.jobId}">
-                                                                    <button type="submit" class="btn btn-success btn-sm">✅ Duyệt</button>
-                                                                </form>
-                                                            </c:if>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -298,7 +295,6 @@
                         </div>
                     </div>
 
-                    <form id="bulkApproveForm" action="${pageContext.request.contextPath}/adminapprovejobpost" method="post" style="display:none;"></form>
                     <form id="deleteJobForm" action="${pageContext.request.contextPath}/adminclosejobpost" method="post" style="display:none;">
                         <input type="hidden" name="jobId" id="deleteJobId">
                     </form>
@@ -427,23 +423,6 @@
             }
         })();
 
-        function bulkApprove() {
-            var selected = document.querySelectorAll('.row-select:checked');
-            if (selected.length === 0) {
-                alert('Vui lòng chọn ít nhất 1 tin để duyệt.');
-                return;
-            }
-            var form = document.getElementById('bulkApproveForm');
-            form.innerHTML = '';
-            for (var i = 0; i < selected.length; i++) {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'jobId';
-                input.value = selected[i].value;
-                form.appendChild(input);
-            }
-            form.submit();
-        }
 
         function deleteJob(jobId) {
             if (!jobId)

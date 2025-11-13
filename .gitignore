@@ -2,16 +2,23 @@
 # NetBeans build and private files
 # ===============================
 /1_TopCV/nbproject/private/
-/1_TopCV/nbproject/build-impl.xml
-/1_TopCV/nbproject/genfiles.properties
+/1_TopCV/nbproject/
 /1_TopCV/build/
 /1_TopCV/dist/
 
 # ===============================
-# IntelliJ / JetBrains IDE files
+# IDE-specific files
 # ===============================
 .idea/
 *.iml
+
+# ===============================
+# Database and secret configuration
+# ===============================
+1_TopCV/src/java/dal/DBContext.java
+1_TopCV/src/java/util/IConstant.java
+config.properties
+TopCV_Avatars/
 
 # ===============================
 # Backup and temporary files
@@ -20,12 +27,6 @@
 *.log
 *.tmp
 *.bak
-
-# ===============================
-# Application-specific secrets or configs
-# ===============================
-/1_TopCV/src/java/util/IConstant.java
-config.properties
 
 # ===============================
 # OS-specific (macOS, Windows, etc.)

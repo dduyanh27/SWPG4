@@ -2,14 +2,30 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ page import="model.MarketingContent, model.Campaign, model.Admin" %>
+<%@ page import="model.MarketingContent, model.Campaign, model.Admin, model.Role" %>
 
 <%
-    Admin admin = (Admin) session.getAttribute("admin");
-    if (admin == null) {
+    // Authentication check - chỉ Marketing Staff mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
         response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
         return;
     }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Marketing Staff".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
+    Admin admin = (Admin) sessionObj.getAttribute("admin");
 %>
 
 <!DOCTYPE html>
@@ -435,7 +451,7 @@
                 <a href="#" class="nav-item">⚙️ Cài đặt</a>
             </nav>
             <div class="sidebar-actions">
-                <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
+                <a href="${pageContext.request.contextPath}/Staff/staff-profile.jsp?role=marketing" class="action-btn">👤 Hồ sơ cá nhân</a>
                 <a href="${pageContext.request.contextPath}/LogoutServlet" class="action-btn logout">🚪 Đăng xuất</a>
             </div>
         </div>

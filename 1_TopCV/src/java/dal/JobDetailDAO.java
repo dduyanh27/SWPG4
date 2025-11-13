@@ -4,7 +4,22 @@ import model.*;
 import java.sql.*;
 
 public class JobDetailDAO extends DBContext {
-    
+
+    /**
+     * Gọi procedure tăng view cho job
+     */
+    public boolean incrementJobViewCount(int jobId) {
+        String sql = "{call sp_IncrementJobView(?)}";
+        try (CallableStatement cs = c.prepareCall(sql)) {
+            cs.setInt(1, jobId);
+            int rows = cs.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * Lấy thông tin chi tiết job với tất cả thông tin liên quan
      * JOIN với các bảng: Recruiter, Locations, Categories, Types
@@ -13,12 +28,12 @@ public class JobDetailDAO extends DBContext {
         String sql = """
             SELECT 
                 j.JobID, j.JobTitle, j.Description, j.Requirements, j.SalaryRange,
-                j.PostingDate, j.ExpirationDate, j.AgeRequirement, j.HiringCount, j.Status,
+                j.PostingDate, j.ExpirationDate, j.AgeRequirement, j.HiringCount, j.Status, j.ViewCount,
                 
                 -- Recruiter info
                 r.RecruiterID, r.CompanyName, r.CompanyDescription, r.CompanyLogoURL,
                 r.Website, r.CompanyAddress, r.CompanySize, r.ContactPerson, 
-                r.CompanyBenefits, r.CompanyVideoURL,
+                r.CompanyBenefits, r.CompanyVideoURL, r.Phone,
                 
                 -- Location info
                 l.LocationID, l.LocationName,
@@ -74,6 +89,7 @@ public class JobDetailDAO extends DBContext {
         jobDetail.setAgeRequirement(rs.getInt("AgeRequirement"));
         jobDetail.setHiringCount(rs.getInt("HiringCount"));
         jobDetail.setStatus(rs.getString("Status"));
+        jobDetail.setViews(rs.getInt("ViewCount"));
         
         // Dates
         Timestamp postingDate = rs.getTimestamp("PostingDate");
@@ -88,16 +104,17 @@ public class JobDetailDAO extends DBContext {
         
         // Recruiter info
         Recruiter recruiter = new Recruiter();
-        recruiter.setRecruiterID(rs.getInt("RecruiterID"));
-        recruiter.setCompanyName(rs.getString("CompanyName"));
-        recruiter.setCompanyDescription(rs.getString("CompanyDescription"));
-        recruiter.setCompanyLogoURL(rs.getString("CompanyLogoURL"));
-        recruiter.setWebsite(rs.getString("Website"));
-        recruiter.setCompanyAddress(rs.getString("CompanyAddress"));
-        recruiter.setCompanySize(rs.getString("CompanySize"));
-        recruiter.setContactPerson(rs.getString("ContactPerson"));
-        recruiter.setCompanyBenefits(rs.getString("CompanyBenefits"));
-        recruiter.setCompanyVideoURL(rs.getString("CompanyVideoURL"));
+    recruiter.setRecruiterID(rs.getInt("RecruiterID"));
+    recruiter.setCompanyName(rs.getString("CompanyName"));
+    recruiter.setCompanyDescription(rs.getString("CompanyDescription"));
+    recruiter.setCompanyLogoURL(rs.getString("CompanyLogoURL"));
+    recruiter.setWebsite(rs.getString("Website"));
+    recruiter.setCompanyAddress(rs.getString("CompanyAddress"));
+    recruiter.setCompanySize(rs.getString("CompanySize"));
+    recruiter.setContactPerson(rs.getString("ContactPerson"));
+    recruiter.setCompanyBenefits(rs.getString("CompanyBenefits"));
+    recruiter.setCompanyVideoURL(rs.getString("CompanyVideoURL"));
+    recruiter.setPhone(rs.getString("Phone"));
         jobDetail.setRecruiter(recruiter);
         
         // Location info

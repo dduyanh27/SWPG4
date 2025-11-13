@@ -1,14 +1,30 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO,java.util.List,model.Admin,dal.JobSeekerDAO,dal.RecruiterDAO" %>
+<%@ page import="dal.AdminDAO,java.util.List,model.Admin,dal.JobSeekerDAO,dal.RecruiterDAO,model.Role" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
-    Admin admin = (Admin) session.getAttribute("admin");
-    if (admin == null) {
+    // Authentication check - chỉ Admin mới được truy cập
+    HttpSession sessionObj = request.getSession(false);
+    if (sessionObj == null) {
         response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
         return;
     }
+    
+    String userType = (String) sessionObj.getAttribute("userType");
+    Role adminRole = (Role) sessionObj.getAttribute("adminRole");
+    
+    if (userType == null || !"admin".equals(userType)) {
+        response.sendRedirect(request.getContextPath() + "/Admin/admin-login.jsp");
+        return;
+    }
+    
+    if (adminRole == null || !"Admin".equals(adminRole.getName())) {
+        response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        return;
+    }
+    
+    Admin admin = (Admin) sessionObj.getAttribute("admin");
 
     // Lấy danh sách admin
     if (request.getAttribute("adminList") == null) {
@@ -73,7 +89,7 @@
                 <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item">👥 Quản lý tài khoản</a>
                 <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
                 <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
-                <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
+                <a href="${pageContext.request.contextPath}/Admin/ad-payment.jsp" class="nav-item">💳 Quản lý thanh toán</a>
             </nav>
 
             <div class="sidebar-actions">

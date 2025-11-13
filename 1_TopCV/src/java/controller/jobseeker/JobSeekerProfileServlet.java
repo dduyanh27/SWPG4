@@ -71,7 +71,10 @@ public class JobSeekerProfileServlet extends HttpServlet {
             JobSeeker js = dao.getJobSeekerById(id);
             List<Location> locations = locDao.getAllLocations();
             List<Type> types = typeDao.getJobLevels();
-            String typeName = typeDao.getTypeNameByCurrentLevelId(js.getCurrentLevelId());
+            String typeName = null;
+            if (js.getCurrentLevelId() != null) {
+                typeName = typeDao.getTypeNameByCurrentLevelId(js.getCurrentLevelId());
+            }
             
             // Lấy danh sách CV của người dùng
             List<CV> uploadedCVs = cvDAO.getCVsByJobSeekerId(id);
@@ -192,8 +195,8 @@ public class JobSeekerProfileServlet extends HttpServlet {
             String locStr = request.getParameter("locationID");
             String levelStr = request.getParameter("currentLevelID");
 
-            int locationId = (locStr != null && !locStr.isEmpty()) ? Integer.parseInt(locStr) : 0;
-            int currentLevelId = (levelStr != null && !levelStr.isEmpty()) ? Integer.parseInt(levelStr) : 0;
+            Integer locationId = (locStr != null && !locStr.isEmpty()) ? Integer.parseInt(locStr) : null;
+            Integer currentLevelId = (levelStr != null && !levelStr.isEmpty()) ? Integer.parseInt(levelStr) : null;
             
 
             // Validate Họ và tên

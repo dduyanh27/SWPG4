@@ -2,11 +2,18 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="dal.LocationDAO"%>
 <%@page import="model.Location"%>
+<%@page import="dal.ContentDAO"%>
+<%@page import="model.MarketingContent"%>
 <%@page import="java.util.List"%>
 <%
     LocationDAO ldao = new LocationDAO();
     List<Location> locations = ldao.getAllLocations();
     request.setAttribute("locations", locations);
+    
+    // Load marketing content for website (only published, website platform, current date)
+    ContentDAO contentDAO = new ContentDAO();
+    List<MarketingContent> marketingContents = contentDAO.getPublishedContentForWebsite();
+    request.setAttribute("marketingContents", marketingContents);
 %>
 <!doctype html>
 <html class="no-js" lang="zxx">
@@ -196,6 +203,110 @@
                 .footer-area p,
                 .footer-area a,
                 .footer-area h4{ color:#ffffff !important; }
+                
+                /* Marketing Content Styles */
+                .marketing-content-area {
+                    background: rgba(255, 255, 255, 0.05);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    padding: 40px 0;
+                    margin: 60px 0;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .marketing-content-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                    gap: 30px;
+                    margin-top: 40px;
+                }
+                
+                .marketing-content-card {
+                    background: rgba(255, 255, 255, 0.08);
+                    border-radius: 16px;
+                    padding: 25px;
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    transition: all 0.3s ease;
+                    backdrop-filter: blur(5px);
+                }
+                
+                .marketing-content-card:hover {
+                    transform: translateY(-5px);
+                    background: rgba(255, 255, 255, 0.12);
+                    border-color: rgba(255, 255, 255, 0.25);
+                    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+                }
+                
+                .marketing-content-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                }
+                
+                .marketing-platform {
+                    background: linear-gradient(90deg, var(--blue-dark), var(--blue));
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                
+                .marketing-date {
+                    color: rgba(255, 255, 255, 0.7);
+                    font-size: 0.9rem;
+                }
+                
+                .marketing-title {
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: #ffffff;
+                    margin-bottom: 15px;
+                    line-height: 1.4;
+                }
+                
+                .marketing-text {
+                    color: rgba(255, 255, 255, 0.85);
+                    line-height: 1.6;
+                    margin-bottom: 20px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                
+                .marketing-media {
+                    width: 100%;
+                    height: 200px;
+                    object-fit: cover;
+                    border-radius: 12px;
+                    margin-bottom: 15px;
+                }
+                
+                .marketing-read-more {
+                    color: var(--link);
+                    text-decoration: none;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s ease;
+                }
+                
+                .marketing-read-more:hover {
+                    color: var(--link-hover);
+                    transform: translateX(5px);
+                }
+                
+                .no-content-message {
+                    text-align: center;
+                    color: rgba(255, 255, 255, 0.6);
+                    font-style: italic;
+                    padding: 40px 20px;
+                }
             </style>
    </head>
 
@@ -233,7 +344,7 @@
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
@@ -262,7 +373,7 @@
                 </div>
                 <div class="mega-col">
                     <h4>Việc của tôi</h4>
-                    <a href="#">Việc đã lưu</a>
+                    <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
                     <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
                     <a href="#">Thông báo việc làm</a>
                     <a href="#">Việc dành cho bạn</a>
@@ -275,176 +386,6 @@
         </div>
     <main>
 
-        <!-- slider Area Start-->
-        <div class="slider-area ">
-            <!-- Mobile Menu -->
-            <div class="slider-active">
-                <div class="single-slider slider-height d-flex align-items-center" data-background="../assets/img/hero/h1_hero.jpg">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-xl-6 col-lg-9 col-md-10">
-                                <div class="hero__caption">
-                                    <h1>Find the most exciting startup jobs</h1>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Search Box -->
-                        <div class="row">
-                            <div class="col-xl-8">
-                                <!-- form -->
-                                <form action="${pageContext.request.contextPath}/job-list" method="get" class="search-box">
-                                    <div class="input-form">
-                                        <input type="text" name="keyword" placeholder="Job Tittle or company name">
-                                    </div>
-                                    <div class="select-form">
-                                        <div class="select-itms">
-                                            <select name="locationId" id="select1" >
-                                                <option value="" disabled selected>Location</option>
-                                                <c:forEach var="loc" items="${locations}">
-                                                <option value="${loc.locationID}">${loc.locationName}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="search-form">
-                                        <a href="#" onclick="this.closest('form').submit(); return false;">Find job</a>
-                                    </div>	
-                                </form>	
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- slider Area End-->
-        <!-- Our Services Start -->
-        <div class="our-services section-pad-t30">
-            <div class="container">
-                <!-- Section Tittle -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="section-tittle text-center">
-                            <span>FEATURED TOURS Packages</span>
-                            <h2>Browse Top Categories </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="row d-flex justify-contnet-center">
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-tour"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Design & Creative</a></h5>
-                                <span>(653)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-cms"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Design & Development</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-report"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Sales & Marketing</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-app"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Mobile Application</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-helmet"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Construction</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-high-tech"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Information Technology</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-real-estate"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Real Estate</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                        <div class="single-services text-center mb-30">
-                            <div class="services-ion">
-                                <span class="flaticon-content"></span>
-                            </div>
-                            <div class="services-cap">
-                               <h5><a href="job_listing.html">Content Writer</a></h5>
-                                <span>(658)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- More Btn -->
-                <!-- Section Button -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="browse-btn2 text-center mt-50">
-                            <a href="job_listing.html" class="border-btn2">Browse All Sectors</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Our Services End -->
-        <!-- Online CV Area Start -->
-         <div class="online-cv cv-bg section-overly pt-90 pb-120"  data-background="../assets/img/gallery/cv_bg.jpg">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-10">
-                        <div class="cv-caption text-center">
-                            <p class="pera1">FEATURED TOURS Packages</p>
-                            <p class="pera2"> Make a Difference with Your Online Resume!</p>
-                            <a href="#" class="border-btn2 border-btn4">Upload your cv</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- Online CV Area End-->
         <!-- Featured_job_start -->
         <section class="featured-job-area feature-padding">
@@ -545,6 +486,63 @@
             </div>
         </section>
         <!-- Featured_job_end -->
+        
+        <!-- Marketing Content Area Start -->
+        <div class="marketing-content-area">
+            <div class="container">
+                <!-- Section Tittle -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="section-tittle text-center">
+                            <span>📢 Tin tức & Cập nhật</span>
+                            <h2>Nội dung Marketing mới nhất</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <c:choose>
+                    <c:when test="${not empty marketingContents}">
+                        <div class="marketing-content-grid">
+                            <c:forEach var="content" items="${marketingContents}" begin="0" end="5">
+                                <div class="marketing-content-card">
+                                    <div class="marketing-content-header">
+                                        <span class="marketing-platform">${content.platform}</span>
+                                        <c:if test="${not empty content.postDate}">
+                                            <span class="marketing-date">
+                                                <fmt:formatDate value="${content.postDate}" pattern="dd/MM/yyyy"/>
+                                            </span>
+                                        </c:if>
+                                    </div>
+                                    
+                                    <h3 class="marketing-title">${content.title}</h3>
+                                    
+                                    <c:if test="${not empty content.contentText}">
+                                        <p class="marketing-text">${content.contentText}</p>
+                                    </c:if>
+                                    
+                                    <c:if test="${not empty content.mediaURL}">
+                                        <img src="${content.mediaURL}" alt="Marketing content" class="marketing-media" 
+                                             onerror="this.style.display='none';">
+                                    </c:if>
+                                    
+                                    <a href="#" onclick="trackViewAndRedirect(${content.contentID})" class="marketing-read-more">
+                                        Đọc thêm <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </c:forEach>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-content-message">
+                            <i class="fas fa-newspaper" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;"></i>
+                            <p>Chưa có nội dung marketing nào được xuất bản.</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+        <!-- Marketing Content Area End -->
+        
         <!-- How  Apply Process Start-->
         <div class="apply-process-area apply-bg pt-150 pb-150" data-background="../assets/img/gallery/how-applybg.png">
             <div class="container">
@@ -935,6 +933,27 @@
                     }
                 });
             })();
+            
+            // Function to track view count and redirect
+            function trackViewAndRedirect(contentID) {
+                // Send view count request
+                fetch('${pageContext.request.contextPath}/view-count?id=' + contentID, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Redirect to content detail page regardless of tracking success
+                    window.location.href = '${pageContext.request.contextPath}/content-detail?id=' + contentID;
+                })
+                .catch(error => {
+                    console.error('Error tracking view:', error);
+                    // Still redirect even if tracking fails
+                    window.location.href = '${pageContext.request.contextPath}/content-detail?id=' + contentID;
+                });
+            }
         </script>
         
     </body>

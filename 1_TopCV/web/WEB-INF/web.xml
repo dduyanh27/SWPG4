@@ -88,6 +88,16 @@
         <servlet-name>UpdateAdminProfile</servlet-name>
         <url-pattern>/updateadminprofile</url-pattern>
     </servlet-mapping>
+
+    
+    <servlet>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <servlet-class>controller.staff.UpdateStaffProfile</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateStaffProfile</servlet-name>
+        <url-pattern>/updatestaffprofile</url-pattern>
+    </servlet-mapping>
     <!-- Recruiter (package 'recuiter' in sources) -->
     <servlet>
         <servlet-name>HomeRecuiterServlet</servlet-name>
@@ -202,6 +212,7 @@
         <servlet-name>JobManagementServlet</servlet-name>
         <url-pattern>/job-management</url-pattern>
     </servlet-mapping>
+    <!-- Reset password -->
     <servlet-mapping>
         <servlet-name>RequestPasswordServlet</servlet-name>
         <url-pattern>/requestPassword</url-pattern>
@@ -210,4 +221,12 @@
         <servlet-name>ResetPasswordServlet</servlet-name>
         <url-pattern>/resetPassword</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>RequestPasswordServlet</servlet-name>
+        <servlet-class>controller.base.RequestPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-class>controller.base.ResetPasswordServlet</servlet-class>
+    </servlet>
 </web-app>

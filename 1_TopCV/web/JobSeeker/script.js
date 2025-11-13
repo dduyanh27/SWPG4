@@ -333,47 +333,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitApplication = document.getElementById('submitApplication');
     const privacyCheck = document.getElementById('privacyCheck');
     
-    // Open modal when apply button is clicked
-    applyButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            applicationModal.classList.add('show');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    // Only initialize modal if elements exist
+    if (applicationModal && modalClose) {
+        // Open modal when apply button is clicked
+        applyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                applicationModal.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            });
         });
-    });
-    
-    // Close modal functionality
-    function closeModal() {
-        applicationModal.classList.remove('show');
-        document.body.style.overflow = 'auto'; // Restore scrolling
+        
+        // Close modal functionality
+        function closeModal() {
+            applicationModal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        modalClose.addEventListener('click', closeModal);
+        
+        // Close modal when clicking overlay
+        applicationModal.addEventListener('click', function(e) {
+            if (e.target === applicationModal || e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && applicationModal.classList.contains('show')) {
+                closeModal();
+            }
+        });
     }
-    
-    modalClose.addEventListener('click', closeModal);
-    
-    // Close modal when clicking overlay
-    applicationModal.addEventListener('click', function(e) {
-        if (e.target === applicationModal || e.target.classList.contains('modal-overlay')) {
-            closeModal();
-        }
-    });
-    
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && applicationModal.classList.contains('show')) {
-            closeModal();
-        }
-    });
     
     // Collapsible form sections
     const collapsibleSections = document.querySelectorAll('.form-section.collapsible');
     collapsibleSections.forEach(section => {
         const header = section.querySelector('h3');
-        header.addEventListener('click', function() {
-            section.classList.toggle('collapsed');
-        });
+        if (header) {
+            header.addEventListener('click', function() {
+                section.classList.toggle('collapsed');
+            });
+        }
     });
     
     // Form validation and submission
-    submitApplication.addEventListener('click', function(e) {
+    if (submitApplication && privacyCheck) {
+        submitApplication.addEventListener('click', function(e) {
         e.preventDefault();
         
         if (!privacyCheck.checked) {
@@ -464,15 +470,16 @@ document.addEventListener('DOMContentLoaded', function() {
             submitApplication.disabled = !privacyCheck.checked;
             submitApplication.textContent = 'Ứng tuyển';
         });
-    });
+        });
     
-    // Enable/disable submit button based on privacy checkbox
-    privacyCheck.addEventListener('change', function() {
-        submitApplication.disabled = !this.checked;
-    });
-    
-    // Initialize submit button state
-    submitApplication.disabled = !privacyCheck.checked;
+        // Enable/disable submit button based on privacy checkbox
+        privacyCheck.addEventListener('change', function() {
+            submitApplication.disabled = !this.checked;
+        });
+        
+        // Initialize submit button state
+        submitApplication.disabled = !privacyCheck.checked;
+    }
     
     // Account Management Modals
     const passwordModal = document.getElementById('passwordModal');

@@ -37,7 +37,7 @@
                     <i class="fas fa-bars"></i>
                     <span>Tất cả danh mục</span>
                 </div>
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 <div class="user-actions">
                     <div class="profile-icon">
                         <i class="fas fa-user"></i>

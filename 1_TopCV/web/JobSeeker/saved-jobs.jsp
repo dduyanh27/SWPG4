@@ -524,7 +524,7 @@
                     <span>Danh mục</span>
                 </div>
                 
-                <button class="recruiter-btn">Nhà tuyển dụng</button>
+                <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
                 
                 <div class="user-actions">
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
@@ -588,55 +588,81 @@
         </c:if>
 
         <!-- Job Cards -->
-        <c:forEach var="saved" items="${savedJobs}">
-            <div class="job-card" data-job-id="${saved.jobID}">
-                <div class="job-title">${saved.jobTitle}</div>
-                <div class="company">${saved.companyName}</div>
-                
-                <div class="job-info">
-                    <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
-                    <span>${saved.locationName}</span>
+        <div id="savedJobsList">
+            <c:forEach var="saved" items="${savedJobs}" varStatus="loop">
+                <div class="job-card" data-job-id="${saved.jobID}" data-index="${loop.index}">
+                    <div class="job-title">${saved.jobTitle}</div>
+                    <div class="company">${saved.companyName}</div>
+                    <div class="job-info">
+                        <strong><i class="fas fa-map-marker-alt"></i> Địa điểm:</strong>
+                        <span>${saved.locationName}</span>
+                    </div>
+                    <div class="job-info">
+                        <strong><i class="fas fa-money-bill-wave"></i> Mức lương:</strong>
+                        <span>${saved.salaryRange}</span>
+                    </div>
+                    <div class="job-info">
+                        <strong><i class="fas fa-briefcase"></i> Ngành nghề:</strong>
+                        <span>${saved.industry}</span>
+                    </div>
+                    <div class="job-info">
+                        <strong><i class="fas fa-calendar-alt"></i> Ngày đăng:</strong>
+                        <span>${saved.postingDate}</span>
+                    </div>
+                    <div class="job-info">
+                        <strong><i class="fas fa-heart"></i> Ngày lưu:</strong>
+                        <span>${saved.formattedSavedDate}</span>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="job-detail?jobId=${saved.jobID}" class="action-btn">
+                            <i class="fas fa-eye"></i> Xem chi tiết
+                        </a>
+                        <button class="action-btn unsave-btn" onclick="unsaveJob(${saved.jobID})">
+                            <i class="fas fa-heart-broken"></i> Bỏ lưu
+                        </button>
+                    </div>
                 </div>
-                
-                <div class="job-info">
-                    <strong><i class="fas fa-money-bill-wave"></i> Mức lương:</strong>
-                    <span>${saved.salaryRange}</span>
-                </div>
-                
-                <div class="job-info">
-                    <strong><i class="fas fa-briefcase"></i> Ngành nghề:</strong>
-                    <span>${saved.industry}</span>
-                </div>
-                
-                <div class="job-info">
-                    <strong><i class="fas fa-calendar-alt"></i> Ngày đăng:</strong>
-                    <span>${saved.postingDate}</span>
-                </div>
-                
-                <div class="job-info">
-                    <strong><i class="fas fa-heart"></i> Ngày lưu:</strong>
-                    <span>${saved.formattedSavedDate}</span>
-                </div>
-                
-                <div class="action-buttons">
-                    <a href="job-detail?jobId=${saved.jobID}" class="action-btn">
-                        <i class="fas fa-eye"></i> Xem chi tiết
-                    </a>
-                    <button class="action-btn unsave-btn" onclick="unsaveJob(${saved.jobID})">
-                        <i class="fas fa-heart-broken"></i> Bỏ lưu
-                    </button>
-                </div>
-            </div>
-        </c:forEach>
+            </c:forEach>
+        </div>
+        <!-- Pagination (JS) -->
+        <div id="pagination" style="display:flex; justify-content:center; gap:0.5rem; margin-top:1.5rem; align-items:center;">
+            <button id="prevPage" class="action-btn"><i class="fas fa-chevron-left"></i></button>
+            <span id="pageInfo" style="color:#fff; min-width:48px; text-align:center;"></span>
+            <button id="nextPage" class="action-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
     </div>
 
     <!-- ========== JAVASCRIPT ========== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Simple JS Pagination for saved jobs ---
+            const jobsList = document.getElementById('savedJobsList');
+            const cards = Array.from(jobsList.querySelectorAll('.job-card'));
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const JOBS_PER_PAGE = 10;
+            let currentPage = 1;
+            const totalPages = Math.max(1, Math.ceil(cards.length / JOBS_PER_PAGE));
+
+            function renderPage(page) {
+                if (page < 1) page = 1;
+                if (page > totalPages) page = totalPages;
+                currentPage = page;
+                cards.forEach((card, idx) => {
+                    card.style.display = (idx >= (currentPage-1)*JOBS_PER_PAGE && idx < currentPage*JOBS_PER_PAGE) ? '' : 'none';
+                });
+                pageInfo.textContent = currentPage + ' / ' + totalPages;
+                prevBtn.disabled = (currentPage === 1);
+                nextBtn.disabled = (currentPage === totalPages);
+            }
+            prevBtn.addEventListener('click', () => renderPage(currentPage-1));
+            nextBtn.addEventListener('click', () => renderPage(currentPage+1));
+            renderPage(1);
+
+            // --- Mega menu toggle (giữ nguyên code cũ) ---
             const menuToggle = document.getElementById('menuToggle');
             const megaMenu = document.getElementById('megaMenu');
-            
-            // Toggle mega menu
             menuToggle.addEventListener('click', function(e) {
                 e.stopPropagation();
                 megaMenu.classList.toggle('open');

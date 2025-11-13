@@ -72,7 +72,7 @@
                 <input type="email" name="email" placeholder="Email" required>
                 <button type="submit">Reset password</button>
             </form>
-            <a href="jobseeker-login.jsp" class="back-link">← Back to Log in</a>
+            <a href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp" class="back-link">← Back to Log in</a>
         </div>
 
         <div style="color: red; margin-top: 10px;">${mess}</div>
