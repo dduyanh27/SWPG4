@@ -602,6 +602,28 @@ public class RecruiterDAO extends DBContext {
         }
     }
 
+    public boolean isTaxCodeExists(String taxCode) {
+        try {
+            if (taxCode == null || taxCode.trim().isEmpty()) {
+                return false;
+            }
+
+            String sql = "SELECT COUNT(*) FROM Recruiter WHERE Taxcode = ?";
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setString(1, taxCode.trim());
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt(1) > 0;
+                    }
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true; // an toàn: coi như đã tồn tại để chặn đăng ký khi lỗi
+        }
+    }
+
     private boolean checkPhoneInTable(String tableName, String phone) throws SQLException {
         if (c == null) {
             System.err.println("Database connection is null in checkPhoneInTable");

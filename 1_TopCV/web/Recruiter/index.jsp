@@ -4,6 +4,12 @@
     String success = request.getParameter("success");
     Recruiter recruiter = (Recruiter) session.getAttribute("recruiter");
     String userName = (recruiter != null) ? recruiter.getContactPerson() : "User";
+    
+    // Lấy success message từ session
+    String successMessage = (String) session.getAttribute("successMessage");
+    if (successMessage != null) {
+        session.removeAttribute("successMessage"); // Xóa sau khi lấy
+    }
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -16,6 +22,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="index-page">
+    <% if (successMessage != null && !successMessage.isEmpty()) { %>
+    <div class="success-alert" style="position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #4caf50; color: white; padding: 15px 25px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10000; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-check-circle"></i>
+        <span><%= successMessage %></span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: 10px;">&times;</button>
+    </div>
+    <script>
+        setTimeout(function() {
+            var alert = document.querySelector('.success-alert');
+            if (alert) alert.remove();
+        }, 5000); // Tự động ẩn sau 5 giây
+    </script>
+    <% } %>
     
     <!-- Top Navigation Bar -->
     <nav class="navbar">
@@ -31,7 +50,7 @@
                     <li class="dropdown">
                         <a href="#" class="active">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="${pageContext.request.contextPath}/candidate-management">Quản lý theo việc đăng tuyển</a>
                             <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html" class="highlighted">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
@@ -45,8 +64,7 @@
                     <li class="dropdown">
                         <a href="#">Đơn hàng <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý đơn hàng</a>
-                            <a href="#">Lịch sử mua</a>
+                            <a href="${pageContext.request.contextPath}/recruiter/purchase-history">Lịch sử mua</a>
                         </div>
                     </li>
                     <li><a href="#">Báo cáo</a></li>

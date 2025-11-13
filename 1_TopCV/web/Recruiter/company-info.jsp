@@ -54,8 +54,8 @@
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
-                                <a href="#">Quản lý theo việc đăng tuyển</a>
-                                <a href="#">Quản lý theo thư mục và thẻ</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                             </div>
                         </li>
                         <li class="dropdown">
@@ -1164,11 +1164,23 @@
                                                                                         return response.json();
                                                                                     })
                                                                                     .then(data => {
-                                                                                        if (data && data.valid === true) {
-                                                                                            showTaxCodeValidation('success', 'Mã số thuế hợp lệ');
-                                                                                        } else if (data && data.valid === false) {
+                                                                                        if (!data) {
+                                                                                            showTaxCodeValidation('error', 'Kết quả không hợp lệ');
+                                                                                            return;
+                                                                                        }
+                                                                                        if (data.valid === false) {
                                                                                             showTaxCodeValidation('error', 'Mã số thuế không đúng định dạng');
-                                                                                        } else if (data && data.error) {
+                                                                                            return;
+                                                                                        }
+                                                                                        if (data.valid === true && data.exists === true) {
+                                                                                            showTaxCodeValidation('error', 'Mã số thuế này đã được sử dụng');
+                                                                                            return;
+                                                                                        }
+                                                                                        if (data.valid === true && data.exists === false) {
+                                                                                            showTaxCodeValidation('success', 'Mã số thuế hợp lệ');
+                                                                                            return;
+                                                                                        }
+                                                                                        if (data.error) {
                                                                                             showTaxCodeValidation('error', 'Lỗi: ' + data.error);
                                                                                         } else {
                                                                                             showTaxCodeValidation('error', 'Kết quả không hợp lệ');

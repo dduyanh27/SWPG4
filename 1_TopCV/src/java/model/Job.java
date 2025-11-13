@@ -9,7 +9,6 @@ public class Job {
     private String description;
     private String requirements;
     private int jobLevelID;
-    private int locationID;
     private String salaryRange;
     private LocalDateTime postingDate;
     private LocalDateTime expirationDate;
@@ -18,11 +17,25 @@ public class Job {
     private String status;
     private int jobTypeID;
     private int hiringCount;
+    private int viewCount;
+    private boolean isUrgent;
+    private boolean isPriority;
+    private LocalDateTime priorityExpiryDate;
+    private String contactPerson;
+    private String applicationEmail;
+    private Integer minExperience;
+    private String minQualification;
+    private String nationality;
+    private String gender;
+    private String maritalStatus;
+    private Integer ageMin;
+    private Integer ageMax;
+    private String jobCode;
 
     public Job() {}
 
     public Job(int jobID, int recruiterID, String jobTitle, String description, String requirements,
-               int jobLevelID, int locationID, String salaryRange, LocalDateTime postingDate,
+               int jobLevelID, String salaryRange, LocalDateTime postingDate,
                LocalDateTime expirationDate, int categoryID, int ageRequirement, String status,
                int jobTypeID, int hiringCount) {
         this.jobID = jobID;
@@ -31,7 +44,6 @@ public class Job {
         this.description = description;
         this.requirements = requirements;
         this.jobLevelID = jobLevelID;
-        this.locationID = locationID;
         this.salaryRange = salaryRange;
         this.postingDate = postingDate;
         this.expirationDate = expirationDate;
@@ -89,14 +101,6 @@ public class Job {
 
     public void setJobLevelID(int jobLevelID) {
         this.jobLevelID = jobLevelID;
-    }
-
-    public int getLocationID() {
-        return locationID;
-    }
-
-    public void setLocationID(int locationID) {
-        this.locationID = locationID;
     }
 
     public String getSalaryRange() {
@@ -163,6 +167,118 @@ public class Job {
         this.hiringCount = hiringCount;
     }
 
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public boolean isIsUrgent() {
+        return isUrgent;
+    }
+
+    public void setIsUrgent(boolean isUrgent) {
+        this.isUrgent = isUrgent;
+    }
+
+    public boolean isIsPriority() {
+        return isPriority;
+    }
+
+    public void setIsPriority(boolean isPriority) {
+        this.isPriority = isPriority;
+    }
+
+    public LocalDateTime getPriorityExpiryDate() {
+        return priorityExpiryDate;
+    }
+
+    public void setPriorityExpiryDate(LocalDateTime priorityExpiryDate) {
+        this.priorityExpiryDate = priorityExpiryDate;
+    }
+
+    public String getContactPerson() {
+        return contactPerson;
+    }
+
+    public void setContactPerson(String contactPerson) {
+        this.contactPerson = contactPerson;
+    }
+
+    public String getApplicationEmail() {
+        return applicationEmail;
+    }
+
+    public void setApplicationEmail(String applicationEmail) {
+        this.applicationEmail = applicationEmail;
+    }
+
+    public Integer getMinExperience() {
+        return minExperience;
+    }
+
+    public void setMinExperience(Integer minExperience) {
+        this.minExperience = minExperience;
+    }
+
+    public String getMinQualification() {
+        return minQualification;
+    }
+
+    public void setMinQualification(String minQualification) {
+        this.minQualification = minQualification;
+    }
+
+    public String getNationality() {
+        return nationality;
+    }
+
+    public void setNationality(String nationality) {
+        this.nationality = nationality;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getMaritalStatus() {
+        return maritalStatus;
+    }
+
+    public void setMaritalStatus(String maritalStatus) {
+        this.maritalStatus = maritalStatus;
+    }
+
+    public Integer getAgeMin() {
+        return ageMin;
+    }
+
+    public void setAgeMin(Integer ageMin) {
+        this.ageMin = ageMin;
+    }
+
+    public Integer getAgeMax() {
+        return ageMax;
+    }
+
+    public void setAgeMax(Integer ageMax) {
+        this.ageMax = ageMax;
+    }
+
+    public String getJobCode() {
+        return jobCode;
+    }
+
+    public void setJobCode(String jobCode) {
+        this.jobCode = jobCode;
+    }
+
     @Override
     public String toString() {
         return "Job{" +
@@ -172,7 +288,6 @@ public class Job {
                 ", description='" + description + '\'' +
                 ", requirements='" + requirements + '\'' +
                 ", jobLevelID=" + jobLevelID +
-                ", locationID=" + locationID +
                 ", salaryRange='" + salaryRange + '\'' +
                 ", postingDate=" + postingDate +
                 ", expirationDate=" + expirationDate +
@@ -181,6 +296,20 @@ public class Job {
                 ", status='" + status + '\'' +
                 ", jobTypeID=" + jobTypeID +
                 ", hiringCount=" + hiringCount +
+                ", viewCount=" + viewCount +
+                ", isUrgent=" + isUrgent +
+                ", isPriority=" + isPriority +
+                ", priorityExpiryDate=" + priorityExpiryDate +
+                ", contactPerson='" + contactPerson + '\'' +
+                ", applicationEmail='" + applicationEmail + '\'' +
+                ", minExperience=" + minExperience +
+                ", minQualification='" + minQualification + '\'' +
+                ", nationality='" + nationality + '\'' +
+                ", gender='" + gender + '\'' +
+                ", maritalStatus='" + maritalStatus + '\'' +
+                ", ageMin=" + ageMin +
+                ", ageMax=" + ageMax +
+                ", jobCode='" + jobCode + '\'' +
                 '}';
     }
 }

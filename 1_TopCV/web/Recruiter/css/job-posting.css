@@ -9,21 +9,175 @@
 .job-posting-page .collapsible .toggle-icon { cursor: pointer; }
 .job-posting-page .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin: 16px 0; }
 .job-posting-page .warning-box { background: #fff7e6; border: 1px solid #ffe58f; color: #ad6800; padding: 10px 12px; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
-.job-posting-page .salary-input-group, .job-posting-page .input-with-toggle, .job-posting-page .age-range-with-toggle, .job-posting-page .radio-group-with-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.job-posting-page .salary-input-group { display: flex; align-items: center; gap: 0; }
+.job-posting-page .salary-input-group input { flex: 1; }
+.job-posting-page .salary-input-group input:first-child { margin-right: 0; }
+.job-posting-page .salary-input-group input:last-child { margin-left: 0; }
+.job-posting-page .input-with-toggle, .job-posting-page .age-range-with-toggle, .job-posting-page .radio-group-with-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.job-posting-page .counter-input-with-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .job-posting-page .counter-input { display: inline-flex; align-items: center; gap: 8px; }
 .job-posting-page .counter-btn { width: 32px; height: 32px; border: 1px solid #ddd; background: #f7f7f7; border-radius: 4px; }
-.job-posting-page .dash { padding: 0 6px; color: #999; }
+.job-posting-page .salary-input-group .dash { padding: 0 4px; color: #999; flex-shrink: 0; }
 .job-posting-page .toggle-group { display: inline-flex; align-items: center; gap: 8px; }
 .job-posting-page .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .job-posting-page .toggle-switch input { display: none; }
 .job-posting-page .toggle-switch .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; transition: .2s; border-radius: 24px; }
 .job-posting-page .toggle-switch .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; transition: .2s; border-radius: 50%; }
-.job-posting-page .toggle-switch input:checked + .slider { background: #4caf50; }
+.job-posting-page .toggle-switch input:checked + .slider { background: #1890ff; }
 .job-posting-page .toggle-switch input:checked + .slider:before { transform: translateX(20px); }
 .job-posting-page .rich-text-editor .editor-toolbar { display: flex; gap: 6px; margin-bottom: 6px; }
 .job-posting-page .toolbar-btn { border: 1px solid #ddd; background: #f9f9f9; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
-.job-posting-page .char-counter { text-align: right; color: #999; font-size: 12px; margin-top: 6px; }
+.job-posting-page .editor-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.job-posting-page .sample-link { font-size: 12px; color: #1890ff; text-decoration: none; }
+.job-posting-page .sample-link:hover { text-decoration: underline; }
+.job-posting-page .char-counter { color: #999; font-size: 12px; }
 .job-posting-page .benefits-list .benefit-item { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: start; margin-bottom: 10px; }
 .job-posting-page .add-location-link { font-size: 12px; color: #1890ff; text-decoration: none; }
 
+/* Simple Custom Dropdown cho Ngành nghề chi tiết */
+.simple-custom-dropdown {
+    position: relative;
+    width: 100%;
+}
 
+.dropdown-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #9ca3af;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: #374151;
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 44px;
+    outline: none;
+}
+
+.dropdown-input:hover {
+    border-color: #6b7280;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.dropdown-input.active {
+    outline: none;
+    border: 1.5px solid #0a67ff;
+    box-shadow: 0 0 0 3px rgba(10, 103, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-input.selected {
+    border: 1.5px solid #9ca3af;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-text {
+    color: #999;
+    flex: 1;
+    line-height: 1.5;
+}
+
+.dropdown-input.selected .dropdown-text {
+    color: #374151;
+    font-weight: 500;
+}
+
+.dropdown-input i.fa-chevron-down {
+    color: #6b7280;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-input.active i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.category-parent-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    user-select: none;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.category-parent-item:hover {
+    background: #e9ecef;
+}
+
+.category-parent-item.active {
+    background: #e9ecef;
+}
+
+.category-arrow {
+    font-size: 12px;
+    color: #666;
+    transition: transform 0.3s;
+    width: 12px;
+}
+
+.category-parent-item.active .category-arrow {
+    transform: rotate(90deg);
+}
+
+.category-children-list {
+    background: white;
+}
+
+.category-child-item {
+    padding: 10px 15px 10px 45px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.category-child-item:hover {
+    background: #f0f7ff;
+}
+
+.category-child-item.selected {
+    background: #007bff;
+    color: white;
+}
+
+/* Scrollbar styling */
+.dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

@@ -170,7 +170,7 @@ public class ResetPasswordServlet extends HttpServlet {
         }
 
         String hashedNewPassword = MD5Util.getMD5Hash(password);
-        if (hashedNewPassword.equals(currentPassword)) {
+        if (hashedNewPassword.equalsIgnoreCase(currentPassword)) {
             request.setAttribute("mess", "Mật khẩu mới không được trùng với mật khẩu hiện tại");
             request.setAttribute("email", email);
             request.setAttribute("userType", userType);
@@ -179,19 +179,18 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        // Hash password and update based on user type
-        String hashedPassword = MD5Util.getMD5Hash(password);
+        // Update based on user type (DAOs will hash to MD5, lowercase)
         tokenForgetPassword.setUsed(true);
 
         switch (userType.toLowerCase()) {
             case "admin":
-                adminDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                adminDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "jobseeker":
-                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "recruiter":
-                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
         }
 

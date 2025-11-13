@@ -1272,7 +1272,7 @@
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
-                                <a href="#">Quản lý theo việc đăng tuyển</a>
+                                <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
                                 <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                             </div>
                         </li>
@@ -1312,17 +1312,11 @@
 
         <!-- Main Content -->
         <main class="packages-main">
-            <!-- Navigation Tabs -->
+            <!-- Navigation Tabs: chỉ còn ĐĂNG TUYỂN -->
             <div class="tab-navigation">
                 <div class="tab-container">
                     <div class="tab-item active" data-tab="dang-tuyen">
                         <span>ĐĂNG TUYỂN</span>
-                    </div>
-                    <div class="tab-item" data-tab="tim-ho-so">
-                        <span>TÌM HỒ SƠ</span>
-                    </div>
-                    <div class="tab-item" data-tab="ai-premium">
-                        <span>AI PREMIUM</span>
                     </div>
                 </div>
             </div>
@@ -1340,25 +1334,7 @@
                         </div>
                     </div>
 
-                    <!-- TÌM HỒ SƠ Tab Content -->
-                    <div class="tab-content" id="tim-ho-so">
-                        <div class="sidebar-section">
-                            <h3>TÌM HỒ SƠ</h3>
-                            <div class="loading-message">
-                                <p>Đang tải dữ liệu...</p>
-                                </div>
-                        </div>
-                    </div>
-
-                    <!-- AI PREMIUM Tab Content -->
-                    <div class="tab-content" id="ai-premium">
-                        <div class="sidebar-section">
-                            <h3>AI PREMIUM</h3>
-                            <div class="loading-message">
-                                <p>Đang tải dữ liệu...</p>
-                                </div>
-                            </div>
-                    </div>
+                    <!-- Đã loại bỏ các tab khác -->
                 </div>
 
                 <!-- Right Main Content -->
@@ -1738,11 +1714,9 @@
 
             function getTypeDisplayName(type) {
                 const typeNames = {
-                    'dang-tuyen': 'ĐĂNG TUYỂN',
-                    'tim-ho-so': 'TÌM HỒ SƠ',
-                    'ai-premium': 'AI PREMIUM'
+                    'dang-tuyen': 'ĐĂNG TUYỂN'
                 };
-                return typeNames[type] || type.toUpperCase();
+                return typeNames[type] || 'ĐĂNG TUYỂN';
             }
 
             function formatPrice(price) {
@@ -1800,38 +1774,7 @@
                 // Load initial data
                 loadPackagesByType('dang-tuyen');
                 
-                // Tab switching functionality
-                const tabItems = document.querySelectorAll('.tab-item');
-                const tabContents = document.querySelectorAll('.tab-content');
-
-                tabItems.forEach(tab => {
-                    tab.addEventListener('click', function () {
-                        const targetTab = this.getAttribute('data-tab');
-                        currentTab = targetTab;
-
-                        // Remove active class from all tabs
-                        tabItems.forEach(t => t.classList.remove('active'));
-                        // Add active class to clicked tab
-                        this.classList.add('active');
-
-                        // Hide all tab contents
-                        tabContents.forEach(content => content.classList.remove('active'));
-                        // Show target tab content
-                        document.getElementById(targetTab).classList.add('active');
-
-                        // Preserve cart state before loading new tab
-                        preserveCartState();
-                        
-                        // Load packages for the selected tab
-                        loadPackagesByType(targetTab);
-                        
-                        // Re-initialize cart display after tab change
-                        setTimeout(function() {
-                            console.log('Re-initializing cart display after tab change...');
-                            updateCartDisplay();
-                        }, 200);
-                    });
-                });
+                // Không còn chuyển tab: chỉ dùng 'dang-tuyen'
 
                 // Add click handlers to package items
                 const packageItems = document.querySelectorAll('.package-item');
@@ -2035,18 +1978,14 @@
                 console.log('Adding to cart:', title, 'price:', price);
                 console.log('Price type:', typeof price);
                 console.log('Current cart before add:', cart);
-                
-                const existingItem = cart.find(item => item.title === title);
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                    console.log('Updated existing item quantity to:', existingItem.quantity);
+                // Chỉ cho phép 1 LOẠI gói trong giỏ: nếu khác loại → thay thế; nếu cùng loại → tăng số lượng
+                const existing = cart[0];
+                if (!existing) {
+                    cart = [{ title: title, price: price, quantity: 1 }];
+                } else if (existing.title === title) {
+                    existing.quantity += 1;
                 } else {
-                    cart.push({
-                        title: title,
-                        price: price,
-                        quantity: 1
-                    });
-                    console.log('Added new item to cart with price:', price);
+                    cart = [{ title: title, price: price, quantity: 1 }];
                 }
                 console.log('Cart after add:', cart);
                 updateCartDisplay();
@@ -2069,6 +2008,7 @@
                         console.log('Removing item from cart:', title);
                         removeFromCart(title);
                     } else {
+                        // Cho phép tăng giảm số lượng tự do (>0)
                         item.quantity = newQuantity;
                         console.log('Updated item quantity:', item.title, 'to', item.quantity);
                         console.log('Cart after update:', cart);

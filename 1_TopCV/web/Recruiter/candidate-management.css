@@ -1,0 +1,261 @@
+:root {
+    --primary-color: #002C77;
+    --secondary-color: #FF6B4A;
+    --background-color: #f5f5f5;
+    --border-color: #e0e0e0;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+}
+
+.main-content {
+    padding: 0;
+    margin: 0;
+    background: #f5f7fa;
+    min-height: 100vh;
+}
+
+.candidates-container {
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    border-radius: 0 0 18px 18px;
+    box-shadow: none;
+    background: #fff;
+    padding: 0 0 30px 0;
+}
+
+.job-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 32px 36px 0 36px;
+    border-bottom: none;
+    font-size: 16px;
+}
+
+.job-info .job-title {
+    color: #1667ef;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.job-info .job-details {
+    font-weight: 600;
+}
+
+.job-info .job-date {
+    color: #606060;
+}
+
+.job-info .action-buttons {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-report {
+    background: #eff4ff;
+    color: #1667ef;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1px solid #dde6ff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-report:hover {
+    background: #dde6ff;
+}
+
+.btn-more {
+    background: none;
+    border: none;
+    color: #999;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.recruitment-stages {
+    margin: 24px 32px 0 32px;
+    background: #fff;
+    box-shadow: 0 2px 6px #e5e9f4;
+    border-radius: 14px;
+}
+
+.stages-list {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.stage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.stage.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.badge {
+    background: #FF4444;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.candidates-table {
+    margin: 32px 32px 0 32px;
+    padding: 20px 0 0 0;
+    background: none;
+    box-shadow: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tag {
+    background: #E8F5E9;
+    color: #2E7D32;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+    margin: 2px;
+}
+
+.footer {
+    background: white;
+    padding: 20px;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.retention-notice {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.copyright {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Action buttons group */
+.action-buttons-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-accept,
+.btn-reject {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+}
+
+.btn-accept {
+    background: #4caf50;
+    color: white;
+}
+
+.btn-accept:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+.btn-accept:active {
+    transform: translateY(0);
+}
+
+.btn-reject {
+    background: #f44336;
+    color: white;
+}
+
+.btn-reject:hover {
+    background: #da190b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+}
+
+.btn-reject:active {
+    transform: translateY(0);
+}
+
+.btn-accept i,
+.btn-reject i {
+    font-size: 12px;
+}
+
+/* Pagination - Candidate Management polish */
+.pagination-container {
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pagination .pagination-btn {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #1f2937;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background .2s, color .2s, border-color .2s, transform .05s;
+}
+.pagination .pagination-btn:hover {
+    background: #f3f4f6;
+}
+.pagination .pagination-btn:active {
+    transform: translateY(1px);
+}
+.pagination .pagination-btn.active {
+    background: #1667ef;
+    border-color: #1667ef;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(22,103,239,.25);
+}
+.pagination .prev-btn i,
+.pagination .next-btn i {
+    font-size: 12px;
+}
+.pagination-dots {
+    color: #9ca3af;
+    padding: 0 4px;
+}
