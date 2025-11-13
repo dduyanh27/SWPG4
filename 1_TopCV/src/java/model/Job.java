@@ -9,6 +9,7 @@ public class Job {
     private String description;
     private String requirements;
     private int jobLevelID;
+    private int locationID;
     private String salaryRange;
     private LocalDateTime postingDate;
     private LocalDateTime expirationDate;
@@ -33,6 +34,26 @@ public class Job {
     private String jobCode;
 
     public Job() {}
+
+    public Job(int jobID, int recruiterID, String jobTitle, String description, String requirements, int jobLevelID, int locationID, String salaryRange, LocalDateTime postingDate, LocalDateTime expirationDate, int categoryID, int ageRequirement, String status, int jobTypeID, int hiringCount) {
+        this.jobID = jobID;
+        this.recruiterID = recruiterID;
+        this.jobTitle = jobTitle;
+        this.description = description;
+        this.requirements = requirements;
+        this.jobLevelID = jobLevelID;
+        this.locationID = locationID;
+        this.salaryRange = salaryRange;
+        this.postingDate = postingDate;
+        this.expirationDate = expirationDate;
+        this.categoryID = categoryID;
+        this.ageRequirement = ageRequirement;
+        this.status = status;
+        this.jobTypeID = jobTypeID;
+        this.hiringCount = hiringCount;
+    }
+    
+    
 
     public Job(int jobID, int recruiterID, String jobTitle, String description, String requirements,
                int jobLevelID, String salaryRange, LocalDateTime postingDate,
@@ -101,6 +122,14 @@ public class Job {
 
     public void setJobLevelID(int jobLevelID) {
         this.jobLevelID = jobLevelID;
+    }
+
+    public int getLocationID() {
+        return locationID;
+    }
+
+    public void setLocationID(int locationID) {
+        this.locationID = locationID;
     }
 
     public String getSalaryRange() {

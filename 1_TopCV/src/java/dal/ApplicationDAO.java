@@ -453,7 +453,7 @@ public class ApplicationDAO extends DBContext {
             e.printStackTrace();
         }
         return false;
-
+    }
     /**
      * Get all applications for a specific job (for recruiter to view candidates)
      * Joins with JobSeeker, CV, Job to get full candidate information
