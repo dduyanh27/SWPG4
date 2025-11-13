@@ -25,6 +25,11 @@ import jakarta.servlet.http.HttpSession;
 public class AuthenticationFilter implements Filter {
     private static final String[] PUBLIC_PATHS = {
         "/index.jsp",
+        "/JobSeeker/index.jsp",  // Allow guests to view homepage
+        "/job-list",              // Allow guests to view job listings
+        "/JobSeeker/job-list.jsp", // Allow guests to view job list page
+        "/job-detail",            // Allow guests to view job details
+        "/JobSeeker/job-detail.jsp", // Allow guests to view job detail page
         "/Admin/admin-login.jsp", 
         "/JobSeeker/jobseeker-login.jsp",
         "/JobSeeker/jobseeker-login",
@@ -174,6 +179,15 @@ public class AuthenticationFilter implements Filter {
         
         // Jobseeker area access control
         if (requestPath.startsWith("/JobSeeker/")) {
+            // Allow guests to access homepage, job list, and job detail
+            if (requestPath.equals("/JobSeeker/index.jsp") || 
+                requestPath.equals("/JobSeeker/job-list.jsp") || 
+                requestPath.equals("/JobSeeker/job-detail.jsp")) {
+                proceed(chain, request, response);
+                return;
+            }
+            
+            // Other JobSeeker pages require authentication
             if ("jobseeker".equals(userType)) {
                 proceed(chain, request, response);
             } else {

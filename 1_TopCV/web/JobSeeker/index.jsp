@@ -6,6 +6,12 @@
 <%@page import="model.MarketingContent"%>
 <%@page import="java.util.List"%>
 <%
+    // Check if user is logged in
+    HttpSession userSession = request.getSession(false);
+    boolean isLoggedIn = (userSession != null && userSession.getAttribute("user") != null);
+    String userType = isLoggedIn ? (String) userSession.getAttribute("userType") : null;
+    boolean isJobSeeker = "jobseeker".equals(userType);
+    
     LocationDAO ldao = new LocationDAO();
     List<Location> locations = ldao.getAllLocations();
     request.setAttribute("locations", locations);
@@ -14,6 +20,10 @@
     ContentDAO contentDAO = new ContentDAO();
     List<MarketingContent> marketingContents = contentDAO.getContentByStatus("Published");
     request.setAttribute("marketingContents", marketingContents);
+    
+    // Set login status for use in JSP
+    request.setAttribute("isLoggedIn", isLoggedIn);
+    request.setAttribute("isJobSeeker", isJobSeeker);
 %>
 <!doctype html>
 <html class="no-js" lang="zxx">
@@ -147,13 +157,14 @@
                 .location-selector{ display:flex; align-items:center; gap:8px; color:#1f2937; background:rgba(2,10,30,0.04); padding:6px 10px; border-radius:14px; }
                 .search-btn{ border:none; background: linear-gradient(90deg, #0b5bdf, #0a67ff); color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 6px 16px rgba(10,103,255,0.35); }
                 .search-btn:hover{ filter:brightness(1.05); box-shadow: 0 8px 20px rgba(10,103,255,0.45); }
-                .header-right{ display:flex; align-items:center; gap:18px; }
-                .menu-toggle{ display:flex; align-items:center; gap:8px; color:#e8f0ff; cursor:pointer; }
-                .recruiter-btn{ background:transparent; color:#e8f0ff; border:1px solid rgba(255,255,255,0.6); padding:8px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(2px); }
-                .recruiter-btn:hover{ background:rgba(255,255,255,0.1); }
+                .header-right{ display:flex; align-items:center; gap:18px; flex-shrink:0; }
+                .menu-toggle{ display:flex; align-items:center; gap:8px; color:#e8f0ff; cursor:pointer; white-space:nowrap; font-size:14px; }
+                .recruiter-btn{ background:transparent; color:#e8f0ff; border:1px solid rgba(255,255,255,0.6); padding:8px 14px; border-radius:10px; cursor:pointer; backdrop-filter: blur(2px); text-decoration:none; white-space:nowrap; font-size:14px; }
+                .recruiter-btn:hover{ background:rgba(255,255,255,0.1); color:#e8f0ff; }
                 .user-actions{ display:flex; align-items:center; gap:12px; }
-                .user-actions > a, .user-actions > div{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#e8f0ff; border:1px solid rgba(255,255,255,0.35); transition: all 0.3s ease; }
+                .user-actions > a, .user-actions > div{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#e8f0ff; border:1px solid rgba(255,255,255,0.35); transition: all 0.3s ease; text-decoration:none; }
                 .user-actions > a:hover, .user-actions > div:hover{ background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.6); }
+                .user-actions > a.head-btn2{ width:auto; border-radius:8px; padding:10px 20px; white-space:nowrap; font-size:14px; }
                 .logout-icon:hover{ background:rgba(255,107,107,0.2) !important; border-color:rgba(255,107,107,0.6) !important; color:#ff6b6b !important; }
                 /* Mega menu */
                 .mega-menu{ position:absolute; left:50%; transform:translateX(-50%); top:72px; width:92%; max-width:1100px; background:#ffffff; color:#0f172a; border-radius:16px; box-shadow:0 24px 60px rgba(2,10,30,0.28); padding:24px; display:none; z-index:1300; border:1px solid rgba(17,24,39,0.08); overflow:hidden; }
@@ -307,6 +318,261 @@
                     font-style: italic;
                     padding: 40px 20px;
                 }
+                
+                /* Notification Dropdown Styles */
+                .notification-icon {
+                    position: relative;
+                    cursor: pointer;
+                }
+                
+                .notification-dropdown {
+                    position: absolute;
+                    top: calc(100% + 15px);
+                    right: 0;
+                    width: 420px;
+                    background: #ffffff;
+                    border-radius: 16px;
+                    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+                    display: none;
+                    z-index: 2000;
+                    overflow: hidden;
+                    border: 1px solid rgba(0, 0, 0, 0.06);
+                }
+                
+                .notification-dropdown.show {
+                    display: block;
+                    animation: slideDown 0.3s ease;
+                }
+                
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                .notification-header {
+                    padding: 20px 24px;
+                    background: linear-gradient(135deg, #0a67ff 0%, #0b5bdf 100%);
+                    color: #ffffff;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .notification-header h3 {
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #ffffff !important;
+                }
+                
+                .notification-tabs {
+                    display: flex;
+                    gap: 4px;
+                    padding: 12px 16px;
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+                
+                .notification-tab {
+                    flex: 1;
+                    padding: 8px 16px;
+                    border: none;
+                    background: transparent;
+                    color: #64748b;
+                    font-size: 14px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+                
+                .notification-tab.active {
+                    background: #ffffff;
+                    color: #0a67ff;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                }
+                
+                .notification-tab:hover:not(.active) {
+                    background: rgba(10, 103, 255, 0.05);
+                    color: #0a67ff;
+                }
+                
+                .notification-list {
+                    max-height: 420px;
+                    overflow-y: auto;
+                }
+                
+                .notification-list::-webkit-scrollbar {
+                    width: 6px;
+                }
+                
+                .notification-list::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                }
+                
+                .notification-list::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 10px;
+                }
+                
+                .notification-list::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+                
+                .notification-item {
+                    padding: 16px 24px;
+                    border-bottom: 1px solid #f1f5f9;
+                    transition: background 0.2s ease;
+                    cursor: pointer;
+                    display: flex;
+                    gap: 12px;
+                }
+                
+                .notification-item:hover {
+                    background: #f8fafc;
+                }
+                
+                .notification-item.unread {
+                    background: #eff6ff;
+                }
+                
+                .notification-item.unread:hover {
+                    background: #dbeafe;
+                }
+                
+                .notification-icon-wrapper {
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    font-size: 20px;
+                }
+                
+                .notification-icon-wrapper.application {
+                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                    color: #ffffff;
+                }
+                
+                .notification-icon-wrapper.profile {
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    color: #ffffff;
+                }
+                
+                .notification-icon-wrapper.system {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: #ffffff;
+                }
+                
+                .notification-content {
+                    flex: 1;
+                    min-width: 0;
+                }
+                
+                .notification-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 0 0 4px 0;
+                    line-height: 1.4;
+                }
+                
+                .notification-message {
+                    font-size: 13px;
+                    color: #64748b;
+                    margin: 0 0 6px 0;
+                    line-height: 1.5;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                
+                .notification-time {
+                    font-size: 12px;
+                    color: #94a3b8;
+                }
+                
+                .notification-dot {
+                    width: 8px;
+                    height: 8px;
+                    background: #3b82f6;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                    margin-top: 6px;
+                }
+                
+                .notification-empty {
+                    padding: 60px 24px;
+                    text-align: center;
+                    color: #94a3b8;
+                }
+                
+                .notification-empty-icon {
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 16px;
+                    background: #f1f5f9;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                    color: #cbd5e1;
+                }
+                
+                .notification-empty-text {
+                    font-size: 15px;
+                    color: #64748b;
+                    margin: 0;
+                }
+                
+                .notification-footer {
+                    padding: 12px 24px;
+                    text-align: center;
+                    border-top: 1px solid #e2e8f0;
+                    background: #f8fafc;
+                }
+                
+                .notification-view-all {
+                    color: #0a67ff;
+                    text-decoration: none;
+                    font-size: 14px;
+                    font-weight: 600;
+                    transition: color 0.2s ease;
+                }
+                
+                .notification-view-all:hover {
+                    color: #0b5bdf;
+                }
+                
+                .notification-badge {
+                    position: absolute;
+                    top: -2px;
+                    right: -2px;
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: #ffffff;
+                    font-size: 10px;
+                    font-weight: 700;
+                    min-width: 18px;
+                    height: 18px;
+                    border-radius: 9px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0 4px;
+                    border: 2px solid #0a67ff;
+                    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+                }
             </style>
    </head>
 
@@ -345,20 +611,58 @@
                     <span>Tất cả danh mục</span>
                 </div>
                 <a class="recruiter-btn" href="../Recruiter/recruiter-login.jsp">Nhà tuyển dụng</a>
-                <div class="user-actions">
-                    <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
-                        <i class="fas fa-user"></i>
-                    </a>
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <div class="message-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
-                </div>
+                
+                <c:choose>
+                    <c:when test="${isLoggedIn && isJobSeeker}">
+                        <!-- User is logged in as JobSeeker -->
+                        <div class="user-actions">
+                            <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
+                                <i class="fas fa-user"></i>
+                            </a>
+                            <div class="notification-icon" id="notificationIcon">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge" style="display:none;">0</span>
+                                
+                                <!-- Notification Dropdown -->
+                                <div class="notification-dropdown" id="notificationDropdown">
+                                    <div class="notification-header">
+                                        <h3><i class="fas fa-bell"></i> Thông Báo</h3>
+                                    </div>
+                                    
+                                    <div class="notification-tabs">
+                                        <button class="notification-tab active" data-tab="all">Tất cả</button>
+                                        <button class="notification-tab" data-tab="unread">Chưa đọc</button>
+                                        <button class="notification-tab" data-tab="read">Đã đọc</button>
+                                    </div>
+                                    
+                                    <div class="notification-list">
+                                        <div class="notification-empty">
+                                            <div class="notification-empty-icon">
+                                                <i class="fas fa-spinner fa-spin"></i>
+                                            </div>
+                                            <p class="notification-empty-text">Đang tải...</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="notification-footer">
+                                        <a href="#" class="notification-view-all">Xem tất cả thông báo</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="logout-icon" href="${pageContext.request.contextPath}/LogoutServlet" title="Đăng xuất">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Guest user - show login button only -->
+                        <div class="user-actions">
+                            <a class="head-btn2" href="${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp">
+                                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                            </a>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </header>
@@ -371,16 +675,18 @@
                     <a href="${pageContext.request.contextPath}/job-list">Tìm việc làm</a>
                     <a href="#">Việc làm quản lý</a>
                 </div>
-                <div class="mega-col">
-                    <h4>Việc của tôi</h4>
-                    <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
-                    <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
-                    <a href="#">Thông báo việc làm</a>
-                    <a href="#">Việc dành cho bạn</a>
-                </div>
+                <c:if test="${isLoggedIn && isJobSeeker}">
+                    <div class="mega-col">
+                        <h4>Việc của tôi</h4>
+                        <a href="${pageContext.request.contextPath}/saved-jobs">Việc đã lưu</a>
+                        <a href="${pageContext.request.contextPath}/applied-jobs">Việc đã ứng tuyển</a>
+                        <a href="#">Thông báo việc làm</a>
+                        <a href="#">Việc dành cho bạn</a>
+                    </div>
+                </c:if>
                 <div class="mega-col">
                     <h4>Công ty</h4>
-                    <a href="#">Tất cả công ty</a>
+                    <a href="${pageContext.request.contextPath}/company-culture">Tất cả công ty</a>
                 </div>
             </div>
         </div>
@@ -954,6 +1260,213 @@
                     window.location.href = '${pageContext.request.contextPath}/content-detail?id=' + contentID;
                 });
             }
+            
+            // Notification Dropdown functionality với AJAX
+            (function() {
+                const notificationIcon = document.getElementById('notificationIcon');
+                const notificationDropdown = document.getElementById('notificationDropdown');
+                const notificationTabs = document.querySelectorAll('.notification-tab');
+                const notificationList = document.querySelector('.notification-list');
+                const notificationBadge = document.querySelector('.notification-badge');
+                
+                if (!notificationIcon || !notificationDropdown) return;
+                
+                let allNotifications = [];
+                let currentFilter = 'all';
+                
+                // Load notifications từ server
+                function loadNotifications() {
+                    fetch('<%= request.getContextPath() %>/notifications?action=getRecent&limit=20')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                allNotifications = data.notifications;
+                                renderNotifications(currentFilter);
+                                updateBadgeCount();
+                            }
+                        })
+                        .catch(error => console.error('Error loading notifications:', error));
+                }
+                
+                // Render notifications based on filter
+                function renderNotifications(filter) {
+                    notificationList.innerHTML = '';
+                    currentFilter = filter;
+                    
+                    let filtered = allNotifications;
+                    if (filter === 'unread') {
+                        filtered = allNotifications.filter(n => !n.isRead);
+                    } else if (filter === 'read') {
+                        filtered = allNotifications.filter(n => n.isRead);
+                    }
+                    
+                    if (filtered.length === 0) {
+                        notificationList.innerHTML = 
+                            '<div class="notification-empty">' +
+                                '<div class="notification-empty-icon"><i class="fas fa-inbox"></i></div>' +
+                                '<p class="notification-empty-text">Không có thông báo nào</p>' +
+                            '</div>';
+                        return;
+                    }
+                    
+                    filtered.forEach(notif => {
+                        const item = createNotificationItem(notif);
+                        notificationList.appendChild(item);
+                    });
+                }
+                
+                // Create notification item HTML
+                function createNotificationItem(notif) {
+                    const item = document.createElement('div');
+                    item.className = 'notification-item' + (notif.isRead ? '' : ' unread');
+                    item.setAttribute('data-id', notif.notificationID);
+                    item.setAttribute('data-status', notif.isRead ? 'read' : 'unread');
+                    
+                    let iconClass = 'fas fa-bell';
+                    let iconColorClass = 'system';
+                    
+                    if (notif.iconType === 'application') {
+                        iconClass = 'fas fa-file-alt';
+                        iconColorClass = 'application';
+                    } else if (notif.iconType === 'profile') {
+                        iconClass = 'fas fa-user-check';
+                        iconColorClass = 'profile';
+                    } else if (notif.iconType === 'chat') {
+                        iconClass = 'fas fa-comment';
+                        iconColorClass = 'system';
+                    }
+                    
+                    item.innerHTML = 
+                        '<div class="notification-icon-wrapper ' + iconColorClass + '">' +
+                            '<i class="' + iconClass + '"></i>' +
+                        '</div>' +
+                        '<div class="notification-content">' +
+                            '<p class="notification-title">' + escapeHtml(notif.title) + '</p>' +
+                            '<p class="notification-message">' + escapeHtml(notif.message) + '</p>' +
+                            '<span class="notification-time">' + notif.timeAgo + '</span>' +
+                        '</div>' +
+                        (!notif.isRead ? '<div class="notification-dot"></div>' : '');
+                    
+                    // Chỉ mark as read, không redirect
+                    item.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (!notif.isRead) {
+                            markAsRead(notif.notificationID);
+                        }
+                    });
+                    
+                    return item;
+                }
+                
+                // Mark notification as read
+                function markAsRead(notificationID) {
+                    const params = new URLSearchParams();
+                    params.append('notificationID', notificationID);
+                    
+                    fetch('<%= request.getContextPath() %>/notifications?action=markAsRead', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: params.toString()
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const notif = allNotifications.find(n => n.notificationID == notificationID);
+                            if (notif) {
+                                notif.isRead = true;
+                                
+                                // Update UI immediately
+                                const notificationItem = document.querySelector('.notification-item[data-id="' + notificationID + '"]');
+                                if (notificationItem) {
+                                    notificationItem.classList.remove('unread');
+                                    notificationItem.setAttribute('data-status', 'read');
+                                    const dot = notificationItem.querySelector('.notification-dot');
+                                    if (dot) dot.remove();
+                                }
+                                
+                                // Update badge count
+                                updateBadgeCount();
+                                
+                                // Re-render if on "unread" tab
+                                const activeTab = document.querySelector('.notification-tab.active');
+                                if (activeTab && activeTab.getAttribute('data-tab') === 'unread') {
+                                    renderNotifications('unread');
+                                }
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error marking as read:', error));
+                }
+                
+                // Update badge count
+                function updateBadgeCount() {
+                    const unreadCount = allNotifications.filter(n => !n.isRead).length;
+                    if (notificationBadge) {
+                        if (unreadCount > 0) {
+                            notificationBadge.textContent = unreadCount;
+                            notificationBadge.style.display = 'flex';
+                        } else {
+                            notificationBadge.style.display = 'none';
+                        }
+                    }
+                }
+                
+                // Escape HTML to prevent XSS
+                function escapeHtml(text) {
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+                
+                // Toggle dropdown
+                notificationIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const wasShown = notificationDropdown.classList.contains('show');
+                    notificationDropdown.classList.toggle('show');
+                    if (!wasShown) loadNotifications(); // Load khi mở dropdown
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationDropdown.contains(e.target) && !notificationIcon.contains(e.target)) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+                
+                // Prevent dropdown from closing when clicking inside
+                notificationDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                // Tab filtering
+                notificationTabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        notificationTabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const filter = this.getAttribute('data-tab');
+                        renderNotifications(filter);
+                    });
+                });
+                
+                // Load initial badge count khi trang load
+                fetch('<%= request.getContextPath() %>/notifications?action=getUnreadCount')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && notificationBadge) {
+                            const count = data.unreadCount;
+                            if (count > 0) {
+                                notificationBadge.textContent = count;
+                                notificationBadge.style.display = 'flex';
+                            } else {
+                                notificationBadge.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error loading unread count:', error));
+            })();
         </script>
         
     </body>

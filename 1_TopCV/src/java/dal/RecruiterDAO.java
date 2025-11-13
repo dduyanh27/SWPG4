@@ -686,4 +686,162 @@ public class RecruiterDAO extends DBContext {
     }
     
     //MINH
+    //DUONG
+    // Phương thức tìm kiếm theo tên công ty
+    public List<Recruiter> searchCompaniesByName(String companyName) {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT * FROM Recruiter WHERE Status = 'Active' "
+                + "AND CompanyName LIKE ? ORDER BY CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, "%" + companyName + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                recruiters.add(mapResultSetToRecruiter(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
+
+// Phương thức lọc theo danh mục
+    public List<Recruiter> getRecruitersByCategory(int categoryId) {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT * FROM Recruiter WHERE Status = 'Active' "
+                + "AND CategoryID = ? ORDER BY CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                recruiters.add(mapResultSetToRecruiter(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
+    
+    /**
+     * Lấy danh sách recruiter kèm số lượng job đang tuyển (Status = 'Published')
+     */
+    public List<Recruiter> getAllRecruitersWithJobCount() {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT R.*, COUNT(J.JobID) AS JobCount "
+                + "FROM Recruiter R "
+                + "LEFT JOIN Jobs J ON R.RecruiterID = J.RecruiterID AND J.Status = 'Published' "
+                + "WHERE R.Status = 'Active' "
+                + "GROUP BY R.RecruiterID, R.Email, R.Password, R.Phone, R.CompanyName, "
+                + "R.CompanyDescription, R.CompanyLogoURL, R.Website, R.Img, R.CategoryID, "
+                + "R.Status, R.CompanyAddress, R.CompanySize, R.ContactPerson, "
+                + "R.CompanyBenefits, R.CompanyVideoURL, R.Taxcode, R.RegistrationCert "
+                + "ORDER BY R.CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Recruiter recruiter = mapResultSetToRecruiter(rs);
+                recruiter.setJobCount(rs.getInt("JobCount"));
+                recruiters.add(recruiter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
+    
+    /**
+     * Lấy danh sách recruiter theo category kèm job count
+     */
+    public List<Recruiter> getRecruitersByCategoryWithJobCount(int categoryId) {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT R.*, COUNT(J.JobID) AS JobCount "
+                + "FROM Recruiter R "
+                + "LEFT JOIN Jobs J ON R.RecruiterID = J.RecruiterID AND J.Status = 'Published' "
+                + "WHERE R.Status = 'Active' AND R.CategoryID = ? "
+                + "GROUP BY R.RecruiterID, R.Email, R.Password, R.Phone, R.CompanyName, "
+                + "R.CompanyDescription, R.CompanyLogoURL, R.Website, R.Img, R.CategoryID, "
+                + "R.Status, R.CompanyAddress, R.CompanySize, R.ContactPerson, "
+                + "R.CompanyBenefits, R.CompanyVideoURL, R.Taxcode, R.RegistrationCert "
+                + "ORDER BY R.CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Recruiter recruiter = mapResultSetToRecruiter(rs);
+                recruiter.setJobCount(rs.getInt("JobCount"));
+                recruiters.add(recruiter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
+    
+    /**
+     * Tìm kiếm recruiter theo tên kèm job count
+     */
+    public List<Recruiter> searchCompaniesByNameWithJobCount(String keyword) {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT R.*, COUNT(J.JobID) AS JobCount "
+                + "FROM Recruiter R "
+                + "LEFT JOIN Jobs J ON R.RecruiterID = J.RecruiterID AND J.Status = 'Published' "
+                + "WHERE R.Status = 'Active' AND R.CompanyName LIKE ? "
+                + "GROUP BY R.RecruiterID, R.Email, R.Password, R.Phone, R.CompanyName, "
+                + "R.CompanyDescription, R.CompanyLogoURL, R.Website, R.Img, R.CategoryID, "
+                + "R.Status, R.CompanyAddress, R.CompanySize, R.ContactPerson, "
+                + "R.CompanyBenefits, R.CompanyVideoURL, R.Taxcode, R.RegistrationCert "
+                + "ORDER BY R.CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Recruiter recruiter = mapResultSetToRecruiter(rs);
+                recruiter.setJobCount(rs.getInt("JobCount"));
+                recruiters.add(recruiter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
+    
+    /**
+     * Tìm kiếm recruiter theo cả tên và category kèm job count
+     */
+    public List<Recruiter> searchCompaniesByNameAndCategoryWithJobCount(String keyword, int categoryId) {
+        List<Recruiter> recruiters = new ArrayList<>();
+        String sql = "SELECT R.*, COUNT(J.JobID) AS JobCount "
+                + "FROM Recruiter R "
+                + "LEFT JOIN Jobs J ON R.RecruiterID = J.RecruiterID AND J.Status = 'Published' "
+                + "WHERE R.Status = 'Active' AND R.CompanyName LIKE ? AND R.CategoryID = ? "
+                + "GROUP BY R.RecruiterID, R.Email, R.Password, R.Phone, R.CompanyName, "
+                + "R.CompanyDescription, R.CompanyLogoURL, R.Website, R.Img, R.CategoryID, "
+                + "R.Status, R.CompanyAddress, R.CompanySize, R.ContactPerson, "
+                + "R.CompanyBenefits, R.CompanyVideoURL, R.Taxcode, R.RegistrationCert "
+                + "ORDER BY R.CompanyName";
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ps.setInt(2, categoryId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Recruiter recruiter = mapResultSetToRecruiter(rs);
+                recruiter.setJobCount(rs.getInt("JobCount"));
+                recruiters.add(recruiter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return recruiters;
+    }
 }

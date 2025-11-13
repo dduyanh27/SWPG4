@@ -19,6 +19,7 @@ public class Recruiter {
     private String companyVideoURL;
     private String taxcode;
     private String registrationCert;
+    private int jobCount; // Số lượng job đang tuyển
 
     public Recruiter() {
     }
@@ -199,6 +200,14 @@ public class Recruiter {
 
     public void setRegistrationCert(String registrationCert) {
         this.registrationCert = registrationCert;
+    }
+
+    public int getJobCount() {
+        return jobCount;
+    }
+
+    public void setJobCount(int jobCount) {
+        this.jobCount = jobCount;
     }
 
     @Override

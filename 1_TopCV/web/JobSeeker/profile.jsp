@@ -1550,6 +1550,245 @@
         --radius-lg: 16px;
     }
 
+    /* ========== SKILLS SECTION ========== */
+    .skills-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        box-shadow: var(--shadow-sm);
+        margin: 24px 0;
+    }
+
+    .skills-section h3 {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .skills-section h3 i {
+        color: var(--primary);
+        font-size: 1.75rem;
+    }
+
+    .add-skill-btn {
+        background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+    }
+
+    .add-skill-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 102, 204, 0.3);
+    }
+
+    .add-skill-btn i {
+        font-size: 1rem;
+    }
+
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .skill-tag {
+        background: linear-gradient(135deg, #e6f3ff 0%, #dbeafe 100%);
+        border: 2px solid #0066cc;
+        border-radius: 24px;
+        padding: 10px 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+        font-size: 1rem;
+        color: #0052a3;
+        transition: all 0.2s ease;
+    }
+
+    .skill-tag:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+    }
+
+    .skill-tag span {
+        font-weight: 600;
+    }
+
+    .remove-skill-btn {
+        background: transparent;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+
+    .remove-skill-btn:hover {
+        background: rgba(220, 53, 69, 0.1);
+        transform: scale(1.2);
+    }
+
+    .no-skills-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6b7280;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: #f9fafb;
+        border-radius: 12px;
+        border: 2px dashed #d1d5db;
+    }
+
+    .no-skills-message i {
+        font-size: 1.3rem;
+        color: #9ca3af;
+    }
+
+    /* Skills Modal */
+    .skills-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+    .skills-modal.show {
+        display: flex;
+    }
+
+    .skills-modal-content {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        max-width: 700px;
+        width: 100%;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .skills-modal-header {
+        padding: 24px 28px;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .skills-modal-header h2 {
+        font-size: 1.75rem;
+        color: #1f2937;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .skills-modal-header h2 i {
+        color: var(--primary);
+    }
+
+    .skills-modal-body {
+        padding: 28px;
+        overflow-y: auto;
+    }
+
+    .skill-search {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        margin-bottom: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .skill-search:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+    }
+
+    .available-skills {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    .skill-option {
+        background: #f9fafb;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .skill-option:hover {
+        background: #e6f3ff;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .skill-option.selected {
+        background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+        color: white;
+        border-color: #0052a3;
+    }
+
+    .skill-option.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: #f3f4f6;
+    }
+
+    .skill-option.disabled:hover {
+        transform: none;
+        border-color: #e5e7eb;
+    }
+
+    .skills-modal-footer {
+        padding: 20px 28px;
+        border-top: 2px solid #e5e7eb;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
     .profile-documents-section {
         background: white;
         border-radius: var(--radius-lg);
@@ -2181,9 +2420,7 @@
                     <a class="profile-icon" href="${pageContext.request.contextPath}/jobseekerprofile" title="Tài khoản">
                         <i class="fas fa-user"></i>
                     </a>
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
+                    <%@ include file="/shared/notification-dropdown.jsp" %>
                     <div class="message-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
@@ -2315,20 +2552,41 @@
                 </div>
             </div>
 
-            <!-- Desired Job Section -->
-            <!--            <div class="desired-job-section">
-                            <h3>Công Việc Mong Muốn</h3>
-                            <div class="desired-job-info">
-                                <div class="job-preference">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Nơi làm việc: Hà Nội</span>
+            <!-- Skills Section -->
+            <div class="skills-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="display: flex; align-items: center; gap: 10px; margin: 0;">
+                        <i class="fas fa-code"></i>
+                        Kỹ Năng
+                    </h3>
+                    <button class="add-skill-btn" id="addSkillBtn" title="Thêm kỹ năng">
+                        <i class="fas fa-plus"></i>
+                        Thêm kỹ năng
+                    </button>
+                </div>
+                
+                <div class="skills-container" id="skillsContainer">
+                    <c:choose>
+                        <c:when test="${not empty jobSeekerSkills}">
+                            <c:forEach var="skill" items="${jobSeekerSkills}">
+                                <div class="skill-tag" data-skill-id="${skill.skillID}">
+                                    <span>${skill.skillName}</span>
+                                    <button class="remove-skill-btn" data-skill-id="${skill.skillID}" data-skill-name="${skill.skillName}" title="Xóa kỹ năng">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
-                                <div class="job-preference">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    <span>Mức lương mong muốn (USD / tháng): 200</span>
-                                </div>
-                            </div>
-                        </div>-->
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <p class="no-skills-message">
+                                <i class="fas fa-info-circle"></i>
+                                Chưa có kỹ năng nào. Hãy thêm kỹ năng để tăng cơ hội tìm việc!
+                            </p>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+
             <!-- Profile Documents Section -->
             <div class="profile-documents-section">
                 <h3>Hồ sơ đã tải lên</h3>
@@ -3310,28 +3568,7 @@
 
         // Add CSS for notification animations
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-            }
-        `;
+        style.textContent = '@keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }';
         document.head.appendChild(style);
 
         // ========== Profile Modal Reset Logic ==========        
@@ -3441,7 +3678,7 @@
         const maxLength = 200;
         if (input.value.length > maxLength) {
             input.value = input.value.substring(0, maxLength);
-            showNotification(`Headline không được vượt quá 200 ký tự`, 'error');
+            showNotification('Headline không được vượt quá 200 ký tự', 'error');
             return false;
         }
         return true;
@@ -3452,7 +3689,7 @@
         const maxLength = 255;
         if (textarea.value.length > maxLength) {
             textarea.value = textarea.value.substring(0, maxLength);
-            showNotification(`Địa chỉ không được vượt quá 255 ký tự`, 'error');
+            showNotification('Địa chỉ không được vượt quá 255 ký tự', 'error');
             return false;
         }
         return true;
@@ -3463,7 +3700,7 @@
         const maxLength = 255;
         if (textarea.value.length > maxLength) {
             textarea.value = textarea.value.substring(0, maxLength);
-            showNotification(`Thông tin liên hệ không được vượt quá 255 ký tự`, 'error');
+            showNotification('Thông tin liên hệ không được vượt quá 255 ký tự', 'error');
             return false;
         }
         return true;
@@ -3756,14 +3993,6 @@
             console.log('✓ Avatar script loaded successfully!');
         }, 100); // Wait 100ms
     })();
-    
-    // Delete avatar button
-    if (deleteAvatarBtn) {
-        deleteAvatarBtn.addEventListener('click', function() {
-            console.log('Delete avatar clicked');
-            confirmDeleteAvatar();
-        });
-    }
     
     // View avatar in modal
     function viewAvatar() {
@@ -4119,6 +4348,355 @@
     
     console.log('Avatar script loaded successfully!');
 </script>
+
+<script>
+    // ==================== SKILLS MANAGEMENT FUNCTIONS ====================
+    
+    var selectedSkillsToAdd = new Set();
+    
+    // Open skills modal
+    window.openSkillsModal = function() {
+        console.log('openSkillsModal called');
+        const modal = document.getElementById('skillsModal');
+        if (modal) {
+            selectedSkillsToAdd.clear();
+            updateSkillsList();
+            modal.classList.add('show');
+        } else {
+            console.error('Skills modal not found!');
+        }
+    }
+    
+    // Close skills modal
+    window.closeSkillsModal = function() {
+        console.log('closeSkillsModal called');
+        const modal = document.getElementById('skillsModal');
+        if (modal) {
+            modal.classList.remove('show');
+            selectedSkillsToAdd.clear();
+            const searchInput = document.getElementById('skillSearch');
+            if (searchInput) searchInput.value = '';
+            updateSkillsList();
+        }
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('skillsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeSkillsModal();
+        }
+    });
+    
+    // Search skills
+    window.searchSkills = function() {
+        console.log('searchSkills called');
+        const searchTerm = document.getElementById('skillSearch').value.toLowerCase();
+        const skillOptions = document.querySelectorAll('.skill-option');
+        
+        skillOptions.forEach(option => {
+            const skillName = option.textContent.toLowerCase();
+            if (skillName.includes(searchTerm)) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
+    
+    // Toggle skill selection
+    window.toggleSkillSelection = function(skillId, element) {
+        console.log('toggleSkillSelection called:', skillId);
+        if (element.classList.contains('disabled')) {
+            return; // Không cho chọn skill đã có
+        }
+        
+        if (selectedSkillsToAdd.has(skillId)) {
+            selectedSkillsToAdd.delete(skillId);
+            element.classList.remove('selected');
+        } else {
+            selectedSkillsToAdd.add(skillId);
+            element.classList.add('selected');
+        }
+    }
+    
+    // Update skills list (mark existing skills as disabled)
+    function updateSkillsList() {
+        const existingSkills = document.querySelectorAll('.skill-tag');
+        const existingSkillIds = new Set();
+        
+        existingSkills.forEach(tag => {
+            const skillId = parseInt(tag.getAttribute('data-skill-id'));
+            existingSkillIds.add(skillId);
+        });
+        
+        const skillOptions = document.querySelectorAll('.skill-option');
+        skillOptions.forEach(option => {
+            const skillId = parseInt(option.getAttribute('data-skill-id'));
+            if (existingSkillIds.has(skillId)) {
+                option.classList.add('disabled');
+                option.classList.remove('selected');
+            } else {
+                option.classList.remove('disabled');
+                if (selectedSkillsToAdd.has(skillId)) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            }
+        });
+    }
+    
+    // Add selected skills
+    window.addSelectedSkills = function() {
+        console.log('addSelectedSkills called');
+        if (selectedSkillsToAdd.size === 0) {
+            showNotification('Vui lòng chọn ít nhất một kỹ năng', 'error');
+            return;
+        }
+        
+        showNotification('Đang thêm kỹ năng...', 'success');
+        
+        const skillsArray = Array.from(selectedSkillsToAdd);
+        let addedCount = 0;
+        let errorCount = 0;
+        
+        // Add skills one by one
+        const addPromises = skillsArray.map(skillId => {
+            const formData = new URLSearchParams();
+            formData.append('action', 'add');
+            formData.append('skillId', skillId);
+            
+            return fetch(contextPath + '/manage-skills', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addedCount++;
+                } else {
+                    errorCount++;
+                    console.error('Failed to add skill:', skillId, data.message);
+                }
+            })
+            .catch(error => {
+                errorCount++;
+                console.error('Error adding skill:', skillId, error);
+            });
+        });
+        
+        Promise.all(addPromises).then(() => {
+            if (addedCount > 0) {
+                showNotification('Đã thêm ' + addedCount + ' kỹ năng thành công!', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showNotification('Không thể thêm kỹ năng. Vui lòng thử lại.', 'error');
+            }
+        });
+    }
+    
+    // Remove skill
+    window.removeSkill = function(skillId, skillName) {
+        console.log('removeSkill called:', skillId, skillName);
+        const confirmed = confirm('Bạn có chắc chắn muốn xóa kỹ năng "' + skillName + '"?');
+        
+        if (!confirmed) return;
+        
+        showNotification('Đang xóa kỹ năng...', 'success');
+        
+        const formData = new URLSearchParams();
+        formData.append('action', 'remove');
+        formData.append('skillId', skillId);
+        
+        fetch(contextPath + '/manage-skills', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString()
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Đã xóa kỹ năng thành công!', 'success');
+                // Remove from UI
+                const skillTag = document.querySelector('.skill-tag[data-skill-id="' + skillId + '"]');
+                if (skillTag) {
+                    skillTag.remove();
+                }
+                
+                // Check if no skills left
+                const skillsContainer = document.querySelector('.skills-container');
+                if (skillsContainer && skillsContainer.querySelectorAll('.skill-tag').length === 0) {
+                    skillsContainer.innerHTML = '<p class="no-skills-message"><i class="fas fa-info-circle"></i> Chưa có kỹ năng nào. Hãy thêm kỹ năng để tăng cơ hội tìm việc!</p>';
+                }
+            } else {
+                showNotification('Lỗi: ' + (data.message || 'Không thể xóa kỹ năng'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Remove skill error:', error);
+            showNotification('Không thể kết nối đến server', 'error');
+        });
+    }
+    
+    // Close modals with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const avatarModal = document.getElementById('avatarViewModal');
+            if (avatarModal && avatarModal.classList.contains('show')) {
+                closeAvatarView();
+            }
+            
+            const changePasswordModal = document.getElementById('changePasswordModal');
+            if (changePasswordModal && changePasswordModal.classList.contains('show')) {
+                closeChangePasswordModal();
+            }
+            
+            const skillsModal = document.getElementById('skillsModal');
+            if (skillsModal && skillsModal.classList.contains('show')) {
+                window.closeSkillsModal();
+            }
+        }
+    });
+    
+    // Debug: Log loaded functions
+    console.log('Skills Management Functions loaded:');
+    console.log('- openSkillsModal:', typeof window.openSkillsModal);
+    console.log('- closeSkillsModal:', typeof window.closeSkillsModal);
+    console.log('- searchSkills:', typeof window.searchSkills);
+    console.log('- toggleSkillSelection:', typeof window.toggleSkillSelection);
+    console.log('- addSelectedSkills:', typeof window.addSelectedSkills);
+    console.log('- removeSkill:', typeof window.removeSkill);
+    
+    // Setup event listeners after DOM loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Setting up Skills event listeners...');
+        
+        // Add skill button
+        const addSkillBtn = document.getElementById('addSkillBtn');
+        if (addSkillBtn) {
+            addSkillBtn.addEventListener('click', function() {
+                console.log('Add skill button clicked');
+                window.openSkillsModal();
+            });
+            console.log('✓ Add skill button listener attached');
+        } else {
+            console.error('✗ Add skill button not found!');
+        }
+        
+        // Remove skill buttons (using event delegation)
+        const skillsContainer = document.getElementById('skillsContainer');
+        if (skillsContainer) {
+            skillsContainer.addEventListener('click', function(e) {
+                const removeBtn = e.target.closest('.remove-skill-btn');
+                if (removeBtn) {
+                    const skillId = parseInt(removeBtn.getAttribute('data-skill-id'));
+                    const skillName = removeBtn.getAttribute('data-skill-name');
+                    console.log('Remove skill button clicked:', skillId, skillName);
+                    window.removeSkill(skillId, skillName);
+                }
+            });
+            console.log('✓ Skills container listener attached (event delegation)');
+        } else {
+            console.error('✗ Skills container not found!');
+        }
+        
+        // Modal close buttons
+        const closeSkillsModalBtn = document.getElementById('closeSkillsModalBtn');
+        if (closeSkillsModalBtn) {
+            closeSkillsModalBtn.addEventListener('click', function() {
+                console.log('Close modal button clicked');
+                window.closeSkillsModal();
+            });
+            console.log('✓ Close modal button listener attached');
+        }
+        
+        const cancelSkillsBtn = document.getElementById('cancelSkillsBtn');
+        if (cancelSkillsBtn) {
+            cancelSkillsBtn.addEventListener('click', function() {
+                console.log('Cancel button clicked');
+                window.closeSkillsModal();
+            });
+            console.log('✓ Cancel button listener attached');
+        }
+        
+        // Save skills button
+        const saveSkillsBtn = document.getElementById('saveSkillsBtn');
+        if (saveSkillsBtn) {
+            saveSkillsBtn.addEventListener('click', function() {
+                console.log('Save skills button clicked');
+                window.addSelectedSkills();
+            });
+            console.log('✓ Save skills button listener attached');
+        }
+        
+        // Skill search input
+        const skillSearch = document.getElementById('skillSearch');
+        if (skillSearch) {
+            skillSearch.addEventListener('input', function() {
+                window.searchSkills();
+            });
+            console.log('✓ Skill search listener attached');
+        }
+        
+        // Available skills list (event delegation for skill selection)
+        const availableSkillsList = document.getElementById('availableSkillsList');
+        if (availableSkillsList) {
+            availableSkillsList.addEventListener('click', function(e) {
+                const skillOption = e.target.closest('.skill-option');
+                if (skillOption) {
+                    const skillId = parseInt(skillOption.getAttribute('data-skill-id'));
+                    console.log('Skill option clicked:', skillId);
+                    window.toggleSkillSelection(skillId, skillOption);
+                }
+            });
+            console.log('✓ Available skills list listener attached (event delegation)');
+        }
+        
+        console.log('✓ All Skills event listeners setup complete!');
+    });
+</script>
+
+<!-- Skills Modal -->
+<div class="skills-modal" id="skillsModal">
+    <div class="skills-modal-content">
+        <div class="skills-modal-header">
+            <h2><i class="fas fa-code"></i> Thêm Kỹ Năng</h2>
+            <button class="close-btn" id="closeSkillsModalBtn" style="background: transparent; border: none; font-size: 1.75rem; color: #6b7280; cursor: pointer; transition: all 0.2s;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="skills-modal-body">
+            <input type="text" 
+                   id="skillSearch" 
+                   class="skill-search" 
+                   placeholder="🔍 Tìm kiếm kỹ năng...">
+            
+            <div class="available-skills" id="availableSkillsList">
+                <c:forEach var="skill" items="${allSkills}">
+                    <div class="skill-option" data-skill-id="${skill.skillID}">
+                        ${skill.skillName}
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+        <div class="skills-modal-footer">
+            <button class="cancel-btn" id="cancelSkillsBtn">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+            <button class="save-btn" id="saveSkillsBtn">
+                <i class="fas fa-plus"></i> Thêm Kỹ Năng
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 

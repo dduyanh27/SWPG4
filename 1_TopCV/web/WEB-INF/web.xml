@@ -196,4 +196,25 @@
         <servlet-name>ResetPasswordServlet</servlet-name>
         <servlet-class>controller.base.ResetPasswordServlet</servlet-class>
     </servlet>
+
+    <!-- Company Culture (JobSeeker) -->
+    <servlet>
+        <servlet-name>CompanyCultureServlet</servlet-name>
+        <servlet-class>controller.jobseeker.CompanyCultureServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CompanyCultureServlet</servlet-name>
+        <url-pattern>/company-culture</url-pattern>
+    </servlet-mapping>
+
+        
+    <!-- Notification System (JobSeeker) -->
+    <servlet>
+        <servlet-name>NotificationServlet</servlet-name>
+        <servlet-class>controller.jobseeker.NotificationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificationServlet</servlet-name>
+        <url-pattern>/notifications</url-pattern>
+    </servlet-mapping>
 </web-app>

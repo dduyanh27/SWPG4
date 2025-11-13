@@ -278,7 +278,7 @@
                         
                         if (countdown <= 0) {
                             clearInterval(timer);
-                            window.location.href = '/Test_ResetPassword/JobSeeker/jobseeker-login.jsp';
+                            window.location.href = '${pageContext.request.contextPath}/JobSeeker/jobseeker-login.jsp';
                         }
                     }, 1000);
                 }

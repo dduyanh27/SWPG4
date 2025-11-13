@@ -60,6 +60,7 @@ public class GoogleLoginServlet extends HttpServlet {
 
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
+            session.setAttribute("jobseeker", user); // Add this for session consistency check
             session.setAttribute("userType", "jobseeker");
             session.setAttribute("userID", user.getJobSeekerId());
             session.setAttribute("userName", user.getFullName() != null ? user.getFullName() : user.getEmail());

@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dal.ApplicationDAO;
+import dal.NotificationDAO;
 import model.JobSeeker;
 import util.SessionHelper;
 
@@ -62,6 +63,19 @@ public class CancelApplicationServlet extends HttpServlet {
             boolean deleted = applicationDAO.deleteApplication(applicationId, jobSeekerId);
             
             if (deleted) {
+                // Tạo thông báo hủy đơn thành công
+                NotificationDAO.sendNotification(
+                    jobSeekerId,
+                    "jobseeker",
+                    "application",
+                    "Đã hủy đơn ứng tuyển",
+                    "Bạn đã hủy đơn ứng tuyển thành công. Bạn có thể ứng tuyển lại bất kỳ lúc nào.",
+                    applicationId,
+                    "application",
+                    "/JobSeeker/applied-jobs.jsp",
+                    0
+                );
+                
                 out.print("{\"success\":true,\"message\":\"Đã hủy nộp đơn thành công\"}");
                 System.out.println("CancelApplicationServlet: Successfully cancelled application " + applicationId);
             } else {

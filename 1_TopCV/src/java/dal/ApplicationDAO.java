@@ -386,4 +386,72 @@ public class ApplicationDAO extends DBContext {
         }
         return appList;
     }
+    
+    /**
+     * Update application status (for recruiter) and send notification to jobseeker
+     * @param applicationId
+     * @param newStatus - "Pending", "Accepted", "Rejected"
+     * @return true if success
+     */
+    public boolean updateApplicationStatus(int applicationId, String newStatus) {
+        String sql = "UPDATE Applications SET Status = ? WHERE ApplicationID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, applicationId);
+            
+            boolean success = ps.executeUpdate() > 0;
+            
+            if (success) {
+                // Get jobseeker info to send notification
+                String getSql = "SELECT c.JobSeekerID, a.JobID FROM Applications a " +
+                               "JOIN CVs c ON a.CVID = c.CVID " +
+                               "WHERE a.ApplicationID = ?";
+                try (PreparedStatement getPs = c.prepareStatement(getSql)) {
+                    getPs.setInt(1, applicationId);
+                    ResultSet rs = getPs.executeQuery();
+                    if (rs.next()) {
+                        int jobSeekerId = rs.getInt("JobSeekerID");
+                        int jobId = rs.getInt("JobID");
+                        
+                        // Send notification
+                        String title = "";
+                        String message = "";
+                        int priority = 2; // High priority
+                        
+                        if ("Accepted".equalsIgnoreCase(newStatus)) {
+                            title = "Chúc mừng! Đơn ứng tuyển được chấp nhận";
+                            message = "Đơn ứng tuyển của bạn đã được nhà tuyển dụng chấp nhận. Họ sẽ liên hệ với bạn sớm nhất.";
+                        } else if ("Rejected".equalsIgnoreCase(newStatus)) {
+                            title = "Đơn ứng tuyển không được chấp nhận";
+                            message = "Rất tiếc, đơn ứng tuyển của bạn chưa phù hợp với yêu cầu tuyển dụng lần này. Đừng nản chí, hãy tiếp tục cố gắng!";
+                            priority = 1;
+                        } else if ("Pending".equalsIgnoreCase(newStatus)) {
+                            title = "Đơn ứng tuyển đang chờ xử lý";
+                            message = "Đơn ứng tuyển của bạn đang được xem xét. Vui lòng kiên nhẫn chờ đợi.";
+                            priority = 0;
+                        }
+                        
+                        if (!title.isEmpty()) {
+                            NotificationDAO.sendNotification(
+                                jobSeekerId,
+                                "jobseeker",
+                                "application",
+                                title,
+                                message,
+                                applicationId,
+                                "application",
+                                "/JobSeeker/applied-jobs.jsp",
+                                priority
+                            );
+                        }
+                    }
+                }
+            }
+            
+            return success;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

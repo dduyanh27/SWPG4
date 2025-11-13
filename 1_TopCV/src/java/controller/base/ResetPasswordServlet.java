@@ -179,19 +179,18 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        // Hash password and update based on user type
-        String hashedPassword = MD5Util.getMD5Hash(password);
+        // Update password - DAO will handle MD5 hashing
         tokenForgetPassword.setUsed(true);
 
         switch (userType.toLowerCase()) {
             case "admin":
-                adminDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                adminDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "jobseeker":
-                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "recruiter":
-                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
         }
 
