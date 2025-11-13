@@ -41,13 +41,16 @@ public class RegistrationValidationServlet extends HttpServlet {
                 boolean exists = recruiterDAO.isPhoneExists(value);
                 out.print("{\"exists\": " + exists + "}");
             } else if ("taxCode".equals(action)) {
-                // Validate tax code format only (optional field)
                 boolean valid = false;
+                boolean exists = false;
                 if (value != null) {
                     String trimmed = value.trim();
                     valid = trimmed.matches("^[0-9]{10}$");
+                    if (valid) {
+                        exists = recruiterDAO.isTaxCodeExists(trimmed);
+                    }
                 }
-                out.print("{\"valid\": " + valid + "}");
+                out.print("{\"valid\": " + valid + ", \"exists\": " + exists + "}");
                 
             } else {
                 out.print("{\"error\": \"Invalid parameter\"}");

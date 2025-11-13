@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"> 
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <filter>
         <filter-name>AuthenticationFilter</filter-name>
         <filter-class>filter.AuthenticationFilter</filter-class>
@@ -8,17 +8,23 @@
         <filter-name>AuthenticationFilter</filter-name>
         <url-pattern>/LoginServlet</url-pattern>
     </filter-mapping>
-    
     <!-- Base/Login -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>controller.base.LoginServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RequestPasswordServlet</servlet-name>
+        <servlet-class>controller.base.RequestPasswordServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <servlet-class>controller.base.ResetPasswordServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/LoginServlet</url-pattern>
     </servlet-mapping>
-    
     <!-- Jobseeker -->
     <servlet>
         <servlet-name>GoogleLoginServlet</servlet-name>
@@ -33,7 +39,6 @@
         <servlet-name>GoogleLoginServlet</servlet-name>
         <url-pattern>/JobSeeker/jobseeker-login</url-pattern>
     </servlet-mapping>
-    
     <!-- Admin -->
     <servlet>
         <servlet-name>AdminAddAccountServlet</servlet-name>
@@ -43,7 +48,6 @@
         <servlet-name>AdminAddAccountServlet</servlet-name>
         <url-pattern>/adminaddaccount</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>AdminChangePassword</servlet-name>
         <servlet-class>controller.admin.AdminChangePassword</servlet-class>
@@ -52,7 +56,6 @@
         <servlet-name>AdminChangePassword</servlet-name>
         <url-pattern>/adminchangepassword</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>AdminDeleteAccount</servlet-name>
         <servlet-class>controller.admin.AdminDeleteAccount</servlet-class>
@@ -61,7 +64,6 @@
         <servlet-name>AdminDeleteAccount</servlet-name>
         <url-pattern>/admindeleteaccount</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>AdminManageAccountServlet</servlet-name>
         <servlet-class>controller.admin.AdminManageAccountServlet</servlet-class>
@@ -78,7 +80,6 @@
         <servlet-name>AdminManageAccountServlet</servlet-name>
         <url-pattern>/manage-accounts</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>UpdateAdminProfile</servlet-name>
         <servlet-class>controller.admin.UpdateAdminProfile</servlet-class>
@@ -87,7 +88,6 @@
         <servlet-name>UpdateAdminProfile</servlet-name>
         <url-pattern>/updateadminprofile</url-pattern>
     </servlet-mapping>
-    
     <!-- Recruiter (package 'recuiter' in sources) -->
     <servlet>
         <servlet-name>HomeRecuiterServlet</servlet-name>
@@ -97,25 +97,22 @@
         <servlet-name>HomeRecuiterServlet</servlet-name>
         <url-pattern>/homerecuiterservlet</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>JobFinalServlet</servlet-name>
         <servlet-class>controller.recuiter.JobFinalServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>JobFinalServlet</servlet-name>
-        <url-pattern>/jobfinalservlet</url-pattern>
+        <url-pattern>/jobfinal</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>JobPostingServlet</servlet-name>
         <servlet-class>controller.recuiter.JobPostingServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>JobPostingServlet</servlet-name>
-        <url-pattern>/jobpostingservlet</url-pattern>
+        <url-pattern>/jobposting</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>ListPostingJobsServlet</servlet-name>
         <servlet-class>controller.recuiter.ListPostingJobsServlet</servlet-class>
@@ -124,7 +121,10 @@
         <servlet-name>ListPostingJobsServlet</servlet-name>
         <url-pattern>/listpostingjobsservlet</url-pattern>
     </servlet-mapping>
-    
+    <servlet-mapping>
+        <servlet-name>ListPostingJobsServlet</servlet-name>
+        <url-pattern>/listpostingjobs</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>RecruitmentProcessServlet</servlet-name>
         <servlet-class>controller.recuiter.RecruitmentProcessServlet</servlet-class>
@@ -141,7 +141,6 @@
         <servlet-name>JobSeekerJobListServlet</servlet-name>
         <url-pattern>/jobseekerjoblist</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>AppliedJobsServlet</servlet-name>
         <servlet-class>controller.jobseeker.AppliedJobsServlet</servlet-class>
@@ -150,7 +149,6 @@
         <servlet-name>AppliedJobsServlet</servlet-name>
         <url-pattern>/applied-jobs</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>SavedJobsServlet</servlet-name>
         <servlet-class>controller.jobseeker.SavedJobsServlet</servlet-class>
@@ -159,7 +157,6 @@
         <servlet-name>SavedJobsServlet</servlet-name>
         <url-pattern>/saved-jobs</url-pattern>
     </servlet-mapping>
-    
     <!-- Candidate Search -->
     <servlet>
         <servlet-name>CandidateSearchServlet</servlet-name>
@@ -169,7 +166,6 @@
         <servlet-name>CandidateSearchServlet</servlet-name>
         <url-pattern>/candidate-search</url-pattern>
     </servlet-mapping>
-    
     <!-- Candidate Search Profile -->
     <servlet>
         <servlet-name>CandidateSearchProfileServlet</servlet-name>
@@ -179,5 +175,39 @@
         <servlet-name>CandidateSearchProfileServlet</servlet-name>
         <url-pattern>/candidate-profile</url-pattern>
     </servlet-mapping>
-    
+    <!-- Candidate Management -->
+    <servlet>
+        <servlet-name>CandidateManagementServlet</servlet-name>
+        <servlet-class>controller.recuiter.CandidateManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CandidateManagementServlet</servlet-name>
+        <url-pattern>/candidate-management</url-pattern>
+    </servlet-mapping>
+    <!-- Candidate Profile View (from candidate-management) -->
+    <servlet>
+        <servlet-name>CandidateProfileServlet</servlet-name>
+        <servlet-class>controller.recuiter.CandidateProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CandidateProfileServlet</servlet-name>
+        <url-pattern>/candidate-profile-view</url-pattern>
+    </servlet-mapping>
+    <!-- Job Management -->
+    <servlet>
+        <servlet-name>JobManagementServlet</servlet-name>
+        <servlet-class>controller.recuiter.JobManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JobManagementServlet</servlet-name>
+        <url-pattern>/job-management</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RequestPasswordServlet</servlet-name>
+        <url-pattern>/requestPassword</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordServlet</servlet-name>
+        <url-pattern>/resetPassword</url-pattern>
+    </servlet-mapping>
 </web-app>

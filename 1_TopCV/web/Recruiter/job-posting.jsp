@@ -1,9 +1,49 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Recruiter" %>
+<%@ page import="dal.TypeDAO" %>
+<%@ page import="dal.LocationDAO" %>
+<%@ page import="dal.CategoryDAO" %>
+<%@ page import="model.Type" %>
+<%@ page import="model.Location" %>
+<%@ page import="model.Category" %>
 <%
     Recruiter recruiter = (Recruiter) session.getAttribute("recruiter");
     String userName = (recruiter != null) ? recruiter.getContactPerson() : "User";
+    
+    // Nếu attributes null (truy cập trực tiếp JSP), tự load dữ liệu
+    if (request.getAttribute("jobLevels") == null) {
+        try {
+            TypeDAO typeDAO = new TypeDAO();
+            LocationDAO locationDAO = new LocationDAO();
+            CategoryDAO categoryDAO = new CategoryDAO();
+            
+            List<Type> jobLevels = typeDAO.getJobLevels();
+            List<Type> jobTypes = typeDAO.getJobTypes();
+            List<Location> locations = locationDAO.getAllLocations();
+            List<Category> parentCategories = categoryDAO.getParentCategories();
+            List<Category> allCategories = categoryDAO.getAllCategories();
+            
+            request.setAttribute("jobLevels", jobLevels != null ? jobLevels : new java.util.ArrayList());
+            request.setAttribute("jobTypes", jobTypes != null ? jobTypes : new java.util.ArrayList());
+            request.setAttribute("locations", locations != null ? locations : new java.util.ArrayList());
+            request.setAttribute("parentCategories", parentCategories != null ? parentCategories : new java.util.ArrayList());
+            request.setAttribute("allCategories", allCategories != null ? allCategories : new java.util.ArrayList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("jobLevels", new java.util.ArrayList());
+            request.setAttribute("jobTypes", new java.util.ArrayList());
+            request.setAttribute("locations", new java.util.ArrayList());
+            request.setAttribute("parentCategories", new java.util.ArrayList());
+            request.setAttribute("allCategories", new java.util.ArrayList());
+        }
+    }
+    // Nếu trang bị mở trực tiếp (không qua /jobposting) thì các attribute như allowFeatured sẽ null
+    // Chuyển hướng về servlet để nạp đầy đủ dữ liệu và quyền từ gói
+    if (request.getAttribute("allowFeatured") == null) {
+        response.sendRedirect(request.getContextPath() + "/jobposting");
+        return;
+    }
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -49,7 +89,7 @@
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
                             <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
@@ -60,7 +100,7 @@
                             <a href="#">Tài liệu hướng dẫn</a>
                         </div>
                     </li>
-                    <li><a href="#">Đơn hàng</a></li>
+                    <li><a href="${pageContext.request.contextPath}/recruiter/purchase-history">Đơn hàng</a></li>
                 <li><a href="#">Báo cáo</a></li>
                 <li><a href="#" class="company-link">Công ty</a></li>
                 </ul>
@@ -72,7 +112,7 @@
                             ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp" class="active">Tạo tin tuyển dụng mới</a>
+                            <a href="${pageContext.request.contextPath}/jobposting" class="active">Tạo tin tuyển dụng mới</a>
                             <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                         </div>
                     </div>
@@ -165,11 +205,6 @@
             <div class="step-line"></div>
             <div class="step">
                 <div class="step-number">2</div>
-                <div class="step-title">Thiết lập quy trình</div>
-            </div>
-            <div class="step-line"></div>
-            <div class="step">
-                <div class="step-number">3</div>
                 <div class="step-title">Đăng tuyển dụng</div>
             </div>
         </div>
@@ -201,80 +236,124 @@
                 
                 <div class="form-group">
                     <label for="job-title">Chức danh <span class="required">*</span></label>
-                    <input type="text" id="job-title" name="job-title" value="Chuyên Viên Kiểm Thử Và Vận Hành Phần Mềm (Ba/tester)" required>
+                    <input type="text" id="job-title" name="job-title" placeholder="Eg. Senior UX Designer" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="job-level">Cấp bậc <span class="required">*</span></label>
                         <select id="job-level" name="job-level" required>
-                            <option value="">Chọn cấp bậc</option>
-                            <% if (request.getAttribute("jobLevels") != null) { 
-                                List<model.Type> jobLevels = (List<model.Type>) request.getAttribute("jobLevels");
-                                for (model.Type level : jobLevels) { %>
-                                    <option value="<%= level.getTypeID() %>"><%= level.getTypeName() %></option>
-                                <% }
-                            } %>
+                            
+                            <% 
+                            try {
+                                if (request.getAttribute("jobLevels") != null) { 
+                                    List<model.Type> jobLevels = (List<model.Type>) request.getAttribute("jobLevels");
+                                    if (jobLevels != null && !jobLevels.isEmpty()) {
+                                        for (model.Type level : jobLevels) { %>
+                                            <option value="<%= level.getTypeID() %>"><%= level.getTypeName() %></option>
+                                        <% }
+                                    }
+                                } else {
+                                    // Debug: Hiển thị nếu không có dữ liệu
+                                    System.out.println("DEBUG: jobLevels attribute is null");
+                                }
+                            } catch (Exception e) {
+                                System.out.println("DEBUG Error in jobLevels: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                            %>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="job-type">Loại việc làm <span class="required">*</span></label>
-                        <select id="job-type" name="job-type" required>
-                            <option value="">Chọn loại việc làm</option>
-                            <% if (request.getAttribute("jobTypes") != null) { 
-                                List<model.Type> jobTypes = (List<model.Type>) request.getAttribute("jobTypes");
-                                for (model.Type type : jobTypes) { %>
-                                    <option value="<%= type.getTypeID() %>"><%= type.getTypeName() %></option>
-                                <% }
-                            } %>
+                        <label for="job-type">Loại việc làm</label>
+                        <select id="job-type" name="job-type">
+                            <% 
+                            try {
+                                if (request.getAttribute("jobTypes") != null) { 
+                                    List<model.Type> jobTypes = (List<model.Type>) request.getAttribute("jobTypes");
+                                    if (jobTypes != null && !jobTypes.isEmpty()) {
+                                        for (model.Type type : jobTypes) { %>
+                                            <option value="<%= type.getTypeID() %>"><%= type.getTypeName() %></option>
+                                        <% }
+                                    }
+                                } else {
+                                    // Debug: Hiển thị nếu không có dữ liệu
+                                    System.out.println("DEBUG: jobTypes attribute is null");
+                                }
+                            } catch (Exception e) {
+                                System.out.println("DEBUG Error in jobTypes: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                            %>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="profession">Ngành nghề chi tiết <span class="required">*</span></label>
-                    <div class="input-group">
-                        <input type="text" id="profession" value="Phần Cứng Máy Tính">
-                        <select>
-                            <option>Công Nghệ Thông Tin/Viễn thông</option>
-                        </select>
-                        <input type="text" placeholder="Tìm kiếm ngành nghề">
+                    <label for="profession">Ngành nghề chi tiết <span class="required">*</span> (Chọn 1 ngành nghề) <i class="fas fa-question-circle"></i></label>
+                    <div class="simple-custom-dropdown">
+                        <input type="hidden" id="profession" name="profession" required>
+                        <div class="dropdown-input" id="profession-input" onclick="toggleProfessionDropdown()">
+                            <span class="dropdown-text" id="profession-text">Vui lòng chọn ngành nghề</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown-list" id="profession-list" style="display: none;">
+                            <%
+                            try {
+                                List<Category> parentCategories = (List<Category>) request.getAttribute("parentCategories");
+                                List<Category> allCategories = (List<Category>) request.getAttribute("allCategories");
+                                
+                                if (parentCategories != null && !parentCategories.isEmpty()) {
+                                    for (Category parent : parentCategories) {
+                            %>
+                            <div class="category-parent-item" onclick="toggleParentCategory(this, event)">
+                                <i class="fas fa-chevron-right category-arrow"></i>
+                                <strong><%= parent.getCategoryName() %></strong>
+                            </div>
+                            <div class="category-children-list" style="display: none;" data-parent-id="<%= parent.getCategoryID() %>">
+                                <%
+                                if (allCategories != null) {
+                                    for (Category sub : allCategories) {
+                                        if (sub.getParentCategoryID() != null && sub.getParentCategoryID() == parent.getCategoryID()) {
+                                %>
+                                <div class="category-child-item" data-category-id="<%= sub.getCategoryID() %>" data-category-name="<%= sub.getCategoryName() %>" onclick="selectProfession(this)">
+                                    <%= sub.getCategoryName() %>
+                                </div>
+                                <%
+                                        }
+                                    }
+                                }
+                                %>
+                            </div>
+                            <%
+                                    }
+                                }
+                            } catch (Exception e) {
+                                System.out.println("DEBUG Error in profession dropdown: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                            %>
+                        </div>
                     </div>
-                    <small class="hint">(Chọn 1 ngành nghề) <i class="fas fa-question-circle"></i></small>
                 </div>
 
                 <div class="form-group">
-                    <label for="job-field">Lĩnh vực công việc <span class="required">*</span></label>
-                    <select id="job-field" name="job-field" required>
-                        <option value="">Chọn lĩnh vực</option>
-                        <% if (request.getAttribute("categories") != null) { 
-                            List<model.Category> categories = (List<model.Category>) request.getAttribute("categories");
-                            for (model.Category category : categories) { %>
-                                <option value="<%= category.getCategoryID() %>"><%= category.getCategoryName() %></option>
-                            <% }
-                        } %>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="work-location">Địa điểm làm việc <span class="required">*</span></label>
-                    <select id="work-location" name="work-location" required>
-                        <option value="">Chọn địa điểm</option>
-                        <% if (request.getAttribute("locations") != null) { 
-                            List<model.Location> locations = (List<model.Location>) request.getAttribute("locations");
-                            for (model.Location location : locations) { %>
-                                <option value="<%= location.getLocationID() %>"><%= location.getLocationName() %></option>
-                            <% }
-                        } %>
-                    </select>
-                    <small class="hint">(Tối đa 3 địa điểm) <i class="fas fa-question-circle"></i></small>
-                    <a href="#" class="add-location-link">Thêm địa điểm làm việc</a>
-                </div>
-
-                <div class="form-group">
-                    <label for="expiration-date">Ngày hết hạn <span class="required">*</span></label>
-                    <input type="date" id="expiration-date" name="expiration-date" required>
-                    <small class="hint">Tin tuyển dụng sẽ tự động hết hạn sau ngày này</small>
+                    <label for="work-location">Địa điểm làm việc <span class="required">*</span> <i class="fas fa-question-circle"></i></label>
+                    <% 
+                    // Sử dụng lại biến recruiter đã khai báo ở đầu file, hoặc lấy từ request attribute
+                    Recruiter currentRecruiter = (Recruiter) request.getAttribute("recruiter");
+                    if (currentRecruiter == null) {
+                        currentRecruiter = recruiter; // Sử dụng biến recruiter từ đầu file
+                    }
+                    String companyAddress = "";
+                    if (currentRecruiter != null && currentRecruiter.getCompanyAddress() != null) {
+                        companyAddress = currentRecruiter.getCompanyAddress();
+                    }
+                    %>
+                    <input type="text" id="work-location" name="work-location" value="<%= companyAddress %>" readonly required style="background-color: #f5f5f5; cursor: not-allowed;">
+                    <div class="info-note" style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 8px; border-left: 4px solid #2196f3; font-size: 12px;">
+                        <i class="fas fa-info-circle"></i> Địa điểm làm việc được lấy từ thông tin công ty và không thể chỉnh sửa.
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -284,15 +363,11 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-description" name="job-description" rows="10" required>• Tham gia vào quá trình phát triển phần mềm từ giai đoạn phân tích yêu cầu đến triển khai
-• Thực hiện kiểm thử chức năng, kiểm thử tích hợp và kiểm thử hệ thống
-• Viết và thực thi các test case, test script
-• Phối hợp với team phát triển để đảm bảo chất lượng sản phẩm
-• Báo cáo và theo dõi các lỗi phát hiện được
-• Tham gia vào quá trình review code và tài liệu kỹ thuật
-• Hỗ trợ triển khai và vận hành hệ thống
-• Đào tạo và hướng dẫn người dùng cuối</textarea>
-                        <div class="char-counter">14150/14500 ký tự</div>
+                        <textarea id="job-description" name="job-description" rows="10" placeholder="Nhập mô tả công việc" required></textarea>
+                        <div class="editor-footer">
+                            <a href="#" class="sample-link">Xem mô tả công việc mẫu</a>
+                            <div class="char-counter">(14500/14500 ký tự)</div>
+                        </div>
                     </div>
                 </div>
 
@@ -303,16 +378,11 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-requirements" name="job-requirements" rows="10" required>1. Tốt nghiệp Đại học chuyên ngành Công nghệ thông tin hoặc tương đương
-2. Có ít nhất 2 năm kinh nghiệm làm Tester
-3. Có khả năng giao tiếp tiếng Anh cơ bản
-4. Có kỹ năng mềm tốt, khả năng làm việc nhóm
-5. Có kinh nghiệm với các công cụ test như Selenium, Postman
-6. Hiểu biết về quy trình phát triển phần mềm Agile/Scrum
-
-Phúc lợi được hưởng:
-• Mức lương hấp dẫn và cạnh tranh</textarea>
-                        <div class="char-counter">13724/14500 ký tự</div>
+                        <textarea id="job-requirements" name="job-requirements" rows="10" placeholder="Nhập yêu cầu công việc" required></textarea>
+                        <div class="editor-footer">
+                            <a href="#" class="sample-link">Xem yêu cầu công việc mẫu</a>
+                            <div class="char-counter">(14500/14500 ký tự)</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -322,20 +392,9 @@ Phúc lợi được hưởng:
                 <div class="form-group">
                     <label for="salary">Mức lương <span class="required">*</span> (USD)</label>
                     <div class="salary-input-group">
-                        <input type="number" id="salary-min" name="salary-min" value="1000" placeholder="Từ">
+                        <input type="number" id="salary-min" name="salary-min" placeholder="Tối thiểu">
                         <span class="dash">-</span>
-                        <input type="number" id="salary-max" name="salary-max" value="1500" placeholder="Đến">
-                        <div class="toggle-group">
-                            <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="warning-box">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Ẩn mức lương có thể làm giảm lượng hồ sơ ứng tuyển lên đến 30%</span>
+                        <input type="number" id="salary-max" name="salary-max" placeholder="Tối đa">
                     </div>
                 </div>
 
@@ -350,48 +409,16 @@ Phúc lợi được hưởng:
 
                 <div class="form-group">
                     <label for="contact-person">Người liên hệ <span class="required">*</span></label>
-                    <div class="input-with-toggle">
-                        <input type="text" id="contact-person" value="Bộ phận Tuyển dụng" required>
-                        <div class="toggle-group">
-                            <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
+                    <input type="text" id="contact-person" name="contact-person" value="nguyen van A" required>
                 </div>
 
                 <div class="form-group">
                     <label for="application-email">Địa chỉ email nhận hồ sơ <span class="required">*</span></label>
-                    <div class="input-with-toggle">
-                        <input type="email" id="application-email" placeholder="example@email.com" required>
-                        <div class="toggle-group">
-                            <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <small class="hint">(Địa chỉ email sẽ được ẩn với người tìm việc. Bạn có thể nhập nhiều địa chỉ cách nhau bằng dấu "," và dấu ".")</small>
-                </div>
+                    <input type="email" id="application-email" name="application-email" value="sdfs@gmail.com" required>
+                    <small class="hint">(Địa chỉ email sẽ được ẩn với người tìm việc. Bạn có thể nhập nhiều địa chỉ cách nhau bằng dấu "," và dấu ";".)</small>
+                </div> 
 
-                <div class="form-group">
-                    <div class="input-with-toggle">
-                        <label for="anonymous-posting">Đăng tin ẩn danh</label>
-                        <div class="toggle-group">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="anonymous-posting">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="warning-box">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Nội dung công việc rõ ràng và minh bạch luôn lôi cuốn hơn trong mắt ứng viên. Ẩn những thông tin quan trọng về công ty có thể giảm lượng hồ sơ ứng tuyển lên đến 30%.</span>
-                    </div>
-                </div>
+                <!-- Removed 'Đăng tin nổi bật' and debug info -->
 
             </div>
 
@@ -403,38 +430,29 @@ Phúc lợi được hưởng:
                 </div>
                 <div class="collapsible-content">
                     <div class="form-group">
-                        <label for="keywords">Thẻ từ khóa <span class="required">*</span></label>
-                        <div class="tag-input">
-                            <div class="selected-tags">
-                                <span class="tag">Test <i class="fas fa-times"></i></span>
-                                <span class="tag">Kiểm Thử Phần Mềm <i class="fas fa-times"></i></span>
+                        <label for="keywords">Kỹ năng <span class="required">*</span></label>
+                        <div class="tag-input" id="skills-tag-input">
+                            <div class="selected-tags" id="selected-skills-tags">
+                                <!-- Tags will be added here dynamically -->
                             </div>
-                            <input type="text" placeholder="Nhập từ khóa...">
+                            <input type="text" id="skill-input" placeholder="Nhập kỹ năng và nhấn Enter...">
                         </div>
-                        <small class="hint">(Tối đa 5 thẻ)</small>
+                        <input type="hidden" id="skills" name="skills" value="">
+                        <small class="hint">(Tối đa 5 kỹ năng, nhấn Enter để thêm)</small>
                     </div>
 
                     <div class="form-group">
                         <label for="min-experience">Năm kinh nghiệm tối thiểu</label>
                         <div class="counter-input">
                             <button type="button" class="counter-btn minus">-</button>
-                            <input type="number" id="min-experience" value="1" min="0">
-                            <button type="button" class="counter-btn plus">+</button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="age-requirement">Yêu cầu tuổi tối thiểu</label>
-                        <div class="counter-input">
-                            <button type="button" class="counter-btn minus">-</button>
-                            <input type="number" id="age-requirement" name="age-requirement" value="18" min="15" max="65">
+                            <input type="number" id="min-experience" name="min-experience" value="1" min="0">
                             <button type="button" class="counter-btn plus">+</button>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="min-qualification">Bằng cấp tối thiểu</label>
-                        <select id="min-qualification">
+                        <select id="min-qualification" name="min-qualification">
                             <option value="any" selected>Bất kỳ</option>
                             <option value="high-school">Trung học phổ thông</option>
                             <option value="college">Cao đẳng</option>
@@ -446,149 +464,74 @@ Phúc lợi được hưởng:
 
                     <div class="form-group">
                         <label>Quốc tịch</label>
-                        <div class="radio-group-with-toggle">
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="nationality" value="any" checked>
-                                    <span class="radio-custom"></span>
-                                    Bất kỳ
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="nationality" value="vietnamese">
-                                    <span class="radio-custom"></span>
-                                    Người Việt Nam
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="nationality" value="foreigner">
-                                    <span class="radio-custom"></span>
-                                    Người nước ngoài
-                                </label>
-                            </div>
-                            <div class="toggle-group">
-                                <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="nationality" value="any" checked>
+                                <span class="radio-custom"></span>
+                                Bất kỳ
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="nationality" value="vietnamese">
+                                <span class="radio-custom"></span>
+                                Người Việt Nam
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="nationality" value="foreigner">
+                                <span class="radio-custom"></span>
+                                Người nước ngoài
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Giới tính</label>
-                        <div class="radio-group-with-toggle">
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="gender" value="any" checked>
-                                    <span class="radio-custom"></span>
-                                    Bất kỳ
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="gender" value="male">
-                                    <span class="radio-custom"></span>
-                                    Nam
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="gender" value="female">
-                                    <span class="radio-custom"></span>
-                                    Nữ
-                                </label>
-                            </div>
-                            <div class="toggle-group">
-                                <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="any" checked>
+                                <span class="radio-custom"></span>
+                                Bất kỳ
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="male">
+                                <span class="radio-custom"></span>
+                                Nam
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="gender" value="female">
+                                <span class="radio-custom"></span>
+                                Nữ
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Tình trạng hôn nhân</label>
-                        <div class="radio-group-with-toggle">
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="marital-status" value="any" checked>
-                                    <span class="radio-custom"></span>
-                                    Bất kỳ
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="marital-status" value="single">
-                                    <span class="radio-custom"></span>
-                                    Độc thân
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="marital-status" value="married">
-                                    <span class="radio-custom"></span>
-                                    Đã kết hôn
-                                </label>
-                            </div>
-                            <div class="toggle-group">
-                                <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="marital-status" value="any" checked>
+                                <span class="radio-custom"></span>
+                                Bất kỳ
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="marital-status" value="single">
+                                <span class="radio-custom"></span>
+                                Độc thân
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="marital-status" value="married">
+                                <span class="radio-custom"></span>
+                                Đã kết hôn
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="age-range">Độ tuổi mong muốn</label>
-                        <div class="age-range-with-toggle">
-                            <div class="age-range-inputs">
-                                <input type="number" id="age-min" value="15" min="15" max="65">
-                                <span class="dash">-</span>
-                                <input type="number" id="age-max" value="60" min="15" max="65">
-                            </div>
-                            <div class="toggle-group">
-                                <label class="toggle-label">Hiển thị cho Ứng Viên</label>
-                                <label class="toggle-switch">
-                                    <input type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
+                        <div class="age-range-inputs">
+                            <input type="number" id="age-min" name="age-min" value="15" min="15" max="65">
+                            <span class="dash">-</span>
+                            <input type="number" id="age-max" name="age-max" value="60" min="15" max="65">
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Yêu cầu thư giới thiệu?</label>
-                        <div class="radio-group">
-                            <label class="radio-label">
-                                <input type="radio" name="cover-letter" value="required">
-                                <span class="radio-custom"></span>
-                                Bắt buộc
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="cover-letter" value="optional">
-                                <span class="radio-custom"></span>
-                                Hiển thị nhưng không bắt buộc
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="cover-letter" value="hidden" checked>
-                                <span class="radio-custom"></span>
-                                Không hiển thị
-                            </label>
-                        </div>
-                        <div class="warning-box">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Yêu cầu thư giới thiệu có thể làm giảm số lượng hồ sơ ứng tuyển. Không hiển thị trên thiết bị di động và khi ứng tuyển nhiều công việc cùng lúc.</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="application-language">Nhận hồ sơ bằng ngôn ngữ</label>
-                        <select id="application-language">
-                            <option value="any" selected>Bất kỳ</option>
-                            <option value="vietnamese">Tiếng Việt</option>
-                            <option value="english">Tiếng Anh</option>
-                            <option value="both">Cả hai</option>
-                        </select>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-primary">Tiếp tục</button>
                     </div>
                 </div>
             </div>
@@ -600,111 +543,105 @@ Phúc lợi được hưởng:
                     <i class="fas fa-chevron-up toggle-icon"></i>
                 </div>
                 <div class="collapsible-content">
+                    <% if (recruiter != null) { %>
+                    <div class="info-note" style="background-color: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #2196f3;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Thông tin công ty được lấy từ hồ sơ của bạn và không thể chỉnh sửa tại đây.</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 14px;">Nếu cần thay đổi, vui lòng cập nhật trong mục "Thông tin công ty".</p>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="company-name">Tên công ty <span class="required">*</span></label>
-                        <input type="text" id="company-name" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="company-address">Địa chỉ công ty</label>
-                        <input type="text" id="company-address">
+                        <input type="text" id="company-name" value="<%= recruiter.getCompanyName() != null ? recruiter.getCompanyName() : "" %>" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
                     </div>
 
                     <div class="form-group">
                         <label for="company-size">Quy mô công ty</label>
-                        <select id="company-size">
+                        <select id="company-size" disabled style="background-color: #f5f5f5; cursor: not-allowed;">
                             <option value="">Vui lòng chọn</option>
-                            <option value="1-10">1-10 nhân viên</option>
-                            <option value="11-50">11-50 nhân viên</option>
-                            <option value="51-200">51-200 nhân viên</option>
-                            <option value="201-500">201-500 nhân viên</option>
-                            <option value="500+">Trên 500 nhân viên</option>
+                            <option value="1-10" <%= "1-10".equals(recruiter.getCompanySize()) ? "selected" : "" %>>1-10 nhân viên</option>
+                            <option value="11-50" <%= "11-50".equals(recruiter.getCompanySize()) ? "selected" : "" %>>11-50 nhân viên</option>
+                            <option value="51-200" <%= "51-200".equals(recruiter.getCompanySize()) ? "selected" : "" %>>51-200 nhân viên</option>
+                            <option value="201-500" <%= "201-500".equals(recruiter.getCompanySize()) ? "selected" : "" %>>201-500 nhân viên</option>
+                            <option value="500+" <%= "500+".equals(recruiter.getCompanySize()) ? "selected" : "" %>>Trên 500 nhân viên</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="company-info">Thông tin công ty <span class="required">*</span></label>
-                        <textarea id="company-info" rows="6" required></textarea>
-                        <div class="char-counter">9316/10000 ký tự</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Phúc lợi từ công ty <span class="required">*</span></label>
-                        <div class="benefits-list">
-                            <div class="benefit-item">
-                                <i class="fas fa-grip-vertical"></i>
-                                <select>
-                                    <option value="bonus" selected>Thưởng</option>
-                                    <option value="health">Chăm sóc sức khỏe</option>
-                                    <option value="leave">Nghỉ phép có lương</option>
-                                </select>
-                                <textarea placeholder="Mô tả chi tiết...">Lương hấp dẫn: Thỏa thuận theo năng lực</textarea>
-                                <i class="fas fa-trash"></i>
-                            </div>
-                            <div class="benefit-item">
-                                <i class="fas fa-grip-vertical"></i>
-                                <select>
-                                    <option value="health" selected>Chăm sóc sức khỏe</option>
-                                    <option value="bonus">Thưởng</option>
-                                    <option value="leave">Nghỉ phép có lương</option>
-                                </select>
-                                <textarea placeholder="Mô tả chi tiết...">BHYT, BHXH, Thưởng lễ, Tết theo quy định của Nhà nước</textarea>
-                                <i class="fas fa-trash"></i>
-                            </div>
-                            <div class="benefit-item">
-                                <i class="fas fa-grip-vertical"></i>
-                                <select>
-                                    <option value="leave" selected>Nghỉ phép có lương</option>
-                                    <option value="bonus">Thưởng</option>
-                                    <option value="health">Chăm sóc sức khỏe</option>
-                                </select>
-                                <textarea placeholder="Mô tả chi tiết...">Môi trường làm việc chuyên nghiệp</textarea>
-                                <i class="fas fa-trash"></i>
-                            </div>
+                        <textarea id="company-info" rows="6" readonly style="background-color: #f5f5f5; cursor: not-allowed;"><%= recruiter.getCompanyDescription() != null ? recruiter.getCompanyDescription() : "" %></textarea>
+                        <div class="char-counter">
+                            <% 
+                            String desc = recruiter.getCompanyDescription() != null ? recruiter.getCompanyDescription() : "";
+                            int descLength = desc.length();
+                            %>
+                            <%= descLength %>/10000 ký tự
                         </div>
-                        <button type="button" class="btn btn-secondary">Thêm phúc lợi</button>
                     </div>
 
                     <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox">
-                            <span class="checkmark"></span>
-                            Lưu thông tin công ty phía trên vào hồ sơ công ty mặc định
-                        </label>
+                        <label for="company-benefits">Phúc lợi từ công ty <span class="required">*</span></label>
+                        <textarea id="company-benefits" name="company-benefits" rows="6" readonly style="background-color: #f5f5f5; cursor: not-allowed;"><%= recruiter.getCompanyBenefits() != null ? recruiter.getCompanyBenefits() : "" %></textarea>
                     </div>
 
                     <div class="form-group">
                         <label>Logo công ty</label>
-                        <div class="file-upload">
-                            <div class="upload-area">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Kéo và thả hình ảnh ở đây hoặc <span>Chọn file</span></p>
+                        <% if (recruiter.getCompanyLogoURL() != null && !recruiter.getCompanyLogoURL().isEmpty()) { %>
+                            <div style="margin-bottom: 10px;">
+                                <img src="<%= recruiter.getCompanyLogoURL() %>" alt="Company Logo" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px; border-radius: 5px;">
                             </div>
-                            <small class="upload-hint">(Tập tin với phần mở rộng .jpg, .jpeg, .png, .gif và kích thước <1MB)</small>
-                        </div>
+                        <% } else { %>
+                            <div style="padding: 10px; background-color: #f5f5f5; border-radius: 5px; color: #999;">
+                                <i class="fas fa-image"></i> Chưa có logo công ty
+                            </div>
+                        <% } %>
                     </div>
 
                     <div class="form-group">
                         <label>Hình ảnh công ty</label>
-                        <div class="file-upload">
-                            <div class="upload-area">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Kéo và thả hình ảnh ở đây hoặc <span>Chọn file</span></p>
+                        <% if (recruiter.getImg() != null && !recruiter.getImg().isEmpty()) { %>
+                            <div style="margin-bottom: 10px;">
+                                <img src="<%= recruiter.getImg() %>" alt="Company Image" style="max-width: 300px; max-height: 300px; border: 1px solid #ddd; padding: 5px; border-radius: 5px;">
                             </div>
-                            <small class="upload-hint">(Tập tin với phần mở rộng .jpg, .jpeg, .png, .gif và kích thước <1MB)</small>
-                        </div>
+                        <% } else { %>
+                            <div style="padding: 10px; background-color: #f5f5f5; border-radius: 5px; color: #999;">
+                                <i class="fas fa-image"></i> Chưa có hình ảnh công ty
+                            </div>
+                        <% } %>
                     </div>
 
                     <div class="form-group">
                         <label for="company-video">Video công ty</label>
-                        <input type="url" id="company-video" placeholder="Sao chép và dán từ liên kết Youtube của bạn vào đây">
+                        <input type="url" id="company-video" value="<%= recruiter.getCompanyVideoURL() != null ? recruiter.getCompanyVideoURL() : "" %>" readonly style="background-color: #f5f5f5; cursor: not-allowed;" placeholder="Chưa có video công ty">
+                        <% if (recruiter.getCompanyVideoURL() != null && !recruiter.getCompanyVideoURL().isEmpty()) { %>
+                            <div style="margin-top: 10px;">
+                                <a href="<%= recruiter.getCompanyVideoURL() %>" target="_blank" class="btn btn-secondary" style="display: inline-block; padding: 5px 15px; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> Xem video
+                                </a>
+                            </div>
+                        <% } %>
                     </div>
-
+                    <% } else { %>
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Không tìm thấy thông tin công ty. Vui lòng đăng nhập lại.
+                    </div>
+                    <% } %>
                 </div>
             </div>
 
+            <% if (request.getAttribute("postingRecruiterPackageID") != null) { %>
+                <input type="hidden" name="posting-recruiter-package-id" value="<%= request.getAttribute("postingRecruiterPackageID") %>">
+            <% } %>
+            <% if (request.getAttribute("packageWarning") != null) { %>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <%= request.getAttribute("packageWarning") %>
+                </div>
+            <% } %>
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Lưu và Tiếp Tục</button>
+                <button type="submit" name="action" value="draft" class="btn btn-secondary">Lưu nháp</button>
+                <button type="submit" name="action" value="post" class="btn btn-primary" <%= (request.getAttribute("postingDisabled") != null && (Boolean)request.getAttribute("postingDisabled")) ? "disabled" : "" %>>Đăng tin</button>
             </div>
             </form>
         </div>
@@ -719,6 +656,212 @@ Phúc lợi được hưởng:
     </div>
 
     <script src="${pageContext.request.contextPath}/Recruiter/script.js"></script>
+    <script>
+        // Validation trước khi submit: mức lương, độ tuổi, năm kinh nghiệm tối thiểu
+        (function() {
+            const form = document.getElementById('job-posting-form');
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                const errs = [];
+                const sMin = document.getElementById('salary-min');
+                const sMax = document.getElementById('salary-max');
+                const aMin = document.getElementById('age-min');
+                const aMax = document.getElementById('age-max');
+                const minExp = document.getElementById('min-experience');
+
+                const toNum = (el) => {
+                    if (!el || el.value === '') return null;
+                    const n = Number(el.value);
+                    return Number.isFinite(n) ? n : NaN;
+                };
+
+                const svMin = toNum(sMin);
+                const svMax = toNum(sMax);
+                if (svMin != null && svMax != null) {
+                    if (isNaN(svMin) || isNaN(svMax) || svMin < 0 || svMax < 0) {
+                        errs.push('Mức lương phải là số không âm.');
+                    } else if (svMin > svMax) {
+                        errs.push('Mức lương tối thiểu không được lớn hơn mức lương tối đa.');
+                    }
+                }
+
+                const avMin = toNum(aMin);
+                const avMax = toNum(aMax);
+                if (avMin != null && avMax != null) {
+                    if (isNaN(avMin) || isNaN(avMax)) {
+                        errs.push('Độ tuổi phải là số.');
+                    } else {
+                        if (avMin < 15 || avMin > 65 || avMax < 15 || avMax > 65) {
+                            errs.push('Độ tuổi phải nằm trong khoảng 15 - 65.');
+                        }
+                        if (avMin > avMax) {
+                            errs.push('Độ tuổi tối thiểu không được lớn hơn độ tuổi tối đa.');
+                        }
+                    }
+                }
+
+                const mx = toNum(minExp);
+                if (mx != null) {
+                    if (isNaN(mx) || mx < 0 || mx > 60) {
+                        errs.push('Năm kinh nghiệm tối thiểu phải là số trong khoảng 0 - 60.');
+                    }
+                }
+
+                if (errs.length) {
+                    e.preventDefault();
+                    alert(errs.join('\n'));
+                }
+            });
+        })();
+        // Removed debug logging for featured toggle
+
+        // Simple Custom Dropdown cho Ngành nghề chi tiết
+        let professionDropdownOpen = false;
+        
+        function toggleProfessionDropdown() {
+            const dropdown = document.getElementById('profession-list');
+            const input = document.getElementById('profession-input');
+            
+            if (dropdown) {
+                if (dropdown.style.display === 'none') {
+                    dropdown.style.display = 'block';
+                    input.classList.add('active');
+                    professionDropdownOpen = true;
+                } else {
+                    dropdown.style.display = 'none';
+                    input.classList.remove('active');
+                    professionDropdownOpen = false;
+                }
+            }
+        }
+        
+        function toggleParentCategory(element, event) {
+            if (event) {
+                event.stopPropagation(); // Ngăn đóng dropdown khi click vào parent
+            }
+            const childrenList = element.nextElementSibling;
+            const arrow = element.querySelector('.category-arrow');
+            
+            if (childrenList && childrenList.classList.contains('category-children-list')) {
+                if (childrenList.style.display === 'none') {
+                    childrenList.style.display = 'block';
+                    element.classList.add('active');
+                } else {
+                    childrenList.style.display = 'none';
+                    element.classList.remove('active');
+                }
+            }
+        }
+        
+        function selectProfession(element) {
+            const categoryId = element.getAttribute('data-category-id');
+            const categoryName = element.getAttribute('data-category-name') || element.textContent.trim();
+            
+            // Update hidden input
+            const hiddenInput = document.getElementById('profession');
+            if (hiddenInput) {
+                hiddenInput.value = categoryId;
+            }
+            
+            // Update display text
+            const textSpan = document.getElementById('profession-text');
+            const input = document.getElementById('profession-input');
+            if (textSpan && input) {
+                textSpan.textContent = categoryName;
+                textSpan.style.color = '#374151';
+                input.classList.add('selected');
+            }
+            
+            // Remove previous selection
+            document.querySelectorAll('.category-child-item.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection
+            element.classList.add('selected');
+            
+            // Close dropdown
+            const dropdown = document.getElementById('profession-list');
+            if (dropdown) {
+                dropdown.style.display = 'none';
+                document.getElementById('profession-input').classList.remove('active');
+                professionDropdownOpen = false;
+            }
+        }
+        
+        // Đóng dropdown khi click bên ngoài
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.simple-custom-dropdown');
+            if (dropdown && !dropdown.contains(e.target) && professionDropdownOpen) {
+                document.getElementById('profession-list').style.display = 'none';
+                document.getElementById('profession-input').classList.remove('active');
+                professionDropdownOpen = false;
+            }
+        });
+        
+        // Skills tag management
+        let skillsArray = [];
+        const maxSkills = 5;
+        const skillInput = document.getElementById('skill-input');
+        const selectedTagsContainer = document.getElementById('selected-skills-tags');
+        const skillsHiddenInput = document.getElementById('skills');
+        
+        function addSkillTag(skillName) {
+            if (skillsArray.length >= maxSkills) {
+                alert('Bạn chỉ có thể thêm tối đa ' + maxSkills + ' kỹ năng!');
+                return;
+            }
+            
+            skillName = skillName.trim();
+            if (!skillName) return;
+            
+            // Kiểm tra xem skill đã tồn tại chưa (case-insensitive)
+            const skillLower = skillName.toLowerCase();
+            if (skillsArray.some(s => s.toLowerCase() === skillLower)) {
+                alert('Kỹ năng "' + skillName + '" đã được thêm!');
+                return;
+            }
+            
+            skillsArray.push(skillName);
+            updateSkillsDisplay();
+            skillInput.value = '';
+        }
+        
+        function removeSkillTag(skillName) {
+            skillsArray = skillsArray.filter(s => s !== skillName);
+            updateSkillsDisplay();
+        }
+        
+        function updateSkillsDisplay() {
+            selectedTagsContainer.innerHTML = '';
+            skillsArray.forEach(skill => {
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.innerHTML = skill + ' <i class="fas fa-times"></i>';
+                tag.querySelector('i').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    removeSkillTag(skill);
+                });
+                selectedTagsContainer.appendChild(tag);
+            });
+            
+            // Update hidden input với danh sách skills (comma-separated)
+            skillsHiddenInput.value = skillsArray.join(',');
+        }
+        
+        skillInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSkillTag(skillInput.value);
+            }
+        });
+        
+        skillInput.addEventListener('blur', function(e) {
+            if (skillInput.value.trim()) {
+                addSkillTag(skillInput.value);
+            }
+        });
+    </script>
 </body>
 </html>
 

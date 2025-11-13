@@ -23,18 +23,31 @@ public class TypeDAO extends DBContext {
         List<Type> types = new ArrayList<>();
         String sql = "SELECT * FROM Types WHERE TypeCategory = ? ORDER BY TypeName";
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try {
+            if (c == null) {
+                System.out.println("ERROR: Connection is null in TypeDAO.getTypesByCategory");
+                return types;
+            }
+            System.out.println("DEBUG: Querying Types with TypeCategory = '" + typeCategory + "'");
+            PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, typeCategory);
             ResultSet rs = ps.executeQuery();
             
+            int count = 0;
             while (rs.next()) {
                 Type type = new Type();
                 type.setTypeID(rs.getInt("TypeID"));
                 type.setTypeCategory(rs.getString("TypeCategory"));
                 type.setTypeName(rs.getString("TypeName"));
                 types.add(type);
+                count++;
+                System.out.println("DEBUG: Found Type - ID: " + type.getTypeID() + ", Name: " + type.getTypeName());
             }
+            System.out.println("DEBUG: Total types found for category '" + typeCategory + "': " + count);
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
+            System.out.println("ERROR in getTypesByCategory: " + e.getMessage());
             e.printStackTrace();
         }
         return types;
@@ -61,12 +74,12 @@ public class TypeDAO extends DBContext {
         return null;
     }
     
-    // Lấy tất cả job levels
+    // Lấy tất cả job levels (TypeCategory = 'Level')
     public List<Type> getJobLevels() {
-        return getTypesByCategory("JobLevel");
+        return getTypesByCategory("Level");
     }
     
-    // Lấy tất cả job types
+    // Lấy tất cả job types (TypeCategory = 'JobType')
     public List<Type> getJobTypes() {
         return getTypesByCategory("JobType");
     }

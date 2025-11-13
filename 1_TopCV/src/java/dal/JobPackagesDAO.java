@@ -213,4 +213,21 @@ public class JobPackagesDAO extends DBContext {
         }
         return null;
     }
+
+    // Find PackageID by package name (case-insensitive, fuzzy). Return 0 if not found
+    public int getPackageIdByName(String packageName) {
+        if (packageName == null || packageName.trim().isEmpty()) return 0;
+        String sql = "SELECT TOP 1 PackageID FROM JobPackages WHERE LOWER(PackageName) LIKE LOWER(?)";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, "%" + packageName.trim() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("PackageID");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

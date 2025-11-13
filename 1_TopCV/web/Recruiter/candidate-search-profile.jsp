@@ -592,7 +592,7 @@
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
                             <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
@@ -615,7 +615,7 @@
                             Đăng Tuyển Dụng <i class="fas fa-chevron-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="#">Quản lý theo việc đăng tuyển</a>
+                            <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
                             <a href="candidate-folder.html" class="highlighted">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </div>

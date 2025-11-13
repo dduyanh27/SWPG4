@@ -35,7 +35,7 @@
                     %>
                 </div>
 
-                <form id="resetForm" class="login-form" action="/Test_ResetPassword/resetPassword" method="POST">
+                <form id="resetForm" class="login-form" action="/1_TopCV/resetPassword" method="POST">
                     <input type="hidden" name="userType" value="recruiter">
                     <input type="hidden" name="email" value="${email}">
                     
@@ -278,7 +278,7 @@
                         
                         if (countdown <= 0) {
                             clearInterval(timer);
-                            window.location.href = '/Test_ResetPassword/Recruiter/recruiter-login.jsp';
+                            window.location.href = '/1_TopCV/Recruiter/recruiter-login.jsp';
                         }
                     }, 1000);
                 }

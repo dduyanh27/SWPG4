@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Universal controller for password reset (all user types)
+ *
  * @author ADMIN
  */
 @WebServlet(name = "ResetPasswordServlet", urlPatterns = {"/resetPassword"})
@@ -35,7 +36,7 @@ public class ResetPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
         String token = request.getParameter("token");
         HttpSession session = request.getSession();
-        
+
         if (token != null) {
             Token tokenForgetPassword = tokenDAO.getTokenPassword(token);
             ResetService service = new ResetService();
@@ -45,13 +46,13 @@ public class ResetPasswordServlet extends HttpServlet {
                 request.getRequestDispatcher("/requestPassword").forward(request, response);
                 return;
             }
-            
+
             if (tokenForgetPassword.isUsed()) {
                 request.setAttribute("mess", "Token đã được sử dụng");
                 request.getRequestDispatcher("/requestPassword").forward(request, response);
                 return;
             }
-            
+
             if (service.isExpireTime(tokenForgetPassword.getExpiryTime())) {
                 request.setAttribute("mess", "Token đã hết hạn");
                 request.getRequestDispatcher("/requestPassword").forward(request, response);
@@ -61,7 +62,7 @@ public class ResetPasswordServlet extends HttpServlet {
             // Get user email based on type
             String email = "";
             String userType = tokenForgetPassword.getUserType();
-            
+            System.out.println(">>> [DEBUG] Token UserType: " + tokenForgetPassword.getUserType());
             switch (userType.toLowerCase()) {
                 case "admin":
                     Admin admin = adminDAO.getAdminById(tokenForgetPassword.getUserId());
@@ -70,7 +71,10 @@ public class ResetPasswordServlet extends HttpServlet {
                     }
                     break;
                 case "jobseeker":
+                    System.out.println(">>> [DEBUG] Token UserId: " + tokenForgetPassword.getUserId());
+                    
                     JobSeeker jobSeeker = jobSeekerDAO.getJobSeekerById(tokenForgetPassword.getUserId());
+                    System.out.println(">>> [DEBUG] Kết quả jobSeeker: " + (jobSeeker != null ? jobSeeker.getEmail() : "null"));
                     if (jobSeeker != null) {
                         email = jobSeeker.getEmail();
                     }
@@ -86,7 +90,7 @@ public class ResetPasswordServlet extends HttpServlet {
             request.setAttribute("email", email);
             request.setAttribute("userType", userType);
             session.setAttribute("token", tokenForgetPassword.getToken());
-            
+
             // Forward to appropriate reset page
             String forwardPath = "/" + getCorrectFolderName(userType) + "/reset-password.jsp";
             request.getRequestDispatcher(forwardPath).forward(request, response);
@@ -122,19 +126,19 @@ public class ResetPasswordServlet extends HttpServlet {
             request.getRequestDispatcher("/requestPassword").forward(request, response);
             return;
         }
-        
+
         if (tokenForgetPassword.isUsed()) {
             request.setAttribute("mess", "Token đã được sử dụng");
             request.getRequestDispatcher("/requestPassword").forward(request, response);
             return;
         }
-        
+
         if (service.isExpireTime(tokenForgetPassword.getExpiryTime())) {
             request.setAttribute("mess", "Token đã hết hạn");
             request.getRequestDispatcher("/requestPassword").forward(request, response);
             return;
         }
-        
+
         // Verify userType matches
         if (!userType.equals(tokenForgetPassword.getUserType())) {
             request.setAttribute("mess", "Token không đúng loại người dùng");
@@ -166,7 +170,7 @@ public class ResetPasswordServlet extends HttpServlet {
         }
 
         String hashedNewPassword = MD5Util.getMD5Hash(password);
-        if (hashedNewPassword.equals(currentPassword)) {
+        if (hashedNewPassword.equalsIgnoreCase(currentPassword)) {
             request.setAttribute("mess", "Mật khẩu mới không được trùng với mật khẩu hiện tại");
             request.setAttribute("email", email);
             request.setAttribute("userType", userType);
@@ -175,28 +179,27 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        // Hash password and update based on user type
-        String hashedPassword = MD5Util.getMD5Hash(password);
+        // Update based on user type (DAOs will hash to MD5, lowercase)
         tokenForgetPassword.setUsed(true);
-        
+
         switch (userType.toLowerCase()) {
             case "admin":
-                adminDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                adminDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "jobseeker":
-                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                jobSeekerDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
             case "recruiter":
-                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), hashedPassword);
+                recruiterDAO.updatePassword(tokenForgetPassword.getUserId(), password);
                 break;
         }
-        
+
         tokenDAO.updateStatus(tokenForgetPassword);
 
         request.setAttribute("mess", "Đặt lại mật khẩu thành công");
         request.setAttribute("email", email);
         request.setAttribute("userType", userType);
-        
+
         // Forward back to reset-password page to show success modal
         String forwardPath = "/" + getCorrectFolderName(userType) + "/reset-password.jsp";
         request.getRequestDispatcher(forwardPath).forward(request, response);

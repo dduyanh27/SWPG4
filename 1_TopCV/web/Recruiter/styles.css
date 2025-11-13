@@ -6998,3 +6998,48 @@ html body .dropdown .dropdown-content {
     }
 }
 
+/* =====================
+   Shared Pagination UI
+   ===================== */
+.pagination-container {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.pagination .pagination-btn {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #1f2937;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background .2s, color .2s, border-color .2s, transform .05s;
+}
+.pagination .pagination-btn:hover {
+    background: #f3f4f6;
+}
+.pagination .pagination-btn:active {
+    transform: translateY(1px);
+}
+.pagination .pagination-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+.pagination .prev-btn i,
+.pagination .next-btn i {
+    font-size: 12px;
+}
+.pagination-dots {
+    color: #9ca3af;
+    padding: 0 4px;
+}
