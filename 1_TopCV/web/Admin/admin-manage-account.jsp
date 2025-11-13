@@ -1,16 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="dal.AdminDAO, dal.RecruiterDAO, dal.JobSeekerDAO, java.util.List, model.Admin, model.Recruiter, model.JobSeeker" %>
+<%@ page import="dal.RecruiterDAO, java.util.List, model.Recruiter" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
-    // Load danh sách Admin và Recruiter nếu chưa có
-    if (request.getAttribute("adminList") == null) {
-        AdminDAO adminDAO = new AdminDAO();
-        List<Admin> adminList = adminDAO.getAllAdmin();
-        request.setAttribute("adminList", adminList);
-    }
-    
+    // Load danh sách Recruiter nếu chưa có
     if (request.getAttribute("recruiterList") == null) {
         try {
             RecruiterDAO recruiterDAO = new RecruiterDAO();
@@ -24,16 +18,6 @@
             request.setAttribute("recruiterList", new java.util.ArrayList<Recruiter>());
         }
     }
-    
-    // Xác định role được chọn (mặc định là admin)
-    String selectedRole = (String) request.getAttribute("selectedRole");
-    if (selectedRole == null) {
-        selectedRole = request.getParameter("role");
-        if (selectedRole == null) {
-            selectedRole = "admin";
-        }
-    }
-    request.setAttribute("selectedRole", selectedRole);
 %>
 
 <!doctype html>
@@ -91,7 +75,7 @@
                     <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp" class="nav-item active">👥 Quản lý tài khoản</a>
                     <a href="${pageContext.request.contextPath}/Admin/admin-cv-management.jsp" class="nav-item">📁 Quản lý CV</a>
                     <a href="${pageContext.request.contextPath}/Admin/ad-staff.jsp" class="nav-item">🏢  Quản lý nhân sự</a>
-                    <a href="#" class="nav-item">💳 Quản lý thanh toán</a>
+                    <a href="${pageContext.request.contextPath}/Admin/ad-payment.jsp" class="nav-item">💳 Quản lý thanh toán</a>
                 </nav>
 
                 <div class="sidebar-actions">
@@ -110,10 +94,9 @@
                 </header>
 
                 <section class="container">
-                    <!-- Role tabs -->
-                    <div class="role-tabs">
-                        <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp?role=admin" class="tab-btn ${selectedRole eq 'admin' ? 'active' : ''}">Admin</a>
-                        <a href="${pageContext.request.contextPath}/Admin/admin-manage-account.jsp?role=recruiter" class="tab-btn ${selectedRole eq 'recruiter' ? 'active' : ''}">Recruiter</a>
+                    <!-- Title for Recruiter Management -->
+                    <div class="page-title">
+                        <h2>Quản lý tài khoản Recruiter</h2>
                     </div>
 
                     <div class="card">
@@ -124,8 +107,7 @@
 
                             <div class="right-tools">
                                 <form method="get" action="Admin/admin-manage-account.jsp" class="search-form">
-                                    <input type="hidden" name="role" value="${selectedRole}" />
-                                    <input type="text" name="search" placeholder="🔍 Tìm kiếm theo tên, email..." 
+                                    <input type="text" name="search" placeholder="🔍 Tìm kiếm theo tên công ty, người liên hệ, email..." 
                                            value="${param.search}" />
                                     <button type="submit" class="btn primary">Tìm Kiếm</button>
                                 </form>
@@ -137,8 +119,8 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Tên/Công ty</th>
-                                        <th>Giới tính</th>
+                                        <th>Tên công ty</th>
+                                        <th>Người liên hệ</th>
                                         <th>Email</th>
                                         <th>Số điện thoại</th>
                                         <th>Trạng thái</th>
@@ -151,81 +133,36 @@
                                         ${param.msg}
                                     </div>
                                 </c:if>
+                                
                                 <c:choose>
-                                    <c:when test="${selectedRole eq 'admin'}">
-                                        <c:choose>
-                                            <c:when test="${not empty adminList}">
-                                                <c:forEach var="admin" items="${adminList}">
-                                                    <c:if test="${empty param.search or 
-                                                                  fn:containsIgnoreCase(admin.fullName, param.search) or 
-                                                                  fn:containsIgnoreCase(admin.email, param.search) or 
-                                                                  fn:contains(admin.phone, param.search)}">
-                                                          <tr>
-                                                              <td>${admin.adminId}</td>
-                                                              <td>${admin.fullName}</td>
-                                                              <td>${admin.gender}</td>
-                                                              <td>${admin.email}</td>
-                                                              <td>${admin.phone}</td>
-                                                              <td><span class="status ${admin.status}">${admin.status}</span></td>
-                                                              <td>
-                                                                  <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${admin.adminId}&type=admin" 
-                                                                     class="btn outline">Chi tiết</a>
-                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${admin.adminId}&type=admin" 
-                                                                     class="btn danger" 
-                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
-                                                              </td>
-
-                                                          </tr>
-                                                    </c:if>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <tr>
-                                                    <td colspan="7" class="no-data">Không có dữ liệu Admin</td>
-                                                </tr>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <c:when test="${not empty recruiterList}">
+                                        <c:forEach var="recruiter" items="${recruiterList}">
+                                            <c:if test="${empty param.search or 
+                                                          fn:containsIgnoreCase(recruiter.companyName, param.search) or 
+                                                          fn:containsIgnoreCase(recruiter.contactPerson, param.search) or
+                                                          fn:containsIgnoreCase(recruiter.email, param.search) or 
+                                                          fn:contains(recruiter.phone, param.search)}">
+                                                  <tr>
+                                                      <td>${recruiter.recruiterID}</td>
+                                                      <td>${recruiter.companyName}</td>
+                                                      <td>${recruiter.contactPerson}</td>
+                                                      <td>${recruiter.email}</td>
+                                                      <td>${recruiter.phone}</td>
+                                                      <td><span class="status ${recruiter.status}">${recruiter.status}</span></td>
+                                                      <td>
+                                                          <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${recruiter.recruiterID}&type=recruiter" class="btn outline">Chi tiết</a>
+                                                          <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${recruiter.recruiterID}&type=recruiter" class="btn danger" 
+                                                             onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
+                                                      </td>
+                                                  </tr>
+                                            </c:if>
+                                        </c:forEach>
                                     </c:when>
-
-                                    
-
-                                    <c:when test="${selectedRole eq 'recruiter'}">
-                                        <!-- Debug info -->
+                                    <c:otherwise>
                                         <tr>
-                                            <td colspan="7" style="background: #f0f0f0; color: #333; font-size: 12px;">
-                                                Debug: recruiterList size = ${fn:length(recruiterList)}, empty = ${empty recruiterList}
-                                            </td>
+                                            <td colspan="7" class="no-data">Không có dữ liệu Recruiter</td>
                                         </tr>
-                                        <c:choose>
-                                            <c:when test="${not empty recruiterList}">
-                                                <c:forEach var="recruiter" items="${recruiterList}">
-                                                    <c:if test="${empty param.search or 
-                                                                  fn:containsIgnoreCase(recruiter.companyName, param.search) or 
-                                                                  fn:containsIgnoreCase(recruiter.email, param.search) or 
-                                                                  fn:contains(recruiter.phone, param.search)}">
-                                                          <tr>
-                                                              <td>${recruiter.recruiterID}</td>
-                                                              <td>${recruiter.companyName}</td>
-                                                              <td>${recruiter.gender}</td>
-                                                              <td>${recruiter.email}</td>
-                                                              <td>${recruiter.phone}</td>
-                                                              <td><span class="status ${recruiter.status}">${recruiter.status}</span></td>
-                                                              <td>
-                                                                  <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp?id=${recruiter.recruiterID}&type=recruiter" class="btn outline">Chi tiết</a>
-                                                                  <a href="${pageContext.request.contextPath}/admindeleteaccount?id=${recruiter.recruiterID}&type=recruiter" class="btn danger" 
-                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">Xóa</a>
-                                                              </td>
-                                                          </tr>
-                                                    </c:if>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <tr>
-                                                    <td colspan="7" class="no-data">Không có dữ liệu Recruiter</td>
-                                                </tr>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
+                                    </c:otherwise>
                                 </c:choose>
                                 </tbody>
                             </table>
@@ -233,14 +170,7 @@
 
                         <div class="table-footer">
                             <div class="info-text">
-                                <c:choose>
-                                    <c:when test="${selectedRole eq 'admin'}">
-                                        Hiển thị ${fn:length(adminList)} tài khoản Admin
-                                    </c:when>
-                                    <c:when test="${selectedRole eq 'recruiter'}">
-                                        Hiển thị ${fn:length(recruiterList)} tài khoản Recruiter
-                                    </c:when>
-                                </c:choose>
+                                Hiển thị ${fn:length(recruiterList)} tài khoản Recruiter
                             </div>
                         </div>
                     </div>
