@@ -313,7 +313,7 @@ public class ContentDAO extends DBContext {
                 + "LEFT JOIN Admins a ON mc.CreatedBy = a.AdminID "
                 + "WHERE mc.Status = 'Published' "
                 + "AND mc.Platform = 'Website' "
-                + "AND mc.PostDate <= GETDATE() "
+                + "AND CAST(mc.PostDate AS DATE) <= CAST(GETDATE() AS DATE) "
                 + "ORDER BY mc.PostDate DESC";
 
         System.out.println("=== DEBUG: getPublishedContentForWebsite() ===");
