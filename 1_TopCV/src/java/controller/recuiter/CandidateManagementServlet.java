@@ -45,17 +45,17 @@ public class CandidateManagementServlet extends HttpServlet {
                 }
             }
 
-            // Lấy danh sách tất cả jobs có status = 'Active' của recruiter
+            // Lấy danh sách tất cả jobs có status = 'Published' của recruiter
             JobDAO jobDAO = new JobDAO();
-            List<Job> allJobs = jobDAO.getActiveJobsByRecruiterId(recruiter.getRecruiterID());
+            List<Job> allJobs = jobDAO.getPublishedJobsByRecruiterId(recruiter.getRecruiterID());
 
-            // Nếu không có jobID, lấy job đầu tiên active của recruiter
+            // Nếu không có jobID, lấy job đầu tiên published của recruiter
             if (jobID == 0) {
                 if (allJobs != null && !allJobs.isEmpty()) {
                     jobID = allJobs.get(0).getJobID();
-                    System.out.println("DEBUG CandidateManagementServlet: Using first active job - JobID: " + jobID);
+                    System.out.println("DEBUG CandidateManagementServlet: Using first published job - JobID: " + jobID);
                 } else {
-                    request.setAttribute("error", "Bạn chưa có tin tuyển dụng Active nào!");
+                    request.setAttribute("error", "Bạn chưa có tin tuyển dụng Published nào!");
                     request.setAttribute("allJobs", new java.util.ArrayList<>());
                     request.setAttribute("candidates", new java.util.ArrayList<>());
                     request.getRequestDispatcher("/Recruiter/candidate-management.jsp").forward(request, response);
@@ -65,7 +65,7 @@ public class CandidateManagementServlet extends HttpServlet {
 
             request.setAttribute("allJobs", allJobs);
 
-            System.out.println("DEBUG CandidateManagementServlet: Found " + allJobs.size() + " active jobs for recruiter: " + recruiter.getRecruiterID());
+            System.out.println("DEBUG CandidateManagementServlet: Found " + allJobs.size() + " published jobs for recruiter: " + recruiter.getRecruiterID());
 
             // Lấy thông tin job được chọn
             Job job = jobDAO.getJobById(jobID);
@@ -77,11 +77,11 @@ public class CandidateManagementServlet extends HttpServlet {
                 return;
             }
 
-            // Kiểm tra job có status = 'Active' không
+            // Kiểm tra job có status = 'Published' không
             String jobStatus = job.getStatus();
-            if (!"Active".equals(jobStatus)) {
-                System.out.println("DEBUG CandidateManagementServlet: Job has status: '" + jobStatus + "', expected: 'Active'");
-                request.setAttribute("error", "Job này không ở trạng thái Active! Status hiện tại: " + jobStatus);
+            if (!"Published".equals(jobStatus)) {
+                System.out.println("DEBUG CandidateManagementServlet: Job has status: '" + jobStatus + "', expected: 'Published'");
+                request.setAttribute("error", "Job này không ở trạng thái Published! Status hiện tại: " + jobStatus);
                 request.setAttribute("candidates", new java.util.ArrayList<>());
                 request.getRequestDispatcher("/Recruiter/candidate-management.jsp").forward(request, response);
                 return;
