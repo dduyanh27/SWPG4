@@ -291,57 +291,129 @@
                 cursor: pointer;
             }
             .right-card {
-                padding: 0.5rem;
+                padding: 1rem;
+                background: #ffffff;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+                position: sticky;
+                top: 1rem;
             }
+            
+            .silver-header {
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid #e2e8f0;
+            }
+            
+            .silver-header h3 {
+                margin: 0;
+                font-size: 1.1rem;
+                color: #1e293b;
+                font-weight: 600;
+            }
+            
             .right-list {
                 display: grid;
-                gap: 0.5rem;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                max-height: 715px;
+                overflow-y: auto;
+                padding-right: 0.5rem;
             }
-            .right-job {
-                display: grid;
-                grid-template-columns: 48px 1fr auto;
-                gap: 0.5rem;
-                align-items: center;
-                padding: 0.6rem;
-                border: 1px solid #f3f3f3;
+            
+            .right-list::-webkit-scrollbar {
+                width: 6px;
+            }
+            
+            .right-list::-webkit-scrollbar-track {
+                background: #f1f5f9;
                 border-radius: 10px;
-                background:#fff;
             }
-            .right-job .logo-square {
-                width: 48px;
-                height: 48px;
-                font-size: 0.85rem;
+            
+            .right-list::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
             }
+            
+            .right-list::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+            
+            .right-job {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.75rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                background: #fff;
+                transition: all 0.2s ease;
+            }
+            
+            .right-job:hover {
+                border-color: #0a67ff;
+                box-shadow: 0 2px 8px rgba(10, 103, 255, 0.1);
+                transform: translateY(-2px);
+            }
+            
             .right-job h4 {
                 margin: 0;
-                font-size: 0.98rem;
-                color: #111827;
+                font-size: 0.9rem;
+                color: #1e293b;
+                font-weight: 600;
+                line-height: 1.3;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
+            
             .right-job .company {
-                margin: 0.15rem 0 0;
-                font-size: 0.85rem;
-                color:#6b7280;
+                margin: 0;
+                font-size: 0.8rem;
+                color: #64748b;
             }
+            
             .right-job .meta {
-                display:flex;
-                gap:0.5rem;
-                margin-top:0.25rem;
-                font-size:0.8rem;
-                color:#374151;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                margin-top: 0.25rem;
+                font-size: 0.75rem;
+                color: #64748b;
             }
-            .right-job .meta .pill {
-                background:#f3f4f6;
-                border-radius:999px;
-                padding:0.15rem 0.5rem;
+            
+            .right-job .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 0.35rem;
             }
+            
+            .right-job .meta-item i {
+                color: #0a67ff;
+                font-size: 0.7rem;
+                width: 12px;
+            }
+            
             .right-job .btn-mini {
-                background:#0066cc;
-                color:#fff;
-                border:none;
-                border-radius:8px;
-                padding:0.4rem 0.55rem;
-                cursor:pointer;
-                font-size:0.85rem;
+                background: #0a67ff;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 0.45rem 0.75rem;
+                cursor: pointer;
+                font-size: 0.8rem;
+                font-weight: 600;
+                text-align: center;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                display: block;
+                margin-top: 0.25rem;
+            }
+            
+            .right-job .btn-mini:hover {
+                background: #0052cc;
+                transform: translateY(-1px);
             }
             .results-grid {
                 display: grid;
@@ -716,56 +788,43 @@
                 </main>
                 <aside class="jobs-right">
                     <div class="right-card">
-                        <div class="right-list">
-                            <div class="right-job">
-                                <div class="logo-square">HEI</div>
-                                <div>
-                                    <h4>Trade Marketing</h4>
-                                    <div class="company">HEINEKEN Vietnam</div>
-                                    <div class="meta">
-                                        <span class="pill">Thương lượng</span>
-                                        <span class="pill">Hà Nội</span>
-                                    </div>
-                                </div>
-                                <a href="job-detail.html" class="btn-mini">Xem</a>
-                            </div>
-                            <div class="right-job">
-                                <div class="logo-square">CHL</div>
-                                <div>
-                                    <h4>Chuyên Viên Thực Tập</h4>
-                                    <div class="company">Chuỗi Thực Phẩm</div>
-                                    <div class="meta">
-                                        <span class="pill">Thương lượng</span>
-                                        <span class="pill">Hà Nội</span>
-                                    </div>
-                                </div>
-                                <a href="job-detail.html" class="btn-mini">Xem</a>
-                            </div>
-                            <div class="right-job">
-                                <div class="logo-square">AFC</div>
-                                <div>
-                                    <h4>Purchasing Officer</h4>
-                                    <div class="company">AFChem</div>
-                                    <div class="meta">
-                                        <span class="pill">10-20tr</span>
-                                        <span class="pill">Hà Nội</span>
-                                    </div>
-                                </div>
-                                <a href="job-detail.html" class="btn-mini">Xem</a>
-                            </div>
-                            <div class="right-job">
-                                <div class="logo-square">CAP</div>
-                                <div>
-                                    <h4>Kiến Trúc Sư</h4>
-                                    <div class="company">Capital House</div>
-                                    <div class="meta">
-                                        <span class="pill">Thương lượng</span>
-                                        <span class="pill">Hà Nội</span>
-                                    </div>
-                                </div>
-                                <a href="job-detail.html" class="btn-mini">Xem</a>
-                            </div>
+                        <div class="silver-header">
+                            <h3>Việc làm bạn sẽ thích</h3>
                         </div>
+                        
+                        <c:choose>
+                            <c:when test="${not empty featuredSilverJobs}">
+                                <div class="right-list">
+                                    <c:forEach var="job" items="${featuredSilverJobs}" varStatus="status">
+                                        <div class="right-job">
+                                            <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" style="text-decoration: none; color: inherit;">
+                                                <h4>${job.jobTitle}</h4>
+                                            </a>
+                                            <p class="company">${job.companyName}</p>
+                                            <div class="meta">
+                                                <div class="meta-item">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    <span>${job.locationName}</span>
+                                                </div>
+                                                <c:if test="${not empty job.salaryRange}">
+                                                    <div class="meta-item">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                        <span>${job.salaryRange}</span>
+                                                    </div>
+                                                </c:if>
+                                            </div>
+                                            <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="btn-mini">Xem chi tiết</a>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+                                    <i class="fas fa-briefcase" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                    <p style="margin: 0; font-size: 0.9rem;">Chưa có việc làm nổi bật</p>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </aside>
 

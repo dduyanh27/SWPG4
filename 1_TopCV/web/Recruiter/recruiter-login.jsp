@@ -89,6 +89,10 @@
                 <p>Don't have an account? <a href="${pageContext.request.contextPath}/RecruiterRegistrationServlet">Sign up</a></p>
             </div>
 
+            <div class="signup-link" style="margin-top: 10px;">
+                <p><a href="${pageContext.request.contextPath}/index.jsp" style="color: #667eea;">← Quay về trang chủ</a></p>
+            </div>
+
             <div class="success-message" id="successMessage">
                 <div class="success-icon">✓</div>
                 <h3>Login Successful!</h3>

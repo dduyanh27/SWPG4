@@ -3,6 +3,7 @@ package controller.recuiter;
 import dal.ApplicationDAO;
 import dal.JobDAO;
 import dal.RecruiterDAO;
+import dal.NotificationDAO;
 import model.CandidateApplication;
 import model.Job;
 import model.Recruiter;
@@ -272,18 +273,21 @@ public class CandidateManagementServlet extends HttpServlet {
                                 recruiterPhone,
                                 companyAddress
                         );
-//                        NotificationDAO.sendNotification(
-//                                jobSeekerId, // ID của JobSeeker
-//                                "jobseeker", // Loại user nhận thông báo
-//                                "application", // Loại thông báo
-//                                "Chúc mừng! Đơn ứng tuyển được chấp nhận", // Tiêu đề
-//                                "Đơn ứng tuyển của bạn đã được nhà tuyển dụng chấp nhận. Họ sẽ liên hệ với bạn sớm nhất.", // Nội dung
-//                                applicationId, // ID đơn ứng tuyển
-//                                "application", // Loại related item
-//                                "/JobSeeker/applied-jobs.jsp", // URL khi click vào thông báo
-//                                2 // Priority: 2 = High (quan trọng)
-//                        );
-                        System.out.println("DEBUG CandidateManagementServlet: Acceptance email sent: " + emailSent);
+                        
+                        // Gửi notification cho JobSeeker
+                        NotificationDAO.sendNotification(
+                                candidate.getJobSeekerID(), // ID của JobSeeker
+                                "jobseeker", // Loại user nhận thông báo
+                                "application", // Loại thông báo
+                                "Chúc mừng! Đơn ứng tuyển được chấp nhận", // Tiêu đề
+                                "Đơn ứng tuyển của bạn cho vị trí \"" + jobTitle + "\" tại " + companyName + " đã được chấp nhận. Nhà tuyển dụng sẽ liên hệ với bạn sớm.", // Nội dung
+                                applicationID, // ID đơn ứng tuyển
+                                "application", // Loại related item
+                                request.getContextPath() + "/JobSeeker/applied-jobs.jsp", // URL khi click vào thông báo
+                                2 // Priority: 2 = High (quan trọng)
+                        );
+                        
+                        System.out.println("DEBUG CandidateManagementServlet: Acceptance email sent: " + emailSent + ", notification sent for JobSeekerID: " + candidate.getJobSeekerID());
                     } else if ("reject".equalsIgnoreCase(action)) {
                         // Gửi email từ chối
                         emailSent = emailService.sendRejectionEmail(
@@ -292,18 +296,21 @@ public class CandidateManagementServlet extends HttpServlet {
                                 jobTitle,
                                 companyName
                         );
-//                        NotificationDAO.sendNotification(
-//                                jobSeekerId, // ID của JobSeeker
-//                                "jobseeker", // Loại user nhận thông báo
-//                                "application", // Loại thông báo
-//                                "Đơn ứng tuyển không được chấp nhận", // Tiêu đề
-//                                "Rất tiếc, đơn ứng tuyển của bạn chưa phù hợp với yêu cầu tuyển dụng lần này. Đừng nản chí, hãy tiếp tục cố gắng!", // Nội dung
-//                                applicationId, // ID đơn ứng tuyển
-//                                "application", // Loại related item
-//                                "/JobSeeker/applied-jobs.jsp", // URL khi click vào thông báo
-//                                1 // Priority: 1 = Medium
-//                        );
-                        System.out.println("DEBUG CandidateManagementServlet: Rejection email sent: " + emailSent);
+                        
+                        // Gửi notification cho JobSeeker
+                        NotificationDAO.sendNotification(
+                                candidate.getJobSeekerID(), // ID của JobSeeker
+                                "jobseeker", // Loại user nhận thông báo
+                                "application", // Loại thông báo
+                                "Đơn ứng tuyển không được chấp nhận", // Tiêu đề
+                                "Rất tiếc, đơn ứng tuyển của bạn cho vị trí \"" + jobTitle + "\" tại " + companyName + " chưa phù hợp với yêu cầu tuyển dụng lần này. Đừng nản chí, hãy tiếp tục cố gắng!", // Nội dung
+                                applicationID, // ID đơn ứng tuyển
+                                "application", // Loại related item
+                                request.getContextPath() + "/JobSeeker/applied-jobs.jsp", // URL khi click vào thông báo
+                                1 // Priority: 1 = Medium
+                        );
+                        
+                        System.out.println("DEBUG CandidateManagementServlet: Rejection email sent: " + emailSent + ", notification sent for JobSeekerID: " + candidate.getJobSeekerID());
                     }
 
                     if (!emailSent) {

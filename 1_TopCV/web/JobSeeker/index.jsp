@@ -6,6 +6,12 @@
 <%@page import="model.MarketingContent"%>
 <%@page import="java.util.List"%>
 <%
+    // IMPORTANT: Force redirect if accessed directly
+    if (request.getAttribute("featuredGoldJobs") == null) {
+        response.sendRedirect(request.getContextPath() + "/JobSeeker/index");
+        return;
+    }
+    
     // Check if user is logged in
     HttpSession userSession = request.getSession(false);
     boolean isLoggedIn = (userSession != null && userSession.getAttribute("user") != null);
@@ -573,6 +579,267 @@
                     border: 2px solid #0a67ff;
                     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
                 }
+                
+                /* ============================================
+                   FEATURED GOLD JOBS STYLES - GÓI VÀNG
+                   ============================================ */
+                
+                /* Premium Gold Badge */
+                .premium-gold-badge {
+                    position: absolute;
+                    top: 15px;
+                    right: 15px;
+                    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                    color: #1a1a1a;
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;
+                    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    z-index: 10;
+                    animation: pulse-gold 2s infinite;
+                }
+                
+                @keyframes pulse-gold {
+                    0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4); }
+                    50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6); }
+                }
+                
+                .premium-gold-badge i {
+                    font-size: 14px;
+                }
+                
+                /* Featured Job Card - Enhanced - Simplified for Template Match */
+                .jobs-grid-3col {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 24px;
+                    margin-bottom: 40px;
+                }
+                
+                .job-card-gold {
+                    background: #ffffff;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                    border: 1px solid #e2e8f0;
+                }
+                
+                .job-card-gold:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 8px 20px rgba(10, 103, 255, 0.15);
+                    border-color: #0a67ff;
+                }
+                
+                .job-card-banner {
+                    height: 130px;
+                    background: #ffffff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: 2px solid #e2e8f0;
+                }
+                
+                .job-card-banner img {
+                    max-width: 80%;
+                    max-height: 80%;
+                    object-fit: contain;
+                }
+                
+                .banner-logo-placeholder {
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(135deg, #0a67ff 0%, #0052cc 100%);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 32px;
+                    font-weight: 700;
+                    color: #ffffff;
+                }
+                
+                .job-card-content {
+                    padding: 20px;
+                }
+                
+                .job-card-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 0 0 8px 0;
+                    line-height: 1.4;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    transition: color 0.2s ease;
+                }
+                
+                .job-card-title:hover {
+                    color: #0a67ff;
+                }
+                
+                .job-card-company {
+                    color: #64748b;
+                    font-size: 14px;
+                    margin: 0 0 16px 0;
+                }
+                
+                .job-card-info {
+                    margin-bottom: 16px;
+                }
+                
+                .job-info-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #64748b;
+                    font-size: 13px;
+                    margin-bottom: 8px;
+                }
+                
+                .job-info-item i {
+                    color: #0a67ff;
+                    width: 16px;
+                    font-size: 13px;
+                }
+                
+                .view-job-btn {
+                    display: block;
+                    width: 100%;
+                    padding: 11px 20px;
+                    background: #0a67ff;
+                    color: #ffffff;
+                    text-align: center;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 14px;
+                    text-decoration: none;
+                    transition: all 0.2s ease;
+                    border: none;
+                }
+                
+                .view-job-btn:hover {
+                    background: #0052cc;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(10, 103, 255, 0.3);
+                    color: #ffffff;
+                }
+                
+                .job-card-link {
+                    text-decoration: none;
+                }
+                
+                /* Responsive */
+                @media (max-width: 992px) {
+                    .jobs-grid-3col {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+                
+                @media (max-width: 576px) {
+                    .jobs-grid-3col {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                
+                .gold-job {
+                    background: rgba(255, 255, 255, 0.08);
+                    backdrop-filter: blur(5px);
+                    border-left: 4px solid #FFD700;
+                    transition: all 0.3s ease;
+                }
+                
+                .gold-job:hover {
+                    transform: translateX(5px);
+                    background: rgba(255, 255, 255, 0.12);
+                    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.15);
+                }
+                
+                /* Hot Badge Animation */
+                .hot-badge {
+                    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+                    color: #ffffff;
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    animation: hot-pulse 1.5s infinite;
+                }
+                
+                @keyframes hot-pulse {
+                    0%, 100% { box-shadow: 0 0 10px rgba(255, 68, 68, 0.5); }
+                    50% { box-shadow: 0 0 20px rgba(255, 68, 68, 0.8); }
+                }
+                
+                /* Company Verified Badge */
+                .verified-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    color: #4CAF50;
+                    font-size: 13px;
+                    font-weight: 600;
+                }
+                
+                .verified-badge i {
+                    font-size: 16px;
+                }
+                
+                /* Empty State */
+                .featured-gold-empty {
+                    text-align: center;
+                    padding: 60px 20px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: 16px;
+                    border: 2px dashed rgba(255, 255, 255, 0.2);
+                }
+                
+                .featured-gold-empty i {
+                    font-size: 4rem;
+                    color: rgba(255, 255, 255, 0.3);
+                    margin-bottom: 20px;
+                }
+                
+                .featured-gold-empty p {
+                    color: rgba(255, 255, 255, 0.6);
+                    font-size: 16px;
+                    font-style: italic;
+                }
+                
+                /* Responsive */
+                @media (max-width: 768px) {
+                    .featured-job-gold {
+                        padding: 20px;
+                    }
+                    
+                    .featured-job-gold .company-img {
+                        width: 70px;
+                        height: 70px;
+                    }
+                    
+                    .featured-job-gold .job-tittle h4 {
+                        font-size: 18px;
+                    }
+                    
+                    .premium-gold-badge {
+                        top: 10px;
+                        right: 10px;
+                        padding: 5px 10px;
+                        font-size: 10px;
+                    }
+                }
             </style>
    </head>
 
@@ -700,93 +967,86 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="section-tittle text-center">
-                            <span>Recent Job</span>
-                            <h2>Featured Jobs</h2>
+                            <h2>Việc Làm Nổi Bật Hàng Đầu</h2>
                         </div>
                     </div>
                 </div>
+                
                 <div class="row justify-content-center">
-                    <div class="col-xl-10">
-                        <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="../assets/img/icon/job-list1.png" alt=""></a>
+                    <div class="col-xl-12">
+                        <c:choose>
+                            <c:when test="${not empty featuredGoldJobs}">
+                                <!-- Grid 3 columns -->
+                                <div class="jobs-grid-3col">
+                                    <c:forEach var="job" items="${featuredGoldJobs}" varStatus="status">
+                                        <!-- Job Card -->
+                                        <div class="job-card-gold gold-job">
+                                            <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="job-card-link">
+                                                <!-- Company Logo -->
+                                                <div class="job-card-banner">
+                                                    <c:choose>
+                                                        <c:when test="${not empty job.companyLogo}">
+                                                            <img src="${pageContext.request.contextPath}/${job.companyLogo}" alt="${job.companyName}">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="banner-logo-placeholder">
+                                                                ${job.companyName.substring(0, 1).toUpperCase()}
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </a>
+                                            
+                                            <!-- Job Content -->
+                                            <div class="job-card-content">
+                                                <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}">
+                                                    <h3 class="job-card-title">${job.jobTitle}</h3>
+                                                </a>
+                                                
+                                                <p class="job-card-company">${job.companyName}</p>
+                                                
+                                                <div class="job-card-info">
+                                                    <div class="job-info-item">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                        <span>${job.locationName}</span>
+                                                    </div>
+                                                    
+                                                    <c:if test="${not empty job.salaryRange}">
+                                                        <div class="job-info-item">
+                                                            <i class="fas fa-money-bill-wave"></i>
+                                                            <span>${job.salaryRange}</span>
+                                                        </div>
+                                                    </c:if>
+                                                </div>
+                                                
+                                                <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" class="view-job-btn">
+                                                    Xem chi tiết
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
                                 </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
+                                
+                                <!-- Pagination -->
+                                <div id="pagination" style="display:flex; justify-content:center; gap:0.5rem; margin-top:2rem; align-items:center;">
+                                    <button id="prevPage" class="btn btn-outline" style="min-width:40px; height:40px; padding:0;">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span id="pageInfo" style="color:#fff; min-width:80px; text-align:center; font-weight:600;"></span>
+                                    <button id="nextPage" class="btn btn-outline" style="min-width:40px; height:40px; padding:0;">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
-                        <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="../assets/img/icon/job-list2.png" alt=""></a>
+                            </c:when>
+                            
+                            <c:otherwise>
+                                <!-- Empty State -->
+                                <div class="text-center" style="padding: 60px 0;">
+                                    <i class="fas fa-briefcase" style="font-size: 48px; color: #ddd; margin-bottom: 20px;"></i>
+                                    <p style="color: #999;">Hiện tại chưa có việc làm premium nào.</p>
                                 </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
-                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="../assets/img/icon/job-list3.png" alt=""></a>
-                                </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
-                         <!-- single-job-content -->
-                        <div class="single-job-items mb-30">
-                            <div class="job-items">
-                                <div class="company-img">
-                                    <a href="job_details.html"><img src="../assets/img/icon/job-list4.png" alt=""></a>
-                                </div>
-                                <div class="job-tittle">
-                                    <a href="job_details.html"><h4>Digital Marketer</h4></a>
-                                    <ul>
-                                        <li>Creative Agency</li>
-                                        <li><i class="fas fa-map-marker-alt"></i>Athens, Greece</li>
-                                        <li>$3500 - $4000</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="items-link f-right">
-                                <a href="job_details.html">Full Time</a>
-                                <span>7 hours ago</span>
-                            </div>
-                        </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -1466,6 +1726,48 @@
                         }
                     })
                     .catch(error => console.error('Error loading unread count:', error));
+            })();
+            
+            // ============================================
+            // PAGINATION FOR FEATURED GOLD JOBS
+            // ============================================
+            (function() {
+                const jobItems = document.querySelectorAll('.gold-job');
+                const pageInfo = document.getElementById('pageInfo');
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                
+                if (!jobItems.length || !pageInfo || !prevBtn || !nextBtn) return;
+                
+                const JOBS_PER_PAGE = 9; // 9 jobs per page (3x3 grid)
+                let currentPage = 1;
+                const totalPages = Math.max(1, Math.ceil(jobItems.length / JOBS_PER_PAGE));
+                
+                function renderPage(page) {
+                    if (page < 1) page = 1;
+                    if (page > totalPages) page = totalPages;
+                    currentPage = page;
+                    
+                    jobItems.forEach((item, idx) => {
+                        const shouldShow = idx >= (currentPage - 1) * JOBS_PER_PAGE && idx < currentPage * JOBS_PER_PAGE;
+                        item.style.display = shouldShow ? '' : 'none';
+                    });
+                    
+                    pageInfo.textContent = currentPage + ' / ' + totalPages;
+                    prevBtn.disabled = (currentPage === 1);
+                    nextBtn.disabled = (currentPage === totalPages);
+                    
+                    // Scroll to top of job section
+                    const jobSection = document.querySelector('.featured-job-area');
+                    if (jobSection) {
+                        jobSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+                
+                prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+                nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+                
+                renderPage(1);
             })();
         </script>
         

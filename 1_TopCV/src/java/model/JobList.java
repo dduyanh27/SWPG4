@@ -17,7 +17,9 @@ public class JobList {
     private int ageRequirement;
     private String status;
     private String companyName;  // lấy từ Recruiter
+    private String companyLogo;  // Company logo URL from Recruiter
     private String locationName; // lấy từ Location
+    private String packageLevel; // "gold", "silver", "bronze" for premium jobs
 
     // Constructor rỗng
     public JobList() {
@@ -154,6 +156,14 @@ public class JobList {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
+    
+    public String getCompanyLogo() {
+        return companyLogo;
+    }
+
+    public void setCompanyLogo(String companyLogo) {
+        this.companyLogo = companyLogo;
+    }
 
     public String getLocationName() {
         return locationName;
@@ -161,5 +171,13 @@ public class JobList {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
+    }
+    
+    public String getPackageLevel() {
+        return packageLevel;
+    }
+    
+    public void setPackageLevel(String packageLevel) {
+        this.packageLevel = packageLevel;
     }
 }

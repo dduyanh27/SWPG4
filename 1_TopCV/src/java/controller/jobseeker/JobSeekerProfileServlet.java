@@ -7,6 +7,7 @@ import dal.CVDAO;
 import dal.ApplicationDAO;
 import dal.SavedJobDAO;
 import dal.SkillDAO;
+import dal.JobListDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
     private ApplicationDAO appDAO;
     private SavedJobDAO savedJobDAO;
     private SkillDAO skillDAO;
+    private JobListDAO jobListDAO;
     
     public JobSeekerProfileServlet() {
         try {
@@ -43,6 +45,7 @@ public class JobSeekerProfileServlet extends HttpServlet {
             this.appDAO = new ApplicationDAO();
             this.savedJobDAO = new SavedJobDAO();
             this.skillDAO = new SkillDAO();
+            this.jobListDAO = new JobListDAO();
         } catch (Exception e) {
             System.err.println("Error initializing DAOs in JobSeekerProfileServlet: " + e.getMessage());
             e.printStackTrace();
@@ -163,6 +166,13 @@ public class JobSeekerProfileServlet extends HttpServlet {
             List<Skill> allSkills = skillDAO.getAllSkills();
             request.setAttribute("jobSeekerSkills", jobSeekerSkills);
             request.setAttribute("allSkills", allSkills);
+            
+            // Load jobs by JobSeeker's location for sidebar
+            List<model.JobList> locationJobs = null;
+            if (js.getLocationId() != null && js.getLocationId() > 0) {
+                locationJobs = jobListDAO.getJobsByLocation(js.getLocationId(), 10);
+            }
+            request.setAttribute("locationJobs", locationJobs);
             
             request.getRequestDispatcher("JobSeeker/profile.jsp").forward(request, response);
         } catch (Exception e) {
