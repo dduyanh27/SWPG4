@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Recruiter" %>
+<%@ page import="model.Job" %>
 <%@ page import="dal.TypeDAO" %>
 <%@ page import="dal.LocationDAO" %>
 <%@ page import="dal.CategoryDAO" %>
@@ -230,7 +231,18 @@
                 </div>
             <% } %>
             
+            <%
+                // Kiểm tra chế độ chỉnh sửa
+                Boolean isEditMode = (Boolean) request.getAttribute("isEditMode");
+                Job editingJob = (Job) request.getAttribute("editingJob");
+                Boolean disableDraftButton = (Boolean) request.getAttribute("disableDraftButton");
+                if (isEditMode == null) isEditMode = false;
+                if (disableDraftButton == null) disableDraftButton = false;
+            %>
             <form action="${pageContext.request.contextPath}/jobposting" method="POST" id="job-posting-form">
+            <% if (isEditMode && editingJob != null) { %>
+                <input type="hidden" name="jobID" value="<%= editingJob.getJobID() %>">
+            <% } %>
             <!-- Job Description Section -->
             <div class="form-section">
                 <div class="section-header">
@@ -239,21 +251,23 @@
                 
                 <div class="form-group">
                     <label for="job-title">Chức danh <span class="required">*</span></label>
-                    <input type="text" id="job-title" name="job-title" placeholder="Eg. Senior UX Designer" required>
+                    <input type="text" id="job-title" name="job-title" placeholder="Eg. Senior UX Designer" 
+                           value="<%= (isEditMode && editingJob != null && editingJob.getJobTitle() != null) ? editingJob.getJobTitle() : "" %>" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="job-level">Cấp bậc <span class="required">*</span></label>
                         <select id="job-level" name="job-level" required>
-                            
+                            <option value="">Vui lòng chọn</option>
                             <% 
                             try {
                                 if (request.getAttribute("jobLevels") != null) { 
                                     List<model.Type> jobLevels = (List<model.Type>) request.getAttribute("jobLevels");
+                                    int selectedJobLevelID = (isEditMode && editingJob != null) ? editingJob.getJobLevelID() : 0;
                                     if (jobLevels != null && !jobLevels.isEmpty()) {
                                         for (model.Type level : jobLevels) { %>
-                                            <option value="<%= level.getTypeID() %>"><%= level.getTypeName() %></option>
+                                            <option value="<%= level.getTypeID() %>" <%= (level.getTypeID() == selectedJobLevelID) ? "selected" : "" %>><%= level.getTypeName() %></option>
                                         <% }
                                     }
                                 } else {
@@ -270,13 +284,15 @@
                     <div class="form-group">
                         <label for="job-type">Loại việc làm</label>
                         <select id="job-type" name="job-type">
+                            <option value="">Vui lòng chọn</option>
                             <% 
                             try {
                                 if (request.getAttribute("jobTypes") != null) { 
                                     List<model.Type> jobTypes = (List<model.Type>) request.getAttribute("jobTypes");
+                                    int selectedJobTypeID = (isEditMode && editingJob != null) ? editingJob.getJobTypeID() : 0;
                                     if (jobTypes != null && !jobTypes.isEmpty()) {
                                         for (model.Type type : jobTypes) { %>
-                                            <option value="<%= type.getTypeID() %>"><%= type.getTypeName() %></option>
+                                            <option value="<%= type.getTypeID() %>" <%= (type.getTypeID() == selectedJobTypeID) ? "selected" : "" %>><%= type.getTypeName() %></option>
                                         <% }
                                     }
                                 } else {
@@ -295,9 +311,15 @@
                 <div class="form-group">
                     <label for="profession">Ngành nghề chi tiết <span class="required">*</span> (Chọn 1 ngành nghề) <i class="fas fa-question-circle"></i></label>
                     <div class="simple-custom-dropdown">
-                        <input type="hidden" id="profession" name="profession" required>
+                        <input type="hidden" id="profession" name="profession" required 
+                               value="<%= (isEditMode && editingJob != null && editingJob.getCategoryID() > 0) ? editingJob.getCategoryID() : "" %>">
                         <div class="dropdown-input" id="profession-input" onclick="toggleProfessionDropdown()">
-                            <span class="dropdown-text" id="profession-text">Vui lòng chọn ngành nghề</span>
+                            <%
+                            String categoryName = (String) request.getAttribute("editingJobCategoryName");
+                            String displayText = (categoryName != null && !categoryName.isEmpty()) ? categoryName : "Vui lòng chọn ngành nghề";
+                            String textColor = (categoryName != null && !categoryName.isEmpty()) ? "#374151" : "";
+                            %>
+                            <span class="dropdown-text" id="profession-text" style="color: <%= textColor %>"><%= displayText %></span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="dropdown-list" id="profession-list" style="display: none;">
@@ -319,7 +341,13 @@
                                     for (Category sub : allCategories) {
                                         if (sub.getParentCategoryID() != null && sub.getParentCategoryID() == parent.getCategoryID()) {
                                 %>
-                                <div class="category-child-item" data-category-id="<%= sub.getCategoryID() %>" data-category-name="<%= sub.getCategoryName() %>" onclick="selectProfession(this)">
+                                <div class="category-child-item" data-category-id="<%= sub.getCategoryID() %>" data-category-name="<%= sub.getCategoryName() %>" onclick="selectProfession(this)"
+                                     <% 
+                                     Integer editingJobCategoryID = (Integer) request.getAttribute("editingJobCategoryID");
+                                     if (editingJobCategoryID != null && sub.getCategoryID() == editingJobCategoryID) {
+                                         out.print("data-selected=\"true\"");
+                                     }
+                                     %>>
                                     <%= sub.getCategoryName() %>
                                 </div>
                                 <%
@@ -348,9 +376,10 @@
                         try {
                             if (request.getAttribute("locations") != null) { 
                                 List<Location> locationsList = (List<Location>) request.getAttribute("locations");
+                                int selectedLocationID = (isEditMode && editingJob != null) ? editingJob.getLocationID() : 0;
                                 if (locationsList != null && !locationsList.isEmpty()) {
                                     for (Location location : locationsList) { %>
-                                        <option value="<%= location.getLocationID() %>"><%= location.getLocationName() %></option>
+                                        <option value="<%= location.getLocationID() %>" <%= (location.getLocationID() == selectedLocationID) ? "selected" : "" %>><%= location.getLocationName() %></option>
                                     <% }
                                 }
                             }
@@ -369,7 +398,7 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-description" name="job-description" rows="10" placeholder="Nhập mô tả công việc" required></textarea>
+                        <textarea id="job-description" name="job-description" rows="10" placeholder="Nhập mô tả công việc" required><%= (isEditMode && editingJob != null && editingJob.getDescription() != null) ? editingJob.getDescription() : "" %></textarea>
                         <div class="editor-footer">
                             <a href="#" class="sample-link">Xem mô tả công việc mẫu</a>
                             <div class="char-counter">(14500/14500 ký tự)</div>
@@ -384,7 +413,7 @@
                             <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
                             <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
                         </div>
-                        <textarea id="job-requirements" name="job-requirements" rows="10" placeholder="Nhập yêu cầu công việc" required></textarea>
+                        <textarea id="job-requirements" name="job-requirements" rows="10" placeholder="Nhập yêu cầu công việc" required><%= (isEditMode && editingJob != null && editingJob.getRequirements() != null) ? editingJob.getRequirements() : "" %></textarea>
                         <div class="editor-footer">
                             <a href="#" class="sample-link">Xem yêu cầu công việc mẫu</a>
                             <div class="char-counter">(14500/14500 ký tự)</div>
@@ -395,12 +424,31 @@
 
             <!-- Salary and Contact Section -->
             <div class="form-section">
+                <%
+                    // Parse salary range for edit mode - format: "23-24 triệu" or "23 triệu"
+                    String salaryMin = "";
+                    String salaryMax = "";
+                    if (isEditMode && editingJob != null && editingJob.getSalaryRange() != null) {
+                        String salaryRange = editingJob.getSalaryRange();
+                        // Remove "triệu" and trim
+                        salaryRange = salaryRange.replace("triệu", "").trim();
+                        // Split by "-"
+                        String[] parts = salaryRange.split("-");
+                        if (parts.length >= 2) {
+                            salaryMin = parts[0].trim();
+                            salaryMax = parts[1].trim();
+                        } else if (parts.length == 1 && !parts[0].trim().isEmpty()) {
+                            salaryMin = parts[0].trim();
+                        }
+                    }
+                %>
                 <div class="form-group">
-                    <label for="salary">Mức lương <span class="required">*</span> (USD)</label>
+                    <label for="salary">Mức lương <span class="required">*</span> (triệu VNĐ)</label>
                     <div class="salary-input-group">
-                        <input type="number" id="salary-min" name="salary-min" placeholder="Tối thiểu">
+                        <input type="number" id="salary-min" name="salary-min" placeholder="Tối thiểu" value="<%= salaryMin %>">
                         <span class="dash">-</span>
-                        <input type="number" id="salary-max" name="salary-max" placeholder="Tối đa">
+                        <input type="number" id="salary-max" name="salary-max" placeholder="Tối đa" value="<%= salaryMax %>">
+                        <span style="margin-left: 8px; color: #6b7280;">triệu</span>
                     </div>
                 </div>
 
@@ -408,19 +456,19 @@
                     <label for="hiring-count">Số lượng tuyển dụng</label>
                     <div class="counter-input">
                         <button type="button" class="counter-btn minus">-</button>
-                        <input type="number" id="hiring-count" name="hiring-count" value="1" min="1">
+                        <input type="number" id="hiring-count" name="hiring-count" value="<%= (isEditMode && editingJob != null) ? editingJob.getHiringCount() : 1 %>" min="1">
                         <button type="button" class="counter-btn plus">+</button>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="contact-person">Người liên hệ <span class="required">*</span></label>
-                    <input type="text" id="contact-person" name="contact-person" value="nguyen van A" required>
+                    <input type="text" id="contact-person" name="contact-person" value="<%= (isEditMode && editingJob != null && editingJob.getContactPerson() != null) ? editingJob.getContactPerson() : "" %>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="application-email">Địa chỉ email nhận hồ sơ <span class="required">*</span></label>
-                    <input type="email" id="application-email" name="application-email" value="sdfs@gmail.com" required>
+                    <input type="email" id="application-email" name="application-email" value="<%= (isEditMode && editingJob != null && editingJob.getApplicationEmail() != null) ? editingJob.getApplicationEmail() : "" %>" required>
                     <small class="hint">(Địa chỉ email sẽ được ẩn với người tìm việc. Bạn có thể nhập nhiều địa chỉ cách nhau bằng dấu "," và dấu ";".)</small>
                 </div> 
 
@@ -451,7 +499,7 @@
                         <label for="min-experience">Năm kinh nghiệm tối thiểu</label>
                         <div class="counter-input">
                             <button type="button" class="counter-btn minus">-</button>
-                            <input type="number" id="min-experience" name="min-experience" value="1" min="0">
+                            <input type="number" id="min-experience" name="min-experience" value="<%= (isEditMode && editingJob != null && editingJob.getMinExperience() != null) ? editingJob.getMinExperience() : 1 %>" min="0">
                             <button type="button" class="counter-btn plus">+</button>
                         </div>
                     </div>
@@ -464,9 +512,10 @@
                             try {
                                 if (request.getAttribute("certificates") != null) { 
                                     List<Type> certificatesList = (List<Type>) request.getAttribute("certificates");
+                                    Integer selectedCertID = (isEditMode && editingJob != null) ? editingJob.getCertificatesID() : null;
                                     if (certificatesList != null && !certificatesList.isEmpty()) {
                                         for (Type certificate : certificatesList) { %>
-                                            <option value="<%= certificate.getTypeID() %>"><%= certificate.getTypeName() %></option>
+                                            <option value="<%= certificate.getTypeID() %>" <%= (selectedCertID != null && certificate.getTypeID() == selectedCertID) ? "selected" : "" %>><%= certificate.getTypeName() %></option>
                                         <% }
                                     }
                                 }
@@ -478,21 +527,28 @@
                         </select>
                     </div>
 
+                    <%
+                        String selectedNationality = (isEditMode && editingJob != null && editingJob.getNationality() != null) ? editingJob.getNationality() : "any";
+                        String selectedGender = (isEditMode && editingJob != null && editingJob.getGender() != null) ? editingJob.getGender() : "any";
+                        String selectedMaritalStatus = (isEditMode && editingJob != null && editingJob.getMaritalStatus() != null) ? editingJob.getMaritalStatus() : "any";
+                        int ageMin = (isEditMode && editingJob != null && editingJob.getAgeMin() != null) ? editingJob.getAgeMin() : 15;
+                        int ageMax = (isEditMode && editingJob != null && editingJob.getAgeMax() != null) ? editingJob.getAgeMax() : 60;
+                    %>
                     <div class="form-group">
                         <label>Quốc tịch</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="nationality" value="any" checked>
+                                <input type="radio" name="nationality" value="any" <%= "any".equals(selectedNationality) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Bất kỳ
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="nationality" value="vietnamese">
+                                <input type="radio" name="nationality" value="vietnamese" <%= "vietnamese".equals(selectedNationality) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Người Việt Nam
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="nationality" value="foreigner">
+                                <input type="radio" name="nationality" value="foreigner" <%= "foreigner".equals(selectedNationality) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Người nước ngoài
                             </label>
@@ -503,17 +559,17 @@
                         <label>Giới tính</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="gender" value="any" checked>
+                                <input type="radio" name="gender" value="any" <%= "any".equals(selectedGender) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Bất kỳ
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="gender" value="male">
+                                <input type="radio" name="gender" value="male" <%= "male".equals(selectedGender) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Nam
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="gender" value="female">
+                                <input type="radio" name="gender" value="female" <%= "female".equals(selectedGender) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Nữ
                             </label>
@@ -524,17 +580,17 @@
                         <label>Tình trạng hôn nhân</label>
                         <div class="radio-group">
                             <label class="radio-label">
-                                <input type="radio" name="marital-status" value="any" checked>
+                                <input type="radio" name="marital-status" value="any" <%= "any".equals(selectedMaritalStatus) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Bất kỳ
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="marital-status" value="single">
+                                <input type="radio" name="marital-status" value="single" <%= "single".equals(selectedMaritalStatus) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Độc thân
                             </label>
                             <label class="radio-label">
-                                <input type="radio" name="marital-status" value="married">
+                                <input type="radio" name="marital-status" value="married" <%= "married".equals(selectedMaritalStatus) ? "checked" : "" %>>
                                 <span class="radio-custom"></span>
                                 Đã kết hôn
                             </label>
@@ -544,9 +600,9 @@
                     <div class="form-group">
                         <label for="age-range">Độ tuổi mong muốn</label>
                         <div class="age-range-inputs">
-                            <input type="number" id="age-min" name="age-min" value="15" min="15" max="65">
+                            <input type="number" id="age-min" name="age-min" value="<%= ageMin %>" min="15" max="65">
                             <span class="dash">-</span>
-                            <input type="number" id="age-max" name="age-max" value="60" min="15" max="65">
+                            <input type="number" id="age-max" name="age-max" value="<%= ageMax %>" min="15" max="65">
                         </div>
                     </div>
                 </div>
@@ -661,7 +717,7 @@
                 </div>
             <% } %>
             <div class="form-actions">
-                <button type="submit" name="action" value="draft" class="btn btn-secondary">Lưu nháp</button>
+                <button type="submit" name="action" value="draft" class="btn btn-secondary" <%= disableDraftButton ? "disabled" : "" %>>Lưu nháp</button>
                 <button type="submit" name="action" value="post" class="btn btn-primary" <%= (request.getAttribute("postingDisabled") != null && (Boolean)request.getAttribute("postingDisabled")) ? "disabled" : "" %>>Đăng tin</button>
             </div>
             </form>
@@ -882,6 +938,122 @@
                 addSkillTag(skillInput.value);
             }
         });
+        
+        // Initialize category and skills in edit mode
+        <% 
+        System.out.println("========== DEBUG: JSP SCRIPT START ==========");
+        Integer editingJobCategoryID = (Integer) request.getAttribute("editingJobCategoryID");
+        java.util.List<String> editingJobSkills = (java.util.List<String>) request.getAttribute("editingJobSkills");
+        System.out.println("DEBUG JSP: editingJobCategoryID = " + editingJobCategoryID);
+        System.out.println("DEBUG JSP: editingJobSkills = " + editingJobSkills);
+        System.out.println("DEBUG JSP: editingJobSkills size = " + (editingJobSkills != null ? editingJobSkills.size() : "null"));
+        %>
+        console.log('========== DEBUG: JavaScript Initialization START ==========');
+        console.log('DEBUG JS: editingJobCategoryID = <%= editingJobCategoryID != null ? editingJobCategoryID : "null" %>');
+        console.log('DEBUG JS: editingJobSkills = <%= editingJobSkills != null ? editingJobSkills : "null" %>');
+        console.log('DEBUG JS: editingJobSkills size = <%= editingJobSkills != null ? editingJobSkills.size() : "null" %>');
+        
+        // Initialize category selection - mark as selected in dropdown
+        <% 
+        if (editingJobCategoryID != null) { 
+        %>
+        console.log('DEBUG JS: CategoryID is NOT null, marking category as selected...');
+        (function() {
+            function initCategory() {
+                console.log('DEBUG JS: initCategory() called');
+                console.log('DEBUG JS: Looking for category with ID: <%= editingJobCategoryID %>');
+                const categoryItem = document.querySelector('.category-child-item[data-category-id="<%= editingJobCategoryID %>"]');
+                console.log('DEBUG JS: categoryItem found: ' + (categoryItem ? 'YES' : 'NO'));
+                if (categoryItem) {
+                    console.log('DEBUG JS: Found category item for ID: <%= editingJobCategoryID %>');
+                    // Mark as selected visually
+                    categoryItem.classList.add('selected');
+                    // Expand parent category if needed
+                    const childrenList = categoryItem.closest('.category-children-list');
+                    if (childrenList) {
+                        const parentItem = childrenList.previousElementSibling;
+                        if (parentItem && parentItem.classList.contains('category-parent-item')) {
+                            // Expand the parent
+                            childrenList.style.display = 'block';
+                            const arrow = parentItem.querySelector('.category-arrow');
+                            if (arrow) {
+                                arrow.classList.remove('fa-chevron-right');
+                                arrow.classList.add('fa-chevron-down');
+                            }
+                            parentItem.classList.add('expanded');
+                        }
+                    }
+                    // Ensure hidden input has the value
+                    const hiddenInput = document.getElementById('profession');
+                    if (hiddenInput) {
+                        hiddenInput.value = '<%= editingJobCategoryID %>';
+                    }
+                    // Mark dropdown as selected
+                    const dropdownInput = document.getElementById('profession-input');
+                    if (dropdownInput) {
+                        dropdownInput.classList.add('selected');
+                    }
+                    console.log('DEBUG JS: Category marked as selected');
+                } else {
+                    console.log('DEBUG JS: Category item not found for ID: <%= editingJobCategoryID %>');
+                    // Retry after a short delay
+                    setTimeout(initCategory, 100);
+                }
+            }
+            
+            console.log('DEBUG JS: Document readyState: ' + document.readyState);
+            if (document.readyState === 'loading') {
+                console.log('DEBUG JS: Adding DOMContentLoaded listener');
+                document.addEventListener('DOMContentLoaded', initCategory);
+            } else {
+                console.log('DEBUG JS: DOM already loaded, calling initCategory directly');
+                setTimeout(initCategory, 100);
+            }
+        })();
+        <% } else { %>
+        console.log('DEBUG JS: CategoryID is NULL, skipping category initialization');
+        <% } %>
+        
+        // Initialize skills
+        <% 
+        java.util.List<String> editingJobSkillsList = (java.util.List<String>) request.getAttribute("editingJobSkills");
+        System.out.println("DEBUG JSP: Checking skills list...");
+        if (editingJobSkillsList != null && !editingJobSkillsList.isEmpty()) { 
+            System.out.println("DEBUG JSP: Skills list is NOT empty, size = " + editingJobSkillsList.size());
+        %>
+        console.log('DEBUG JS: Skills list is NOT empty, initializing...');
+        (function() {
+            function initSkills() {
+                console.log('DEBUG JS: initSkills() called');
+                console.log('DEBUG JS: Initializing skills, count: <%= editingJobSkillsList.size() %>');
+                <% for (String skillName : editingJobSkillsList) { 
+                    // Escape single quotes and backslashes for JavaScript
+                    String escapedSkillName = skillName.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"");
+                %>
+                skillsArray.push('<%= escapedSkillName %>');
+                <% } %>
+                updateSkillsDisplay();
+                console.log('DEBUG JS: Skills initialized:', skillsArray);
+                console.log('DEBUG JS: skillsHiddenInput.value =', document.getElementById('skills').value);
+            }
+            
+            console.log('DEBUG JS: Document readyState for skills: ' + document.readyState);
+            if (document.readyState === 'loading') {
+                console.log('DEBUG JS: Adding DOMContentLoaded listener for skills');
+                document.addEventListener('DOMContentLoaded', initSkills);
+            } else {
+                console.log('DEBUG JS: DOM already loaded, calling initSkills directly');
+                // DOM already loaded
+                setTimeout(initSkills, 100);
+            }
+        })();
+        <% } else { 
+            System.out.println("DEBUG JSP: Skills list is NULL or EMPTY");
+        %>
+        console.log('DEBUG JS: No skills to initialize (editingJobSkills is null or empty)');
+        <% } %>
+        console.log('========== DEBUG: JavaScript Initialization END ==========');
+        System.out.println("========== DEBUG: JSP SCRIPT END ==========");
     </script>
 </body>
 </html>

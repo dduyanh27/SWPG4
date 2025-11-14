@@ -77,6 +77,100 @@ public class JobPostingServlet extends HttpServlet {
             throws ServletException, IOException {
         System.out.println("DEBUG: JobPostingServlet doGet() called"); // Gọi khi tải trang đăng tin (GET)
         try {
+            // Kiểm tra xem có jobID không (chế độ chỉnh sửa)
+            String jobIDStr = request.getParameter("jobID");
+            System.out.println("========== DEBUG: JobPostingServlet.doGet() START ==========");
+            System.out.println("DEBUG: jobID parameter = " + jobIDStr);
+            Job existingJob = null;
+            boolean isEditMode = false;
+            
+            if (jobIDStr != null && !jobIDStr.trim().isEmpty()) {
+                try {
+                    int jobID = Integer.parseInt(jobIDStr);
+                    System.out.println("DEBUG: Parsed jobID = " + jobID);
+                    JobDAO jobDAO = new JobDAO();
+                    existingJob = jobDAO.getJobById(jobID);
+                    System.out.println("DEBUG: existingJob retrieved: " + (existingJob != null ? "NOT NULL" : "NULL"));
+                    
+                    // Kiểm tra quyền: job phải thuộc về recruiter hiện tại
+                    model.Recruiter recruiter = (model.Recruiter) request.getSession().getAttribute("recruiter");
+                    System.out.println("DEBUG: recruiter from session: " + (recruiter != null ? "NOT NULL (ID: " + recruiter.getRecruiterID() + ")" : "NULL"));
+                    if (existingJob != null) {
+                        System.out.println("DEBUG: existingJob.getRecruiterID() = " + existingJob.getRecruiterID());
+                    }
+                    
+                    if (existingJob != null && recruiter != null && existingJob.getRecruiterID() == recruiter.getRecruiterID()) {
+                        isEditMode = true;
+                        request.setAttribute("editingJob", existingJob);
+                        request.setAttribute("isEditMode", true);
+                        System.out.println("DEBUG: ===== ENTERING EDIT MODE =====");
+                        System.out.println("DEBUG: Edit mode - JobID: " + jobID + ", Status: " + existingJob.getStatus());
+                        
+                        // Load job's category ID from Category table
+                        int categoryID = existingJob.getCategoryID();
+                        System.out.println("DEBUG: ===== LOADING CATEGORY =====");
+                        System.out.println("DEBUG: existingJob.getCategoryID() = " + categoryID);
+                        if (categoryID > 0) {
+                            // Get category directly from Category table by CategoryID
+                            CategoryDAO categoryDAO = new CategoryDAO();
+                            System.out.println("DEBUG: Calling categoryDAO.getCategoryById(" + categoryID + ")");
+                            Category category = categoryDAO.getCategoryById(categoryID);
+                            if (category != null) {
+                                System.out.println("DEBUG: Category found in database: ID=" + category.getCategoryID() + ", Name=" + category.getCategoryName() + ", ParentID=" + category.getParentCategoryID());
+                                
+                                // Set both ID and Name for direct display
+                                request.setAttribute("editingJobCategoryID", categoryID);
+                                request.setAttribute("editingJobCategoryName", category.getCategoryName());
+                                System.out.println("DEBUG: Set attribute 'editingJobCategoryID' = " + categoryID);
+                                System.out.println("DEBUG: Set attribute 'editingJobCategoryName' = " + category.getCategoryName());
+                            } else {
+                                System.out.println("DEBUG: WARNING: Category not found in Category table for ID: " + categoryID);
+                            }
+                        } else {
+                            System.out.println("DEBUG: No CategoryID in job (categoryID <= 0)");
+                        }
+                        
+                        // Load job's skills from Skill table through JobSkillMappings
+                        System.out.println("DEBUG: ===== LOADING SKILLS =====");
+                        dal.JobSkillMappingDAO jobSkillMappingDAO = new dal.JobSkillMappingDAO();
+                        System.out.println("DEBUG: Calling jobSkillMappingDAO.getSkillIDsByJobID(" + jobID + ")");
+                        java.util.List<Integer> skillIDs = jobSkillMappingDAO.getSkillIDsByJobID(jobID);
+                        System.out.println("DEBUG: SkillIDs from JobSkillMapping: " + skillIDs);
+                        System.out.println("DEBUG: SkillIDs size: " + (skillIDs != null ? skillIDs.size() : "null"));
+                        
+                        dal.SkillDAO skillDAO = new dal.SkillDAO();
+                        java.util.List<String> skillNames = new java.util.ArrayList<>();
+                        
+                        if (skillIDs != null && !skillIDs.isEmpty()) {
+                            System.out.println("DEBUG: Processing " + skillIDs.size() + " skill IDs");
+                            for (Integer skillID : skillIDs) {
+                                System.out.println("DEBUG: Getting skill for ID: " + skillID);
+                                model.Skill skill = skillDAO.getSkillById(skillID);
+                                if (skill != null && skill.getSkillName() != null) {
+                                    skillNames.add(skill.getSkillName());
+                                    System.out.println("DEBUG: Skill loaded successfully: " + skill.getSkillName() + " (ID: " + skillID + ")");
+                                } else {
+                                    System.out.println("DEBUG: WARNING: Skill not found in Skill table for ID: " + skillID);
+                                }
+                            }
+                        } else {
+                            System.out.println("DEBUG: No skills found in JobSkillMapping for JobID: " + jobID);
+                        }
+                        
+                        // Always set the attribute, even if empty
+                        request.setAttribute("editingJobSkills", skillNames);
+                        System.out.println("DEBUG: Set attribute 'editingJobSkills' = " + skillNames);
+                        System.out.println("DEBUG: editingJobSkills size: " + skillNames.size());
+                        System.out.println("DEBUG: ===== EDIT MODE DATA LOADED =====");
+                    } else {
+                        request.setAttribute("error", "Không tìm thấy tin tuyển dụng hoặc bạn không có quyền chỉnh sửa!");
+                        existingJob = null;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("DEBUG: Invalid jobID: " + jobIDStr);
+                }
+            }
+            
             TypeDAO typeDAO = new TypeDAO(); // Khởi tạo DAO để lấy dữ liệu Type
             System.out.println("DEBUG: TypeDAO created"); // Log debug
             
@@ -250,8 +344,18 @@ public class JobPostingServlet extends HttpServlet {
                         }
                     }
                 }
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {            }
             
+            // Nếu là chế độ chỉnh sửa và job đã Published, vô hiệu hóa nút "Lưu nháp"
+            if (isEditMode && existingJob != null && "Published".equals(existingJob.getStatus())) {
+                request.setAttribute("disableDraftButton", true);
+                System.out.println("DEBUG: Disabling draft button for Published job");
+            }
+            
+            System.out.println("DEBUG: Forwarding to JSP...");
+            System.out.println("DEBUG: editingJobCategoryID attribute = " + request.getAttribute("editingJobCategoryID"));
+            System.out.println("DEBUG: editingJobSkills attribute = " + request.getAttribute("editingJobSkills"));
+            System.out.println("========== DEBUG: JobPostingServlet.doGet() END ==========");
             request.getRequestDispatcher("Recruiter/job-posting.jsp").forward(request, response); // Forward sang JSP hiển thị form
         } catch (Exception e) {
             System.out.println("DEBUG: Exception in doGet: " + e.getMessage()); // Log lỗi tổng quát
@@ -279,19 +383,63 @@ public class JobPostingServlet extends HttpServlet {
         System.out.println("DEBUG: Request URI: " + request.getRequestURI()); // URI
         System.out.println("=========================================="); // Log phân cách
         try {
+            // Kiểm tra xem có jobID không (chế độ chỉnh sửa)
+            String jobIDStr = request.getParameter("jobID");
+            Integer editingJobID = null;
+            Job existingJob = null;
+            boolean isEditMode = false;
+            String originalStatus = null;
+            
+            if (jobIDStr != null && !jobIDStr.trim().isEmpty()) {
+                try {
+                    editingJobID = Integer.parseInt(jobIDStr);
+                    JobDAO jobDAO = new JobDAO();
+                    existingJob = jobDAO.getJobById(editingJobID);
+                    
+                    // Kiểm tra quyền
+                    model.Recruiter recruiter = (model.Recruiter) request.getSession().getAttribute("recruiter");
+                    if (existingJob != null && recruiter != null && existingJob.getRecruiterID() == recruiter.getRecruiterID()) {
+                        isEditMode = true;
+                        originalStatus = existingJob.getStatus();
+                        System.out.println("DEBUG: Edit mode - JobID: " + editingJobID + ", Original Status: " + originalStatus);
+                    } else {
+                        request.setAttribute("error", "Không tìm thấy tin tuyển dụng hoặc bạn không có quyền chỉnh sửa!");
+                        doGet(request, response);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("DEBUG: Invalid jobID: " + jobIDStr);
+                }
+            }
+            
             String jobTitle = request.getParameter("job-title"); // Tiêu đề công việc
             String description = request.getParameter("job-description"); // Mô tả công việc
             String requirements = request.getParameter("job-requirements"); // Yêu cầu công việc
             int jobLevelID = Integer.parseInt(request.getParameter("job-level")); // Cấp bậc
             String salaryMinStr = request.getParameter("salary-min");
             String salaryMaxStr = request.getParameter("salary-max");
-            String salaryRange = salaryMinStr + "-" + salaryMaxStr; // Dải lương "min-max"
+            String salaryRange = "";
+            if (salaryMinStr != null && !salaryMinStr.trim().isEmpty() && salaryMaxStr != null && !salaryMaxStr.trim().isEmpty()) {
+                salaryRange = salaryMinStr.trim() + "-" + salaryMaxStr.trim() + " triệu"; // Dải lương "min-max triệu"
+            } else if (salaryMinStr != null && !salaryMinStr.trim().isEmpty()) {
+                salaryRange = salaryMinStr.trim() + " triệu";
+            } else if (salaryMaxStr != null && !salaryMaxStr.trim().isEmpty()) {
+                salaryRange = salaryMaxStr.trim() + " triệu";
+            }
             String expirationDateStr = request.getParameter("expiration-date"); // Hạn bài (nếu có)
             int ageRequirement = 0; // Giá trị mặc định (field cũ đã bỏ)
             int jobTypeID = Integer.parseInt(request.getParameter("job-type")); // Loại việc
             int hiringCount = Integer.parseInt(request.getParameter("hiring-count")); // Số lượng cần tuyển
             String action = request.getParameter("action"); // draft | post (2 nút submit)
             // Chú thích: action đến từ nút Lưu nháp hoặc Đăng tin
+            
+            // Nếu đang chỉnh sửa job đã Published, không cho phép lưu nháp
+            if (isEditMode && "Published".equals(originalStatus) && "draft".equalsIgnoreCase(action)) {
+                request.setAttribute("error", "Không thể lưu nháp tin đã đăng. Chỉ có thể cập nhật và đăng lại.");
+                doGet(request, response);
+                return;
+            }
+            
             String featuredParam = request.getParameter("featured"); // Checkbox nổi bật
             boolean featuredSelected = "1".equals(featuredParam) || "on".equalsIgnoreCase(featuredParam); // true nếu người dùng tick
             // Chú thích: nếu gói không cho phép nổi bật, checkbox sẽ bị disabled trên UI
@@ -304,15 +452,38 @@ public class JobPostingServlet extends HttpServlet {
                 return;
             }
             
-            // Lấy categoryID từ recruiter (vì đã bỏ field job-field)
+            // Lấy categoryID từ form parameter "profession"
             int categoryID = 0;
-            if (recruiter.getCategoryID() > 0) {
-                categoryID = recruiter.getCategoryID();
+            String professionParam = request.getParameter("profession");
+            System.out.println("DEBUG: profession parameter from form = " + professionParam);
+            if (professionParam != null && !professionParam.trim().isEmpty()) {
+                try {
+                    categoryID = Integer.parseInt(professionParam.trim());
+                    System.out.println("DEBUG: Parsed categoryID from form = " + categoryID);
+                } catch (NumberFormatException e) {
+                    System.out.println("DEBUG: WARNING - Invalid profession parameter: " + professionParam);
+                    request.setAttribute("error", "Ngành nghề chi tiết không hợp lệ!");
+                    doGet(request, response);
+                    return;
+                }
+            } else {
+                System.out.println("DEBUG: WARNING - profession parameter is null or empty");
+                request.setAttribute("error", "Vui lòng chọn ngành nghề chi tiết!");
+                doGet(request, response);
+                return;
             }
             
             // Tạo Job object
-            Job job = new Job(); // Tạo đối tượng Job để lưu DB
+            Job job;
+            if (isEditMode && existingJob != null) {
+                job = existingJob; // Sử dụng job hiện có
+            } else {
+                job = new Job(); // Tạo đối tượng Job mới
+            }
             job.setRecruiterID(recruiter.getRecruiterID()); // Gán RecruiterID
+            if (isEditMode) {
+                job.setJobID(editingJobID); // Gán JobID cho chế độ chỉnh sửa
+            }
             job.setJobTitle(jobTitle); // Tiêu đề
             job.setDescription(description); // Mô tả
             job.setRequirements(requirements); // Yêu cầu
@@ -336,12 +507,15 @@ public class JobPostingServlet extends HttpServlet {
                 return;
             }
 
-            // Parse expiration date - chỉ dùng khi lưu nháp
-            // Khi đăng tin (post), sẽ dùng ngày hết hạn của gói
+            // Parse expiration date
             if ("draft".equalsIgnoreCase(action)) {
+                // Lưu nháp: dùng ngày hết hạn từ form (nếu có)
                 if (expirationDateStr != null && !expirationDateStr.isEmpty()) {
                     LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr + "T23:59:59");
                     job.setExpirationDate(expirationDate);
+                } else if (isEditMode && existingJob != null && existingJob.getExpirationDate() != null) {
+                    // Giữ nguyên ngày hết hạn hiện tại
+                    job.setExpirationDate(existingJob.getExpirationDate());
                 }
             } else {
                 // Khi đăng tin (post), tìm gói và lấy ngày hết hạn
@@ -360,11 +534,18 @@ public class JobPostingServlet extends HttpServlet {
                     // Đặt ngày hết hạn của job trùng với ngày hết hạn của gói
                     job.setExpirationDate(chosen.expiryDate);
                     System.out.println("DEBUG: Set job expiration date to package expiry date: " + chosen.expiryDate);
+                } else if (isEditMode && existingJob != null && existingJob.getExpirationDate() != null) {
+                    // Nếu không tìm thấy gói (chỉnh sửa Published job), giữ nguyên ngày hết hạn
+                    job.setExpirationDate(existingJob.getExpirationDate());
                 }
             }
             
-            // Set PostingDate to current time
-            job.setPostingDate(LocalDateTime.now()); // Ngày đăng (thời điểm tạo)
+            // Set PostingDate - chỉ set khi tạo mới, chỉnh sửa thì giữ nguyên
+            if (!isEditMode) {
+                job.setPostingDate(LocalDateTime.now()); // Ngày đăng (thời điểm tạo)
+            } else if (existingJob != null && existingJob.getPostingDate() != null) {
+                job.setPostingDate(existingJob.getPostingDate()); // Giữ nguyên ngày đăng ban đầu
+            }
             
             job.setCategoryID(categoryID);
             job.setAgeRequirement(ageRequirement);
@@ -374,12 +555,20 @@ public class JobPostingServlet extends HttpServlet {
             job.setHiringCount(hiringCount);
             
             // Set default values
-            job.setViewCount(0); // Khởi tạo lượt xem
+            if (!isEditMode) {
+                job.setViewCount(0); // Khởi tạo lượt xem
+            } else if (existingJob != null) {
+                job.setViewCount(existingJob.getViewCount()); // Giữ nguyên lượt xem
+            }
             job.setIsUrgent(false); // Không gấp mặc định
             job.setIsPriority(featuredSelected); // Lưu trạng thái nổi bật (1/0)
             
-            // Generate job code
-            job.setJobCode(JobCodeGenerator.generateJobCode()); // Sinh mã công việc
+            // Generate job code - chỉ khi tạo mới
+            if (!isEditMode) {
+                job.setJobCode(JobCodeGenerator.generateJobCode()); // Sinh mã công việc
+            } else if (existingJob != null && existingJob.getJobCode() != null) {
+                job.setJobCode(existingJob.getJobCode()); // Giữ nguyên mã công việc
+            }
             
             // Get and set contact person and application email
             String contactPerson = request.getParameter("contact-person"); // Người liên hệ
@@ -471,19 +660,38 @@ public class JobPostingServlet extends HttpServlet {
                 }
             }
             
-            System.out.println("DEBUG: Starting to save job...");
+            System.out.println("DEBUG: Starting to " + (isEditMode ? "update" : "save") + " job...");
             JobDAO jobDAO = new JobDAO();
-            int jobID = jobDAO.addJob(job);
-            System.out.println("DEBUG: Job saved with ID: " + jobID);
+            int jobID;
+            boolean success;
             
-            if (jobID > 0) {
+            if (isEditMode) {
+                // Cập nhật job hiện có
+                success = jobDAO.updateJob(job);
+                jobID = editingJobID;
+                System.out.println("DEBUG: Job updated - ID: " + jobID + ", Success: " + success);
+            } else {
+                // Tạo job mới
+                jobID = jobDAO.addJob(job);
+                success = (jobID > 0);
+                System.out.println("DEBUG: Job saved with ID: " + jobID);
+            }
+            
+            if (success && jobID > 0) {
                 // Xử lý skills
                 String skillsParam = request.getParameter("skills");
                 System.out.println("DEBUG: Skills parameter: " + skillsParam);
+                
+                dal.SkillDAO skillDAO = new dal.SkillDAO();
+                dal.JobSkillMappingDAO jobSkillMappingDAO = new dal.JobSkillMappingDAO();
+                
+                // Nếu là chế độ chỉnh sửa, xóa tất cả mapping cũ trước
+                if (isEditMode) {
+                    boolean deleted = jobSkillMappingDAO.deleteMappingsByJobID(jobID);
+                    System.out.println("DEBUG: Deleted old skill mappings for JobID " + jobID + ": " + deleted);
+                }
+                
                 if (skillsParam != null && !skillsParam.trim().isEmpty()) {
-                    dal.SkillDAO skillDAO = new dal.SkillDAO();
-                    dal.JobSkillMappingDAO mappingDAO = new dal.JobSkillMappingDAO();
-                    
                     // Split skills bằng dấu phẩy (tạo skill nếu chưa có và map vào Job)
                     String[] skillNames = skillsParam.split(",");
                     System.out.println("DEBUG: Processing " + skillNames.length + " skills");
@@ -498,19 +706,39 @@ public class JobPostingServlet extends HttpServlet {
                                 
                                 if (skillID > 0) {
                                     // Thêm mapping giữa Job và Skill
-                                    boolean mappingAdded = mappingDAO.addMapping(jobID, skillID);
-                                    System.out.println("DEBUG: Mapping added: " + mappingAdded);
+                                    boolean mappingAdded = jobSkillMappingDAO.addMapping(jobID, skillID);
+                                    if (mappingAdded) {
+                                        System.out.println("DEBUG: Successfully added mapping - JobID: " + jobID + ", SkillID: " + skillID);
+                                    } else {
+                                        System.out.println("DEBUG: WARNING - Failed to add mapping - JobID: " + jobID + ", SkillID: " + skillID);
+                                    }
+                                } else {
+                                    System.out.println("DEBUG: WARNING - Invalid SkillID returned for skill: " + skillName);
                                 }
                             } catch (Exception ex) {
                                 System.out.println("DEBUG: Error processing skill '" + skillName + "': " + ex.getMessage());
                                 ex.printStackTrace();
+                                // Tiếp tục xử lý skill tiếp theo, không dừng lại
                             }
                         }
                     }
+                } else {
+                    System.out.println("DEBUG: No skills provided, skipping skill mapping");
                 }
                 
                 if ("post".equalsIgnoreCase(action)) {
-                    // Nhánh Đăng tin：BẮT BUỘC dùng gói ĐĂNG_TUYỂN mua gần nhất
+                    // Kiểm tra xem có cần trừ lượt không
+                    // - Nếu chỉnh sửa job đã Published: KHÔNG trừ lượt
+                    // - Nếu chỉnh sửa job Draft/Expired hoặc tạo mới: CÓ trừ lượt
+                    boolean shouldDeductPackage = true;
+                    if (isEditMode && "Published".equals(originalStatus)) {
+                        shouldDeductPackage = false;
+                        System.out.println("DEBUG: Editing Published job - will NOT deduct package usage");
+                    } else {
+                        System.out.println("DEBUG: New job or editing Draft/Expired job - will deduct package usage");
+                    }
+                    
+                    // Nhánh Đăng tin：Tìm gói ĐĂNG_TUYỂN mua gần nhất (để lấy ngày hết hạn và trừ lượt nếu cần)
                     RecruiterPackagesDAO rpDAO = new RecruiterPackagesDAO();
                     List<RecruiterPackagesDAO.RecruiterPackagesWithDetails> history = rpDAO.getPurchaseHistoryWithDetails(recruiter.getRecruiterID());
                     RecruiterPackagesDAO.RecruiterPackagesWithDetails chosen = null;
@@ -522,88 +750,106 @@ public class JobPostingServlet extends HttpServlet {
                             }
                         }
                     }
-                    if (chosen == null) {
+                    
+                    // Nếu cần trừ lượt nhưng không tìm thấy gói → lỗi
+                    if (shouldDeductPackage && chosen == null) {
                         request.setAttribute("error", "Không tìm thấy gói ĐĂNG_TUYỂN gần nhất. Vui lòng mua gói trước khi đăng."); // Không có gói để dùng
                         doGet(request, response);
                         return;
                     }
-                    boolean isExpired = chosen.expiryDate == null || !chosen.expiryDate.isAfter(java.time.LocalDateTime.now()); // Hết hạn?
-                    // Tính lượt còn lại = Quantity * postsPerPackage - UsedQuantity
-                    int postsPerPackage = 1;
-                    try {
-                        JobPackagesDAO tmpDao = new JobPackagesDAO();
-                        model.JobPackages tmpPkg = tmpDao.getPackageById(chosen.packageID);
-                        if (tmpPkg != null && tmpPkg.getFeatures() != null) {
-                            try {
-                                com.google.gson.JsonObject obj = new com.google.gson.Gson().fromJson(tmpPkg.getFeatures(), com.google.gson.JsonObject.class);
-                                if (obj != null && obj.has("posts")) {
-                                    postsPerPackage = obj.get("posts").getAsInt();
-                                }
-                            } catch (Exception ignore) {}
-                        }
-                    } catch (Exception ignore) {}
-                    int remainingPosts = (chosen.quantity * postsPerPackage) - chosen.usedQuantity;
-                    boolean outOfPosts = remainingPosts <= 0; // Hết lượt?
-                    if (isExpired) {
-                        request.setAttribute("error", "Gói đăng tuyển gần nhất đã hết hạn. Vui lòng gia hạn hoặc mua gói mới."); // Cảnh báo hết hạn
-                        doGet(request, response);
-                        return;
+                    
+                    // Cập nhật ngày hết hạn từ gói (nếu có gói)
+                    if (chosen != null && chosen.expiryDate != null) {
+                        job.setExpirationDate(chosen.expiryDate);
+                        System.out.println("DEBUG: Updated job expiration date to package expiry date: " + chosen.expiryDate);
                     }
-                    if (outOfPosts) {
-                        request.setAttribute("error", "Gói đăng tuyển gần nhất đã hết lượt đăng tin. Vui lòng mua thêm lượt."); // Cảnh báo hết lượt
-                        doGet(request, response);
-                        return;
+                    // Chỉ kiểm tra gói nếu cần trừ lượt
+                    if (shouldDeductPackage && chosen != null) {
+                        boolean isExpired = chosen.expiryDate == null || !chosen.expiryDate.isAfter(java.time.LocalDateTime.now()); // Hết hạn?
+                        // Tính lượt còn lại = Quantity * postsPerPackage - UsedQuantity
+                        int postsPerPackage = 1;
+                        try {
+                            JobPackagesDAO tmpDao = new JobPackagesDAO();
+                            model.JobPackages tmpPkg = tmpDao.getPackageById(chosen.packageID);
+                            if (tmpPkg != null && tmpPkg.getFeatures() != null) {
+                                try {
+                                    com.google.gson.JsonObject obj = new com.google.gson.Gson().fromJson(tmpPkg.getFeatures(), com.google.gson.JsonObject.class);
+                                    if (obj != null && obj.has("posts")) {
+                                        postsPerPackage = obj.get("posts").getAsInt();
+                                    }
+                                } catch (Exception ignore) {}
+                            }
+                        } catch (Exception ignore) {}
+                        int remainingPosts = (chosen.quantity * postsPerPackage) - chosen.usedQuantity;
+                        boolean outOfPosts = remainingPosts <= 0; // Hết lượt?
+                        if (isExpired) {
+                            request.setAttribute("error", "Gói đăng tuyển gần nhất đã hết hạn. Vui lòng gia hạn hoặc mua gói mới."); // Cảnh báo hết hạn
+                            doGet(request, response);
+                            return;
+                        }
+                        if (outOfPosts) {
+                            request.setAttribute("error", "Gói đăng tuyển gần nhất đã hết lượt đăng tin. Vui lòng mua thêm lượt."); // Cảnh báo hết lượt
+                            doGet(request, response);
+                            return;
+                        }
                     }
 
-                    // Bước 2: Kiểm tra quyền nổi bật (web_priority/featured trong features JSON)
+                    // Bước 2: Kiểm tra quyền nổi bật (web_priority/featured trong features JSON) - chỉ khi có gói
                     boolean allowFeatured = false;
-                    try {
-                        JobPackagesDAO jpDAO = new JobPackagesDAO();
-                        model.JobPackages jp = jpDAO.getPackageById(chosen.packageID);
-                        if (jp != null && jp.getFeatures() != null) {
-                            try {
-                                Gson gson = new Gson();
-                                JsonObject obj = gson.fromJson(jp.getFeatures(), JsonObject.class);
-                                boolean webPriority = obj.has("web_priority") && obj.get("web_priority").getAsBoolean();
-                                boolean featuredFlag = obj.has("featured") && obj.get("featured").getAsBoolean();
-                                allowFeatured = webPriority || featuredFlag;
-                            } catch (Exception je) {
-                                String lower = jp.getFeatures().toLowerCase();
-                                allowFeatured = lower.contains("\"web_priority\": true") || lower.contains("\"featured\": true");
+                    if (chosen != null) {
+                        try {
+                            JobPackagesDAO jpDAO = new JobPackagesDAO();
+                            model.JobPackages jp = jpDAO.getPackageById(chosen.packageID);
+                            if (jp != null && jp.getFeatures() != null) {
+                                try {
+                                    Gson gson = new Gson();
+                                    JsonObject obj = gson.fromJson(jp.getFeatures(), JsonObject.class);
+                                    boolean webPriority = obj.has("web_priority") && obj.get("web_priority").getAsBoolean();
+                                    boolean featuredFlag = obj.has("featured") && obj.get("featured").getAsBoolean();
+                                    allowFeatured = webPriority || featuredFlag;
+                                } catch (Exception je) {
+                                    String lower = jp.getFeatures().toLowerCase();
+                                    allowFeatured = lower.contains("\"web_priority\": true") || lower.contains("\"featured\": true");
+                                }
                             }
+                        } catch (Exception ex) {
+                            System.out.println("DEBUG: features check error: " + ex.getMessage()); // Lỗi đọc features gói
                         }
-                    } catch (Exception ex) {
-                        System.out.println("DEBUG: features check error: " + ex.getMessage()); // Lỗi đọc features gói
                     }
                     if (!allowFeatured && featuredSelected) {
                         // Nếu không được phép nổi bật nhưng người dùng tick → bỏ chọn (không set trái phép)
-                        jobDAO.updateJobStatus(jobID, "Published"); // Trạng thái vẫn Published
+                        job.setIsPriority(false);
+                        jobDAO.updateJob(job); // Cập nhật lại job với isPriority = false
                     }
 
-                    // Bước 3: Trừ lượt của gói (UsedQuantity + 1)
-                    // Đã tự kiểm tra remainingPosts dựa trên features.posts → tăng UsedQuantity trực tiếp
-                    boolean pkgUpdated = rpDAO.incrementUsedQuantityForce(chosen.recruiterPackageID);
-                    if (!pkgUpdated) {
-                        request.setAttribute("error", "Không thể trừ lượt từ gói đăng tuyển. Vui lòng thử lại."); // Không trừ được lượt → lỗi
-                        doGet(request, response);
-                        return;
-                    }
+                    // Bước 3: Trừ lượt của gói (chỉ khi cần)
+                    if (shouldDeductPackage && chosen != null) {
+                        // Đã tự kiểm tra remainingPosts dựa trên features.posts → tăng UsedQuantity trực tiếp
+                        boolean pkgUpdated = rpDAO.incrementUsedQuantityForce(chosen.recruiterPackageID);
+                        if (!pkgUpdated) {
+                            request.setAttribute("error", "Không thể trừ lượt từ gói đăng tuyển. Vui lòng thử lại."); // Không trừ được lượt → lỗi
+                            doGet(request, response);
+                            return;
+                        }
 
-                    // Bước 4: Lưu lịch sử sử dụng gói vào JobFeatureMappings (để theo dõi hiệu lực)
-                    JobFeatureMappingsDAO mappingDAO = new JobFeatureMappingsDAO();
-                    model.JobFeatureMappings mapping = new model.JobFeatureMappings();
-                    mapping.setJobID(jobID); // Gán JobID
-                    mapping.setRecruiterPackageID(chosen.recruiterPackageID); // Gán ID gói
-                    mapping.setFeatureType("DANG_TUYEN"); // Loại tính năng/nhóm gói
-                    mapping.setAppliedDate(LocalDateTime.now()); // Ngày áp dụng
-                    if (chosen.duration > 0) {
-                        mapping.setExpireDate(LocalDateTime.now().plusDays(chosen.duration)); // Hết hạn = hôm nay + duration
-                    }
-                    boolean mappingOk = mappingDAO.addJobFeatureMapping(mapping);
-                    if (!mappingOk) {
-                        request.setAttribute("error", "Không thể lưu lịch sử sử dụng gói."); // Lưu lịch sử thất bại
-                        doGet(request, response);
-                        return;
+                        // Bước 4: Lưu lịch sử sử dụng gói vào JobFeatureMappings (để theo dõi hiệu lực)
+                        JobFeatureMappingsDAO mappingDAO = new JobFeatureMappingsDAO();
+                        model.JobFeatureMappings mapping = new model.JobFeatureMappings();
+                        mapping.setJobID(jobID); // Gán JobID
+                        mapping.setRecruiterPackageID(chosen.recruiterPackageID); // Gán ID gói
+                        mapping.setFeatureType("DANG_TUYEN"); // Loại tính năng/nhóm gói
+                        mapping.setAppliedDate(LocalDateTime.now()); // Ngày áp dụng
+                        if (chosen.duration > 0) {
+                            mapping.setExpireDate(LocalDateTime.now().plusDays(chosen.duration)); // Hết hạn = hôm nay + duration
+                        }
+                        boolean mappingOk = mappingDAO.addJobFeatureMapping(mapping);
+                        if (!mappingOk) {
+                            request.setAttribute("error", "Không thể lưu lịch sử sử dụng gói."); // Lưu lịch sử thất bại
+                            doGet(request, response);
+                            return;
+                        }
+                    } else {
+                        System.out.println("DEBUG: Skipping package deduction for Published job edit");
                     }
 
                     // Thành công

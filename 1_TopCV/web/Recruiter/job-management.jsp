@@ -737,7 +737,7 @@
                                 <span class="job-id">ID: <%= j.getJobID() %></span>
                             </div>
                             <div class="job-actions">
-                                <button class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></button>
+                                <a href="<%= request.getContextPath() %>/jobposting?jobID=<%= j.getJobID() %>" class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
                                 <button class="action-btn" title="Sao chép"><i class="fas fa-copy"></i></button>
                                 <button class="action-btn" title="Xem"><i class="fas fa-eye"></i></button>
                                 <button class="action-btn" title="Thêm"><i class="fas fa-ellipsis-h"></i></button>
@@ -790,7 +790,7 @@
                                 <span class="job-id">ID: <%= j.getJobID() %></span>
                             </div>
                             <div class="job-actions">
-                                <button class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></button>
+                                <a href="<%= request.getContextPath() %>/jobposting?jobID=<%= j.getJobID() %>" class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
                                 <button class="action-btn" title="Sao chép"><i class="fas fa-copy"></i></button>
                                 <button class="action-btn" title="Xem"><i class="fas fa-eye"></i></button>
                                 <button class="action-btn" title="Thêm"><i class="fas fa-ellipsis-h"></i></button>
@@ -843,7 +843,7 @@
                                 <span class="job-id">ID: <%= j.getJobID() %></span>
                             </div>
                             <div class="job-actions">
-                                <button class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></button>
+                                <a href="<%= request.getContextPath() %>/jobposting?jobID=<%= j.getJobID() %>" class="action-btn" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
                                 <button class="action-btn" title="Sao chép"><i class="fas fa-copy"></i></button>
                                 <button class="action-btn" title="Xem"><i class="fas fa-eye"></i></button>
                                 <button class="action-btn" title="Thêm"><i class="fas fa-ellipsis-h"></i></button>

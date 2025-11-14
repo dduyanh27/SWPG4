@@ -328,23 +328,57 @@ public class JobDAO extends DBContext {
         String sql = "UPDATE Jobs SET JobTitle = ?, Description = ?, Requirements = ?, " +
                     "JobLevelID = ?, LocationID = ?, SalaryRange = ?, ExpirationDate = ?, " +
                     "CategoryID = ?, AgeRequirement = ?, Status = ?, JobTypeID = ?, " +
-                    "HiringCount = ? WHERE JobID = ?";
+                    "HiringCount = ?, ContactPerson = ?, ApplicationEmail = ?, " +
+                    "MinExperience = ?, Nationality = ?, Gender = ?, MaritalStatus = ?, " +
+                    "AgeMin = ?, AgeMax = ?, CertificatesID = ? WHERE JobID = ?";
         
         try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, job.getJobTitle());
-            ps.setString(2, job.getDescription());
-            ps.setString(3, job.getRequirements());
-            ps.setInt(4, job.getJobLevelID());
-            ps.setInt(5, job.getLocationID());
-            ps.setString(6, job.getSalaryRange());
-            ps.setTimestamp(7, job.getExpirationDate() != null ? 
+            int paramIndex = 1;
+            ps.setString(paramIndex++, job.getJobTitle());
+            ps.setString(paramIndex++, job.getDescription());
+            ps.setString(paramIndex++, job.getRequirements());
+            ps.setInt(paramIndex++, job.getJobLevelID());
+            ps.setInt(paramIndex++, job.getLocationID());
+            ps.setString(paramIndex++, job.getSalaryRange());
+            ps.setTimestamp(paramIndex++, job.getExpirationDate() != null ? 
                 Timestamp.valueOf(job.getExpirationDate()) : null);
-            ps.setInt(8, job.getCategoryID());
-            ps.setInt(9, job.getAgeRequirement());
-            ps.setString(10, job.getStatus());
-            ps.setInt(11, job.getJobTypeID());
-            ps.setInt(12, job.getHiringCount());
-            ps.setInt(13, job.getJobID());
+            ps.setInt(paramIndex++, job.getCategoryID());
+            ps.setInt(paramIndex++, job.getAgeRequirement());
+            ps.setString(paramIndex++, job.getStatus());
+            ps.setInt(paramIndex++, job.getJobTypeID());
+            ps.setInt(paramIndex++, job.getHiringCount());
+            ps.setString(paramIndex++, job.getContactPerson());
+            ps.setString(paramIndex++, job.getApplicationEmail());
+            
+            if (job.getMinExperience() != null) {
+                ps.setInt(paramIndex++, job.getMinExperience());
+            } else {
+                ps.setNull(paramIndex++, java.sql.Types.INTEGER);
+            }
+            
+            ps.setString(paramIndex++, job.getNationality());
+            ps.setString(paramIndex++, job.getGender());
+            ps.setString(paramIndex++, job.getMaritalStatus());
+            
+            if (job.getAgeMin() != null) {
+                ps.setInt(paramIndex++, job.getAgeMin());
+            } else {
+                ps.setNull(paramIndex++, java.sql.Types.INTEGER);
+            }
+            
+            if (job.getAgeMax() != null) {
+                ps.setInt(paramIndex++, job.getAgeMax());
+            } else {
+                ps.setNull(paramIndex++, java.sql.Types.INTEGER);
+            }
+            
+            if (job.getCertificatesID() != null) {
+                ps.setInt(paramIndex++, job.getCertificatesID());
+            } else {
+                ps.setNull(paramIndex++, java.sql.Types.INTEGER);
+            }
+            
+            ps.setInt(paramIndex++, job.getJobID());
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

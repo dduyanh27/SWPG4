@@ -9,38 +9,93 @@ public class JobSkillMappingDAO extends DBContext {
     
     // Thêm mapping giữa Job và Skill
     public boolean addMapping(int jobID, int skillID) {
+        // Validate input
+        if (jobID <= 0 || skillID <= 0) {
+            System.out.println("DEBUG JobSkillMappingDAO: Invalid input - JobID: " + jobID + ", SkillID: " + skillID);
+            return false;
+        }
+        
         // Kiểm tra xem mapping đã tồn tại chưa
         if (mappingExists(jobID, skillID)) {
+            System.out.println("DEBUG JobSkillMappingDAO: Mapping already exists - JobID: " + jobID + ", SkillID: " + skillID);
             return true; // Đã tồn tại, không cần insert lại
         }
         
-        String sql = "INSERT INTO JobSkillMapping (JobID, SkillID) VALUES (?, ?)";
+        // Thử cả hai表名（JobSkillMapping 和 JobSkillMappings）
+        String[] tableNames = {"JobSkillMapping", "JobSkillMappings"};
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobID);
-            ps.setInt(2, skillID);
+        for (String tableName : tableNames) {
+            String sql = "INSERT INTO " + tableName + " (JobID, SkillID) VALUES (?, ?)";
             
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, jobID);
+                ps.setInt(2, skillID);
+                
+                System.out.println("DEBUG JobSkillMappingDAO: Attempting to insert into " + tableName + " - JobID: " + jobID + ", SkillID: " + skillID);
+                int rowsAffected = ps.executeUpdate();
+                System.out.println("DEBUG JobSkillMappingDAO: Insert result - rows affected: " + rowsAffected);
+                
+                if (rowsAffected > 0) {
+                    System.out.println("DEBUG JobSkillMappingDAO: Successfully inserted mapping into " + tableName);
+                    return true;
+                } else {
+                    System.out.println("DEBUG JobSkillMappingDAO: WARNING - No rows affected for " + tableName);
+                }
+            } catch (SQLException e) {
+                // Nếu是表名错误，继续尝试下一个表名
+                if (e.getMessage() != null && (e.getMessage().contains("Invalid object name") || e.getMessage().contains("does not exist"))) {
+                    System.out.println("DEBUG JobSkillMappingDAO: Table " + tableName + " does not exist, trying next...");
+                    continue;
+                }
+                
+                System.out.println("DEBUG JobSkillMappingDAO: SQL Exception occurred for " + tableName + "!");
+                System.out.println("DEBUG JobSkillMappingDAO: Error Code: " + e.getErrorCode());
+                System.out.println("DEBUG JobSkillMappingDAO: SQL State: " + e.getSQLState());
+                System.out.println("DEBUG JobSkillMappingDAO: Message: " + e.getMessage());
+                System.out.println("DEBUG JobSkillMappingDAO: JobID: " + jobID + ", SkillID: " + skillID);
+                
+                // 如果是外键约束错误或其他非表名错误，直接返回false
+                if (e.getErrorCode() != 208) { // 208 = Invalid object name
+                    e.printStackTrace();
+                    return false;
+                }
+            } catch (Exception e) {
+                System.out.println("DEBUG JobSkillMappingDAO: General Exception for " + tableName + ": " + e.getMessage());
+                e.printStackTrace();
+            }
         }
+        
+        System.out.println("DEBUG JobSkillMappingDAO: Failed to insert mapping after trying all table names");
         return false;
     }
     
     // Kiểm tra mapping đã tồn tại chưa
     public boolean mappingExists(int jobID, int skillID) {
-        String sql = "SELECT COUNT(*) FROM JobSkillMapping WHERE JobID = ? AND SkillID = ?";
+        // Thử cả hai表名
+        String[] tableNames = {"JobSkillMapping", "JobSkillMappings"};
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobID);
-            ps.setInt(2, skillID);
-            ResultSet rs = ps.executeQuery();
+        for (String tableName : tableNames) {
+            String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE JobID = ? AND SkillID = ?";
             
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, jobID);
+                ps.setInt(2, skillID);
+                ResultSet rs = ps.executeQuery();
+                
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    if (count > 0) {
+                        System.out.println("DEBUG JobSkillMappingDAO: Mapping exists in " + tableName);
+                        return true;
+                    }
+                }
+            } catch (SQLException e) {
+                // Nếu是表名错误，继续尝试下一个表名
+                if (e.getMessage() != null && (e.getMessage().contains("Invalid object name") || e.getMessage().contains("does not exist"))) {
+                    continue;
+                }
+                System.out.println("DEBUG JobSkillMappingDAO: Error checking mapping existence in " + tableName + ": " + e.getMessage());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return false;
     }
@@ -48,44 +103,77 @@ public class JobSkillMappingDAO extends DBContext {
     // Lấy tất cả skills của một job
     public List<Integer> getSkillIDsByJobID(int jobID) {
         List<Integer> skillIDs = new ArrayList<>();
-        String sql = "SELECT SkillID FROM JobSkillMapping WHERE JobID = ?";
+        // Thử cả hai表名
+        String[] tableNames = {"JobSkillMapping", "JobSkillMappings"};
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobID);
-            ResultSet rs = ps.executeQuery();
+        for (String tableName : tableNames) {
+            String sql = "SELECT SkillID FROM " + tableName + " WHERE JobID = ?";
             
-            while (rs.next()) {
-                skillIDs.add(rs.getInt("SkillID"));
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, jobID);
+                ResultSet rs = ps.executeQuery();
+                
+                while (rs.next()) {
+                    skillIDs.add(rs.getInt("SkillID"));
+                }
+                // Nếu成功执行（没有异常），返回结果（即使为空）
+                return skillIDs;
+            } catch (SQLException e) {
+                // Nếu是表名错误，继续尝试下一个表名
+                if (e.getMessage() != null && (e.getMessage().contains("Invalid object name") || e.getMessage().contains("does not exist"))) {
+                    continue;
+                }
+                System.out.println("DEBUG JobSkillMappingDAO: Error getting skills from " + tableName + ": " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return skillIDs;
     }
     
     // Xóa mapping theo JobID
     public boolean deleteMappingsByJobID(int jobID) {
-        String sql = "DELETE FROM JobSkillMapping WHERE JobID = ?";
+        // Thử cả hai表名
+        String[] tableNames = {"JobSkillMapping", "JobSkillMappings"};
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (String tableName : tableNames) {
+            String sql = "DELETE FROM " + tableName + " WHERE JobID = ?";
+            
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, jobID);
+                int rowsAffected = ps.executeUpdate();
+                System.out.println("DEBUG JobSkillMappingDAO: Deleted " + rowsAffected + " mappings from " + tableName + " for JobID: " + jobID);
+                return true; // 成功或表不存在都返回true（因为目标都是删除）
+            } catch (SQLException e) {
+                // Nếu是表名错误，继续尝试下一个表名
+                if (e.getMessage() != null && (e.getMessage().contains("Invalid object name") || e.getMessage().contains("does not exist"))) {
+                    continue;
+                }
+                System.out.println("DEBUG JobSkillMappingDAO: Error deleting mappings from " + tableName + ": " + e.getMessage());
+                e.printStackTrace();
+            }
         }
         return false;
     }
     
     // Xóa một mapping cụ thể
     public boolean deleteMapping(int jobID, int skillID) {
-        String sql = "DELETE FROM JobSkillMapping WHERE JobID = ? AND SkillID = ?";
+        // Thử cả hai表名
+        String[] tableNames = {"JobSkillMapping", "JobSkillMappings"};
         
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, jobID);
-            ps.setInt(2, skillID);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (String tableName : tableNames) {
+            String sql = "DELETE FROM " + tableName + " WHERE JobID = ? AND SkillID = ?";
+            
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, jobID);
+                ps.setInt(2, skillID);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                // Nếu是表名错误，继续尝试下一个表名
+                if (e.getMessage() != null && (e.getMessage().contains("Invalid object name") || e.getMessage().contains("does not exist"))) {
+                    continue;
+                }
+                e.printStackTrace();
+            }
         }
         return false;
     }
