@@ -20,12 +20,14 @@
             
             List<Type> jobLevels = typeDAO.getJobLevels();
             List<Type> jobTypes = typeDAO.getJobTypes();
+            List<Type> certificates = typeDAO.getTypesByCategory("Certificate");
             List<Location> locations = locationDAO.getAllLocations();
             List<Category> parentCategories = categoryDAO.getParentCategories();
             List<Category> allCategories = categoryDAO.getAllCategories();
             
             request.setAttribute("jobLevels", jobLevels != null ? jobLevels : new java.util.ArrayList());
             request.setAttribute("jobTypes", jobTypes != null ? jobTypes : new java.util.ArrayList());
+            request.setAttribute("certificates", certificates != null ? certificates : new java.util.ArrayList());
             request.setAttribute("locations", locations != null ? locations : new java.util.ArrayList());
             request.setAttribute("parentCategories", parentCategories != null ? parentCategories : new java.util.ArrayList());
             request.setAttribute("allCategories", allCategories != null ? allCategories : new java.util.ArrayList());
@@ -33,6 +35,7 @@
             e.printStackTrace();
             request.setAttribute("jobLevels", new java.util.ArrayList());
             request.setAttribute("jobTypes", new java.util.ArrayList());
+            request.setAttribute("certificates", new java.util.ArrayList());
             request.setAttribute("locations", new java.util.ArrayList());
             request.setAttribute("parentCategories", new java.util.ArrayList());
             request.setAttribute("allCategories", new java.util.ArrayList());
@@ -338,22 +341,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="work-location">Địa điểm làm việc <span class="required">*</span> <i class="fas fa-question-circle"></i></label>
-                    <% 
-                    // Sử dụng lại biến recruiter đã khai báo ở đầu file, hoặc lấy từ request attribute
-                    Recruiter currentRecruiter = (Recruiter) request.getAttribute("recruiter");
-                    if (currentRecruiter == null) {
-                        currentRecruiter = recruiter; // Sử dụng biến recruiter từ đầu file
-                    }
-                    String companyAddress = "";
-                    if (currentRecruiter != null && currentRecruiter.getCompanyAddress() != null) {
-                        companyAddress = currentRecruiter.getCompanyAddress();
-                    }
-                    %>
-                    <input type="text" id="work-location" name="work-location" value="<%= companyAddress %>" readonly required style="background-color: #f5f5f5; cursor: not-allowed;">
-                    <div class="info-note" style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 8px; border-left: 4px solid #2196f3; font-size: 12px;">
-                        <i class="fas fa-info-circle"></i> Địa điểm làm việc được lấy từ thông tin công ty và không thể chỉnh sửa.
-                    </div>
+                    <label for="location-id">Khu vực <span class="required">*</span></label>
+                    <select id="location-id" name="location-id" required>
+                        <option value="">Vui lòng chọn khu vực</option>
+                        <% 
+                        try {
+                            if (request.getAttribute("locations") != null) { 
+                                List<Location> locationsList = (List<Location>) request.getAttribute("locations");
+                                if (locationsList != null && !locationsList.isEmpty()) {
+                                    for (Location location : locationsList) { %>
+                                        <option value="<%= location.getLocationID() %>"><%= location.getLocationName() %></option>
+                                    <% }
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.out.println("DEBUG Error in locations: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        %>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -451,14 +457,24 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="min-qualification">Bằng cấp tối thiểu</label>
-                        <select id="min-qualification" name="min-qualification">
-                            <option value="any" selected>Bất kỳ</option>
-                            <option value="high-school">Trung học phổ thông</option>
-                            <option value="college">Cao đẳng</option>
-                            <option value="university">Đại học</option>
-                            <option value="master">Thạc sĩ</option>
-                            <option value="phd">Tiến sĩ</option>
+                        <label for="certificates-id">Bằng cấp tối thiểu</label>
+                        <select id="certificates-id" name="certificates-id">
+                            <option value="">Bất kỳ</option>
+                            <% 
+                            try {
+                                if (request.getAttribute("certificates") != null) { 
+                                    List<Type> certificatesList = (List<Type>) request.getAttribute("certificates");
+                                    if (certificatesList != null && !certificatesList.isEmpty()) {
+                                        for (Type certificate : certificatesList) { %>
+                                            <option value="<%= certificate.getTypeID() %>"><%= certificate.getTypeName() %></option>
+                                        <% }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                System.out.println("DEBUG Error in certificates: " + e.getMessage());
+                                e.printStackTrace();
+                            }
+                            %>
                         </select>
                     </div>
 
@@ -553,6 +569,11 @@
                     <div class="form-group">
                         <label for="company-name">Tên công ty <span class="required">*</span></label>
                         <input type="text" id="company-name" value="<%= recruiter.getCompanyName() != null ? recruiter.getCompanyName() : "" %>" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company-address">Địa chỉ công ty</label>
+                        <input type="text" id="company-address" value="<%= recruiter.getCompanyAddress() != null ? recruiter.getCompanyAddress() : "" %>" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
                     </div>
 
                     <div class="form-group">

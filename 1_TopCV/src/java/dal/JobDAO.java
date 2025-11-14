@@ -11,12 +11,12 @@ public class JobDAO extends DBContext {
     // Thêm job mới và trả về jobID
     public int addJob(Job job) {
         String sql = "INSERT INTO Jobs (RecruiterID, JobTitle, Description, Requirements, " +
-                    "JobLevelID, SalaryRange, PostingDate, ExpirationDate, CategoryID, " +
+                    "JobLevelID, LocationID, SalaryRange, PostingDate, ExpirationDate, CategoryID, " +
                     "AgeRequirement, Status, JobTypeID, HiringCount, ViewCount, IsUrgent, " +
                     "IsPriority, PriorityExpiryDate, ContactPerson, ApplicationEmail, " +
-                    "MinExperience, MinQualification, Nationality, Gender, MaritalStatus, " +
-                    "AgeMin, AgeMax, JobCode) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "MinExperience, Nationality, Gender, MaritalStatus, " +
+                    "AgeMin, AgeMax, JobCode, CertificatesID) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             int paramIndex = 1;
@@ -25,6 +25,7 @@ public class JobDAO extends DBContext {
             ps.setString(paramIndex++, job.getDescription());
             ps.setString(paramIndex++, job.getRequirements());
             ps.setInt(paramIndex++, job.getJobLevelID());
+            ps.setInt(paramIndex++, job.getLocationID());
             ps.setString(paramIndex++, job.getSalaryRange());
             
             // PostingDate - set current time if null
@@ -57,7 +58,6 @@ public class JobDAO extends DBContext {
                 ps.setNull(paramIndex++, java.sql.Types.INTEGER);
             }
             
-            ps.setString(paramIndex++, job.getMinQualification());
             ps.setString(paramIndex++, job.getNationality());
             ps.setString(paramIndex++, job.getGender());
             ps.setString(paramIndex++, job.getMaritalStatus());
@@ -75,6 +75,12 @@ public class JobDAO extends DBContext {
             }
             
             ps.setString(paramIndex++, job.getJobCode());
+            
+            if (job.getCertificatesID() != null) {
+                ps.setInt(paramIndex++, job.getCertificatesID());
+            } else {
+                ps.setNull(paramIndex++, java.sql.Types.INTEGER);
+            }
             
             System.out.println("DEBUG JobDAO: Executing INSERT statement...");
             int rowsAffected = ps.executeUpdate();
@@ -174,6 +180,36 @@ public class JobDAO extends DBContext {
             System.out.println("DEBUG JobDAO: Total found: " + jobs.size() + " Active jobs for recruiterID: " + recruiterId);
         } catch (SQLException e) {
             System.out.println("DEBUG JobDAO: Error getting active jobs: " + e.getMessage());
+            System.out.println("DEBUG JobDAO: SQL State: " + e.getSQLState());
+            System.out.println("DEBUG JobDAO: Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+        }
+        return jobs;
+    }
+    
+    // Lấy tất cả jobs có status = 'Published' của một recruiter
+    public List<Job> getPublishedJobsByRecruiterId(int recruiterId) {
+        List<Job> jobs = new ArrayList<>();
+        String sql = "SELECT * FROM Jobs WHERE RecruiterID = ? AND Status = 'Published' ORDER BY PostingDate DESC";
+        
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, recruiterId);
+            ResultSet rs = ps.executeQuery();
+            
+            System.out.println("DEBUG JobDAO: Executing query for recruiterID: " + recruiterId);
+            System.out.println("DEBUG JobDAO: SQL: " + sql);
+            
+            while (rs.next()) {
+                Job job = mapResultSetToJob(rs);
+                jobs.add(job);
+                System.out.println("DEBUG JobDAO: Found Published job - ID: " + job.getJobID() + 
+                                 ", Title: " + job.getJobTitle() + 
+                                 ", Status: '" + job.getStatus() + "'");
+            }
+            
+            System.out.println("DEBUG JobDAO: Total found: " + jobs.size() + " Published jobs for recruiterID: " + recruiterId);
+        } catch (SQLException e) {
+            System.out.println("DEBUG JobDAO: Error getting published jobs: " + e.getMessage());
             System.out.println("DEBUG JobDAO: SQL State: " + e.getSQLState());
             System.out.println("DEBUG JobDAO: Error Code: " + e.getErrorCode());
             e.printStackTrace();
@@ -388,7 +424,7 @@ public class JobDAO extends DBContext {
         job.setDescription(rs.getString("Description"));
         job.setRequirements(rs.getString("Requirements"));
         job.setJobLevelID(rs.getInt("JobLevelID"));
-        // LocationID removed from Job model - location is now in recruiter's companyAddress
+        job.setLocationID(rs.getInt("LocationID"));
         job.setSalaryRange(rs.getString("SalaryRange"));
         
         Timestamp postingDate = rs.getTimestamp("PostingDate");
@@ -425,7 +461,6 @@ public class JobDAO extends DBContext {
             job.setMinExperience(minExp);
         }
         
-        job.setMinQualification(rs.getString("MinQualification"));
         job.setNationality(rs.getString("Nationality"));
         job.setGender(rs.getString("Gender"));
         job.setMaritalStatus(rs.getString("MaritalStatus"));
@@ -441,6 +476,11 @@ public class JobDAO extends DBContext {
         }
         
         job.setJobCode(rs.getString("JobCode"));
+        
+        int certificatesID = rs.getInt("CertificatesID");
+        if (!rs.wasNull()) {
+            job.setCertificatesID(certificatesID);
+        }
         
         return job;
     }

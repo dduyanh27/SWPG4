@@ -91,7 +91,11 @@ public class JobPostingServlet extends HttpServlet {
             List<Type> jobTypes = typeDAO.getJobTypes(); // Danh sách loại việc
             System.out.println("DEBUG: getJobTypes() returned: " + (jobTypes != null ? jobTypes.size() + " items" : "null"));
             
-            List<Location> locations = locationDAO.getAllLocations(); // Danh sách địa điểm (nếu hiển thị)
+            System.out.println("DEBUG: Calling getTypesByCategory('Certificate')"); // Lấy danh sách bằng cấp
+            List<Type> certificates = typeDAO.getTypesByCategory("Certificate"); // Danh sách bằng cấp
+            System.out.println("DEBUG: getTypesByCategory('Certificate') returned: " + (certificates != null ? certificates.size() + " items" : "null"));
+            
+            List<Location> locations = locationDAO.getAllLocations(); // Danh sách địa điểm
             
             // Lấy parent categories và all categories để hiển thị dropdown phân cấp
             List<Category> parentCategories = categoryDAO.getParentCategories(); // Danh mục cha
@@ -106,6 +110,14 @@ public class JobPostingServlet extends HttpServlet {
                 jobTypes = new java.util.ArrayList<>(); // Tránh null gây lỗi JSP
                 System.out.println("DEBUG: jobTypes was null, setting to empty list");
             }
+            if (certificates == null) {
+                certificates = new java.util.ArrayList<>(); // Tránh null gây lỗi JSP
+                System.out.println("DEBUG: certificates was null, setting to empty list");
+            }
+            if (locations == null) {
+                locations = new java.util.ArrayList<>(); // Tránh null
+                System.out.println("DEBUG: locations was null, setting to empty list");
+            }
             if (parentCategories == null) {
                 parentCategories = new java.util.ArrayList<>(); // Tránh null
             }
@@ -115,6 +127,7 @@ public class JobPostingServlet extends HttpServlet {
             
             request.setAttribute("jobLevels", jobLevels); // Đẩy cấp bậc sang JSP
             request.setAttribute("jobTypes", jobTypes); // Đẩy loại việc sang JSP
+            request.setAttribute("certificates", certificates); // Đẩy bằng cấp sang JSP
             request.setAttribute("locations", locations); // Đẩy địa điểm sang JSP
             request.setAttribute("parentCategories", parentCategories); // Danh mục cha sang JSP
             request.setAttribute("allCategories", allCategories); // Tất cả danh mục sang JSP
@@ -323,10 +336,31 @@ public class JobPostingServlet extends HttpServlet {
                 return;
             }
 
-            // Parse expiration date
-            if (expirationDateStr != null && !expirationDateStr.isEmpty()) {
-                LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr + "T23:59:59");
-                job.setExpirationDate(expirationDate);
+            // Parse expiration date - chỉ dùng khi lưu nháp
+            // Khi đăng tin (post), sẽ dùng ngày hết hạn của gói
+            if ("draft".equalsIgnoreCase(action)) {
+                if (expirationDateStr != null && !expirationDateStr.isEmpty()) {
+                    LocalDateTime expirationDate = LocalDateTime.parse(expirationDateStr + "T23:59:59");
+                    job.setExpirationDate(expirationDate);
+                }
+            } else {
+                // Khi đăng tin (post), tìm gói và lấy ngày hết hạn
+                RecruiterPackagesDAO rpDAO = new RecruiterPackagesDAO();
+                List<RecruiterPackagesDAO.RecruiterPackagesWithDetails> history = rpDAO.getPurchaseHistoryWithDetails(recruiter.getRecruiterID());
+                RecruiterPackagesDAO.RecruiterPackagesWithDetails chosen = null;
+                if (history != null && !history.isEmpty()) {
+                    for (RecruiterPackagesDAO.RecruiterPackagesWithDetails pkg : history) {
+                        if (pkg.packageType != null && pkg.packageType.equalsIgnoreCase("DANG_TUYEN")) {
+                            chosen = pkg; // Chọn gói gần nhất
+                            break;
+                        }
+                    }
+                }
+                if (chosen != null && chosen.expiryDate != null) {
+                    // Đặt ngày hết hạn của job trùng với ngày hết hạn của gói
+                    job.setExpirationDate(chosen.expiryDate);
+                    System.out.println("DEBUG: Set job expiration date to package expiry date: " + chosen.expiryDate);
+                }
             }
             
             // Set PostingDate to current time
@@ -335,7 +369,7 @@ public class JobPostingServlet extends HttpServlet {
             job.setCategoryID(categoryID);
             job.setAgeRequirement(ageRequirement);
             // Ghi chú (VI): trạng thái việc làm sẽ theo action người dùng chọn
-            job.setStatus("draft".equalsIgnoreCase(action) ? "Draft" : "Active"); // Lưu nháp → Draft, Đăng tin → Pending
+            job.setStatus("draft".equalsIgnoreCase(action) ? "Draft" : "Published"); // Lưu nháp → Draft, Đăng tin → Published
             job.setJobTypeID(jobTypeID);
             job.setHiringCount(hiringCount);
             
@@ -369,9 +403,35 @@ public class JobPostingServlet extends HttpServlet {
                 }
             }
             
-            // Get and set min qualification
-            String minQualification = request.getParameter("min-qualification");
-            job.setMinQualification(minQualification != null ? minQualification : "any");
+            // Get and set certificates ID (bằng cấp tối thiểu)
+            String certificatesIDStr = request.getParameter("certificates-id");
+            if (certificatesIDStr != null && !certificatesIDStr.trim().isEmpty()) {
+                try {
+                    int certID = Integer.parseInt(certificatesIDStr);
+                    job.setCertificatesID(certID);
+                } catch (NumberFormatException e) {
+                    job.setCertificatesID(null);
+                }
+            } else {
+                job.setCertificatesID(null);
+            }
+            
+            // Get and set location ID (khu vực)
+            String locationIDStr = request.getParameter("location-id");
+            if (locationIDStr != null && !locationIDStr.trim().isEmpty()) {
+                try {
+                    int locID = Integer.parseInt(locationIDStr);
+                    job.setLocationID(locID);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("error", "Khu vực không hợp lệ.");
+                    doGet(request, response);
+                    return;
+                }
+            } else {
+                request.setAttribute("error", "Vui lòng chọn khu vực.");
+                doGet(request, response);
+                return;
+            }
             
             // Get and set nationality
             String nationality = request.getParameter("nationality");
@@ -517,7 +577,7 @@ public class JobPostingServlet extends HttpServlet {
                     }
                     if (!allowFeatured && featuredSelected) {
                         // Nếu không được phép nổi bật nhưng người dùng tick → bỏ chọn (không set trái phép)
-                        jobDAO.updateJobStatus(jobID, "Pending"); // Trạng thái vẫn Pending
+                        jobDAO.updateJobStatus(jobID, "Published"); // Trạng thái vẫn Published
                     }
 
                     // Bước 3: Trừ lượt của gói (UsedQuantity + 1)

@@ -32,6 +32,7 @@ public class Job {
     private Integer ageMin;
     private Integer ageMax;
     private String jobCode;
+    private Integer certificatesID;
 
     public Job() {}
 
@@ -306,6 +307,14 @@ public class Job {
 
     public void setJobCode(String jobCode) {
         this.jobCode = jobCode;
+    }
+
+    public Integer getCertificatesID() {
+        return certificatesID;
+    }
+
+    public void setCertificatesID(Integer certificatesID) {
+        this.certificatesID = certificatesID;
     }
 
     @Override
