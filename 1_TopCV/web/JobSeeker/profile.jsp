@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -2449,7 +2450,7 @@
             </div>
             <div class="mega-col">
                 <h4>Công ty</h4>
-                <a href="#">Tất cả công ty</a>
+                <a href="${pageContext.request.contextPath}/company-culture">Tất cả công ty</a>
             </div>
         </div>
     </div>
@@ -2892,98 +2893,54 @@
 
         <!-- Right Sidebar -->
         <aside class="right-sidebar">
-            <h2>Việc Làm Bạn Sẽ Thích</h2>
+            <h2>Các Công Việc Ở Khu Vực Của Bạn</h2>
             
             <div class="job-listings">
-                <div class="job-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">N</div>
-                    </div>
-                    <div class="job-info">
-                        <h4>Account Exec...</h4>
-                        <p class="company">Tập Đoàn Novaon</p>
-                        <p class="salary">15tr-40tr đ/tháng</p>
-                        <p class="location">Hà Nội, Hồ Chí Minh</p>
-                    </div>
-                </div>
-
-                <div class="job-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">D</div>
-                    </div>
-                    <div class="job-info">
-                        <h4>Trade Marketing</h4>
-                        <p class="company">CÔNG TY TNHH T...</p>
-                        <p class="salary">Từ 10tr đ/tháng</p>
-                        <p class="location">Hà Nội</p>
-                    </div>
-                </div>
-
-                <div class="job-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">S</div>
-                    </div>
-                    <div class="job-info">
-                        <h4>Phát Triển Kin...</h4>
-                        <p class="company">Công Ty TNHH SPE...</p>
-                        <p class="salary">$ 500-1,500 /tháng</p>
-                        <p class="location">Hà Nội</p>
-                    </div>
-                </div>
-
-                <div class="job-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">V</div>
-                    </div>
-                    <div class="job-info">
-                        <h4>Trưởng Ban N...</h4>
-                        <p class="company">Công Ty Cổ Phần S...</p>
-                        <p class="salary">Thương lượng</p>
-                        <p class="location">Hà Nội</p>
-                    </div>
-                </div>
-            </div>
-
-            <h2>Công Ty Bạn Sẽ Thích</h2>
-            
-            <div class="company-listings">
-                <div class="company-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">H</div>
-                    </div>
-                    <div class="company-info">
-                        <h4>HEINEKEN Vietnam</h4>
-                        <p class="followers">2458 lượt theo dõi</p>
-                        <p class="jobs">14 việc làm</p>
-                    </div>
-                </div>
-
-                <div class="company-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">G</div>
-                    </div>
-                    <div class="company-info">
-                        <h4>Công ty Cổ phần Tập đoà...</h4>
-                        <p class="followers">787 lượt theo dõi</p>
-                        <p class="jobs">24 việc làm</p>
-                    </div>
-                </div>
-
-                <div class="company-card">
-                    <div class="company-logo">
-                        <div class="logo-placeholder">T</div>
-                    </div>
-                    <div class="company-info">
-                        <h4>Techcombank</h4>
-                        <p class="followers">4901 lượt theo dõi</p>
-                        <p class="jobs">44 việc làm</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Zalo Chat Icon -->
-            <div class="zalo-chat">
-                <i class="fab fa-facebook-messenger"></i>
+                <c:choose>
+                    <c:when test="${not empty locationJobs}">
+                        <c:forEach var="job" items="${locationJobs}">
+                            <a href="${pageContext.request.contextPath}/job-detail?jobId=${job.jobID}" 
+                               class="job-card" 
+                               style="text-decoration: none; color: inherit; display: flex; gap: 18px; padding: 20px;">
+                                <div class="job-info" style="flex: 1; min-width: 0;">
+                                    <h4 title="${job.jobTitle}">
+                                        <c:choose>
+                                            <c:when test="${fn:length(job.jobTitle) > 20}">
+                                                ${fn:substring(job.jobTitle, 0, 20)}...
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${job.jobTitle}
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </h4>
+                                    <p class="company" title="${job.companyName}">
+                                        <c:choose>
+                                            <c:when test="${fn:length(job.companyName) > 20}">
+                                                ${fn:substring(job.companyName, 0, 20)}...
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${job.companyName}
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </p>
+                                    <p class="salary">
+                                        ${not empty job.salaryRange ? job.salaryRange : 'Thương lượng'}
+                                    </p>
+                                    <p class="location">
+                                        <i class="fas fa-map-marker-alt"></i> ${job.locationName}
+                                    </p>
+                                </div>
+                            </a>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <div style="text-align: center; padding: 30px; color: #6b7280;">
+                            <i class="fas fa-map-marker-alt" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>Chưa có việc làm nào tại khu vực của bạn</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Hãy cập nhật địa chỉ trong hồ sơ để xem các công việc phù hợp!</p>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </aside>
     </div>

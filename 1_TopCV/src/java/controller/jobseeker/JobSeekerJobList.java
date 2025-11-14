@@ -50,9 +50,13 @@ public class JobSeekerJobList extends HttpServlet {
         List<JobList> jobs = dao.searchJobs(keyword, categoryIds, locationId);
 
         int totalJobs = jobs.size();
+        
+        // Load Silver package jobs for sidebar (up to 50 jobs)
+        List<JobList> featuredSilverJobs = dao.getFeaturedJobsSilver(50);
 
         request.setAttribute("jobList", jobs);
         request.setAttribute("totalJobs", totalJobs);
+        request.setAttribute("featuredSilverJobs", featuredSilverJobs);
         request.getRequestDispatcher("JobSeeker/job-list.jsp").forward(request, response);
 
     }
