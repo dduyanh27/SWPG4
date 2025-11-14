@@ -1,9 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="dal.LocationDAO"%>
 <%@page import="model.Location"%>
-<%@page import="dal.ContentDAO"%>
-<%@page import="model.MarketingContent"%>
 <%@page import="java.util.List"%>
 <%
     // IMPORTANT: Force redirect if accessed directly
@@ -22,10 +21,8 @@
     List<Location> locations = ldao.getAllLocations();
     request.setAttribute("locations", locations);
     
-    // Load marketing content for website (only published, website platform, current date)
-    ContentDAO contentDAO = new ContentDAO();
-    List<MarketingContent> marketingContents = contentDAO.getPublishedContentForWebsite();
-    request.setAttribute("marketingContents", marketingContents);
+    // NOTE: Marketing content is already loaded by IndexServlet
+    // No need to reload here to avoid duplication
     
     // Set login status for use in JSP
     request.setAttribute("isLoggedIn", isLoggedIn);

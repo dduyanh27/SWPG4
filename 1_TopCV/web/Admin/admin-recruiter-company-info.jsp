@@ -217,8 +217,20 @@
                 <div class="company-logo-section">
                     <c:choose>
                         <c:when test="${not empty recruiter.companyLogoURL}">
-                            <img src="${pageContext.request.contextPath}/assets/img/company/${recruiter.companyLogoURL}" 
-                                 alt="Company Logo" class="company-logo">
+                            <!-- Resolve absolute vs relative logo URL and add onerror fallback -->
+                            <c:set var="logoPath" value="${recruiter.companyLogoURL}" />
+                            <c:choose>
+                                <c:when test="${fn:startsWith(logoPath, 'http://') || fn:startsWith(logoPath, 'https://')}">
+                                    <c:set var="resolvedLogo" value="${logoPath}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <c:set var="resolvedLogo" value="${pageContext.request.contextPath}${fn:startsWith(logoPath, '/') ? logoPath : '/'.concat(logoPath)}" />
+                                </c:otherwise>
+                            </c:choose>
+                            <img src="${resolvedLogo}" 
+                                 alt="${recruiter.companyName}" 
+                                 class="company-logo"
+                                 onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/logo/logo.png'">
                         </c:when>
                         <c:otherwise>
                             <div class="logo-placeholder">

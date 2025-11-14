@@ -111,7 +111,7 @@
 
                 <div class="sidebar-actions">
                     <a href="${pageContext.request.contextPath}/Admin/admin-profile.jsp" class="action-btn">👤 Hồ sơ cá nhân</a>
-                    <a href="#" class="action-btn logout">🚪 Đăng xuất</a>
+                    <a href="${pageContext.request.contextPath}/LogoutServlet" class="action-btn logout">🚪 Đăng xuất</a>
                 </div>
             </div>
 

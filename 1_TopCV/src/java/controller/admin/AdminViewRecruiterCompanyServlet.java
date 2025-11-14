@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+@WebServlet(name = "AdminViewRecruiterCompanyServlet", urlPatterns = {"/admin-view-recruiter-company"})
 public class AdminViewRecruiterCompanyServlet extends HttpServlet {
 
     @Override
