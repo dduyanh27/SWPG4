@@ -98,11 +98,16 @@ public class CompanyInfoServlet extends HttpServlet {
                     return;
                 }
                 
-                // Check if phone already exists for other recruiters
-                RecruiterDAO recruiterDAO = new RecruiterDAO();
-                if (recruiterDAO.isPhoneExistsForOtherRecruiter(phone.trim(), recruiter.getRecruiterID())) {
-                    response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=phone_exists");
-                    return;
+                // Only check if phone exists for other recruiters if the phone number has changed
+                String trimmedPhone = phone.trim();
+                String currentPhone = recruiter.getPhone() != null ? recruiter.getPhone().trim() : "";
+                if (!trimmedPhone.equals(currentPhone)) {
+                    // Check if phone already exists for other recruiters
+                    RecruiterDAO recruiterDAO = new RecruiterDAO();
+                    if (recruiterDAO.isPhoneExistsForOtherRecruiter(trimmedPhone, recruiter.getRecruiterID())) {
+                        response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=phone_exists");
+                        return;
+                    }
                 }
             }
             
@@ -111,6 +116,18 @@ public class CompanyInfoServlet extends HttpServlet {
                 if (!isValidTaxCodeFormat(taxCode.trim())) {
                     response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=taxcode_format_invalid");
                     return;
+                }
+                
+                // Only check if tax code exists for other recruiters if the tax code has changed
+                String trimmedTaxCode = taxCode.trim();
+                String currentTaxCode = recruiter.getTaxcode() != null ? recruiter.getTaxcode().trim() : "";
+                if (!trimmedTaxCode.equals(currentTaxCode)) {
+                    // Check if tax code already exists for other recruiters
+                    RecruiterDAO recruiterDAO = new RecruiterDAO();
+                    if (recruiterDAO.isTaxCodeExistsForOtherRecruiter(trimmedTaxCode, recruiter.getRecruiterID())) {
+                        response.sendRedirect(request.getContextPath() + "/CompanyInfoServlet?error=taxcode_exists");
+                        return;
+                    }
                 }
             }
             
