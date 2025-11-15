@@ -947,6 +947,8 @@
                                                                         if (taxCodeInput) {
                                                                             console.log('Tax code validation initialized');
                                                                             let taxCodeValidationTimeout;
+                                                                            // Get original tax code value
+                                                                            const originalTaxCode = taxCodeInput.value ? taxCodeInput.value.trim() : '';
 
                                                                             taxCodeInput.addEventListener('input', function () {
                                                                                 const taxCode = this.value.trim();
@@ -965,6 +967,13 @@
                                                                                     return;
                                                                                 }
 
+                                                                                // If tax code hasn't changed, skip AJAX validation
+                                                                                if (taxCode === originalTaxCode) {
+                                                                                    console.log('Tax code unchanged, skipping validation');
+                                                                                    showTaxCodeValidation('success', 'Mã số thuế hợp lệ');
+                                                                                    return;
+                                                                                }
+
                                                                                 console.log('Tax code format valid, scheduling AJAX validation');
                                                                                 taxCodeValidationTimeout = setTimeout(() => {
                                                                                     console.log('Executing AJAX validation for tax code:', taxCode);
@@ -976,6 +985,11 @@
                                                                                 const taxCode = this.value.trim();
 
                                                                                 if (taxCode.length > 0 && isValidTaxCodeFormat(taxCode)) {
+                                                                                    // If tax code hasn't changed, skip AJAX validation
+                                                                                    if (taxCode === originalTaxCode) {
+                                                                                        showTaxCodeValidation('success', 'Mã số thuế hợp lệ');
+                                                                                        return;
+                                                                                    }
                                                                                     validateTaxCodeExists(taxCode);
                                                                                 }
                                                                             }
@@ -1276,6 +1290,8 @@
                                                                         if (phoneInput) {
                                                                             console.log('Phone validation initialized');
                                                                             let validationTimeout;
+                                                                            // Get original phone value
+                                                                            const originalPhone = phoneInput.value ? phoneInput.value.trim() : '';
 
                                                                             phoneInput.addEventListener('input', function () {
                                                                                 const phone = this.value.trim();
@@ -1294,6 +1310,13 @@
                                                                                     return;
                                                                                 }
 
+                                                                                // If phone hasn't changed, skip AJAX validation
+                                                                                if (phone === originalPhone) {
+                                                                                    console.log('Phone unchanged, skipping validation');
+                                                                                    showPhoneValidation('success', 'Số điện thoại có thể sử dụng');
+                                                                                    return;
+                                                                                }
+
                                                                                 console.log('Phone format valid, scheduling AJAX validation');
                                                                                 validationTimeout = setTimeout(() => {
                                                                                     console.log('Executing AJAX validation for:', phone);
@@ -1304,6 +1327,11 @@
                                                                             phoneInput.addEventListener('blur', function () {
                                                                                 const phone = this.value.trim();
                                                                                 if (phone.length > 0 && isValidPhoneFormat(phone)) {
+                                                                                    // If phone hasn't changed, skip AJAX validation
+                                                                                    if (phone === originalPhone) {
+                                                                                        showPhoneValidation('success', 'Số điện thoại có thể sử dụng');
+                                                                                        return;
+                                                                                    }
                                                                                     validatePhoneExists(phone);
                                                                                 }
                                                                             });

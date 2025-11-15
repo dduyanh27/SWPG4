@@ -623,6 +623,34 @@ public class RecruiterDAO extends DBContext {
             return true; // an toàn: coi như đã tồn tại để chặn đăng ký khi lỗi
         }
     }
+    
+    // Check if tax code exists for other recruiters (excluding current recruiter)
+    public boolean isTaxCodeExistsForOtherRecruiter(String taxCode, int currentRecruiterId) {
+        if (taxCode == null || taxCode.trim().isEmpty()) {
+            return false;
+        }
+        
+        String sql = "SELECT COUNT(*) FROM Recruiter WHERE Taxcode = ? AND RecruiterID != ?";
+        
+        try {
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, taxCode.trim());
+            ps.setInt(2, currentRecruiterId);
+            
+            ResultSet rs = ps.executeQuery();
+            boolean exists = false;
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0;
+            }
+            
+            rs.close();
+            ps.close();
+            return exists;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     private boolean checkPhoneInTable(String tableName, String phone) throws SQLException {
         if (c == null) {
