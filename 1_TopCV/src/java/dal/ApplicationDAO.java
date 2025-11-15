@@ -597,4 +597,23 @@ public class ApplicationDAO extends DBContext {
             return false;
         }
     }
+    
+    /**
+     * Get application count for a specific job
+     * @param jobID The job ID
+     * @return The number of applications for this job
+     */
+    public int getApplicationCountByJobId(int jobID) {
+        String sql = "SELECT COUNT(*) FROM Applications WHERE JobID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, jobID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

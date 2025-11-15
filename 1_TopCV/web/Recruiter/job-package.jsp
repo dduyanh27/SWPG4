@@ -1267,13 +1267,13 @@
                         <span>RecruitPro</span>
                     </div>
                     <ul class="nav-menu">
-                        <li><a href="index.html">Dashboard</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                         <li><a href="#">Việc Làm</a></li>
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
-                                <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
-                                <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                                <a href="${pageContext.request.contextPath}/candidate-management">Quản lý theo việc đăng tuyển</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                             </div>
                         </li>
                         <li class="dropdown">
@@ -1287,13 +1287,13 @@
                             <a href="#">Đơn hàng <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
                                 <a href="#">Quản lý đơn hàng</a>
-                                <a href="#">Lịch sử mua</a>
+                                <a href="${pageContext.request.contextPath}/recruiter/purchase-history">Lịch sử mua</a>
                             </div>
                         </li>
                         <li><a href="#">Báo cáo</a></li>
-                        <li><a href="job-packages.html" class="active">Đăng Tuyển Dụng</a></li>
-                        <li><a href="candidate-search.html">Tìm Ứng Viên</a></li>
-                        <li><a href="shopping-cart.html" class="btn btn-red">Mua</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/job-package.jsp" class="active">Đăng Tuyển Dụng</a></li>
+                        <li><a href="${pageContext.request.contextPath}/candidate-search">Tìm Ứng Viên</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/shop-cart.jsp" class="btn btn-red">Mua</a></li>
                     </ul>
                 </div>
                 <div class="nav-right">

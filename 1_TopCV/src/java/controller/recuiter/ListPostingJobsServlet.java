@@ -18,9 +18,12 @@ import dal.JobDAO;
 import dal.JobFeatureMappingsDAO;
 import dal.RecruiterPackagesDAO;
 import dal.JobPackagesDAO;
+import dal.ApplicationDAO;
 import model.JobPackages;
 import model.Job;
 import model.Recruiter;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -205,9 +208,18 @@ public class ListPostingJobsServlet extends HttpServlet {
          int to = Math.min(total, from + pageSize);
          List<Job> paged = from < to ? currentList.subList(from, to) : Collections.emptyList();
 
+         // Get application counts for each job
+         ApplicationDAO applicationDAO = new ApplicationDAO();
+         Map<Integer, Integer> applicationCounts = new HashMap<>();
+         for (Job job : paged) {
+             int count = applicationDAO.getApplicationCountByJobId(job.getJobID());
+             applicationCounts.put(job.getJobID(), count);
+         }
+
          request.setAttribute("selectedTab", tab);
          // Cung cấp đúng một danh sách đã phân trang cho JSP, giống purchase-history
          request.setAttribute("jobs", paged);
+         request.setAttribute("applicationCounts", applicationCounts);
          request.setAttribute("page", page);
          request.setAttribute("pageSize", pageSize);
          request.setAttribute("total", total);

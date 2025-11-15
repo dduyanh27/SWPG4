@@ -12,16 +12,20 @@ body {
 }
 
 .main-content {
-    padding: 0;
-    margin: 0;
-    background: #f5f7fa;
-    min-height: 100vh;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 1400px !important;
+    background: #f5f7fa !important;
+    min-height: 100vh !important;
+    display: block !important;
+    align-items: unset !important;
+    justify-content: unset !important;
 }
 
 .candidates-container {
-    width: 100vw;
-    max-width: none;
-    margin: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
     border-radius: 0 0 18px 18px;
     box-shadow: none;
     background: #fff;
@@ -49,35 +53,6 @@ body {
 
 .job-info .job-date {
     color: #606060;
-}
-
-.job-info .action-buttons {
-    margin-left: auto;
-    display: flex;
-    gap: 10px;
-}
-
-.btn-report {
-    background: #eff4ff;
-    color: #1667ef;
-    padding: 7px 16px;
-    border-radius: 8px;
-    border: 1px solid #dde6ff;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-report:hover {
-    background: #dde6ff;
-}
-
-.btn-more {
-    background: none;
-    border: none;
-    color: #999;
-    padding: 7px 12px;
-    border-radius: 8px;
-    cursor: pointer;
 }
 
 .recruitment-stages {

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="model.Job" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -71,7 +72,7 @@
 
             .search-container {
                 flex: 1;
-                max-width: 400px;
+                max-width: 800px;
             }
 
             .search-box {
@@ -394,7 +395,8 @@
             /* Applications Section */
             .applications-section {
                 display: flex;
-                align-items: center;
+                flex-direction: column;
+                gap: 8px;
             }
 
             .application-count {
@@ -536,13 +538,13 @@
                         <span>RecruitPro</span>
                     </div>
                     <ul class="nav-menu">
-                        <li><a href="index.html">Dashboard</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
                         <li><a href="#">Việc Làm</a></li>
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
-                                <a href="#">Quản lý theo việc đăng tuyển</a>
-                                <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                                <a href="${pageContext.request.contextPath}/candidate-management">Quản lý theo việc đăng tuyển</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                             </div>
                         </li>
                         <li class="dropdown">
@@ -552,9 +554,15 @@
                                 <a href="#">Tài liệu hướng dẫn</a>
                             </div>
                         </li>
-                        <li><a href="<%= request.getContextPath() %>/recruiter/purchase-history">Đơn hàng</a></li>
+                        <li class="dropdown">
+                            <a href="#">Đơn hàng <i class="fas fa-chevron-down"></i></a>
+                            <div class="dropdown-content">
+                                <a href="#">Quản lý đơn hàng</a>
+                                <a href="${pageContext.request.contextPath}/recruiter/purchase-history">Lịch sử mua</a>
+                            </div>
+                        </li>
                         <li><a href="#">Báo cáo</a></li>
-                        <li><a href="#" class="company-link">Công ty</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="company-link">Công ty</a></li>
                     </ul>
                 </div>
                 <div class="nav-right">
@@ -564,12 +572,12 @@
                                 ĐĂNG TUYỂN DỤNG <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="dropdown-content">
-                                <a href="job-posting.html">Tạo tin tuyển dụng mới</a>
-                                <a href="<%= request.getContextPath() %>/listpostingjobs" class="active">Quản lý tin đã đăng</a>
+                                <a href="${pageContext.request.contextPath}/jobposting">Tạo tin tuyển dụng mới</a>
+                                <a href="${pageContext.request.contextPath}/listpostingjobs" class="active">Quản lý tin đã đăng</a>
                             </div>
                         </div>
-                        <button class="btn btn-blue" onclick="window.location.href = 'candidate-profile.html'">TÌM ỨNG VIÊN</button>
-                        <button class="btn btn-white">Mua</button>
+                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/candidate-search'">TÌM ỨNG VIÊN</button>
+                        <button class="btn btn-white" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-package.jsp'">Mua</button>
                     </div>
                     <div class="nav-icons">
                         <i class="fas fa-shopping-cart"></i>
@@ -596,11 +604,11 @@
 
                                 <div class="menu-section">
                                     <div class="section-title">Thiết lập tài khoản</div>
-                                    <a href="account-management.html" class="menu-item">
+                                    <a href="#" class="menu-item">
                                         <i class="fas fa-cog"></i>
                                         <span>Quản lý tài khoản</span>
                                     </a>
-                                    <a href="company-info.html" class="menu-item highlighted">
+                                    <a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="menu-item highlighted">
                                         <i class="fas fa-building"></i>
                                         <span>Thông tin công ty</span>
                                     </a>
@@ -635,7 +643,7 @@
                                 </div>
 
                                 <div class="menu-footer">
-                                    <a href="#" class="logout-item">
+                                    <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-item">
                                         <i class="fas fa-sign-out-alt"></i>
                                         <span>Thoát</span>
                                     </a>
@@ -675,9 +683,6 @@
                         <span>Nháp (<%= dC %>)</span>
                     </a>
                 </div>
-                <div style="margin:10px 20px; padding:8px 12px; background:#f3f4f6; color:#374151; border-radius:8px; font-size:12px;">
-                    Tab hiện tại: <b><%= selectedTab %></b> | Active: <%= aC %> | Expired: <%= eC %> | Draft: <%= dC %>
-                </div>
 
                 <!-- Action Bar -->
                 <div class="action-bar">
@@ -708,19 +713,10 @@
                             <button type="submit" class="btn btn-filter">Lọc</button>
                         </form>
                     </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-excel">
-                            <i class="fas fa-file-excel"></i>
-                            Xuất ra Excel
-                        </button>
-                        <button class="btn btn-filter">
-                            <i class="fas fa-filter"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Job List - Đang Hiển Thị -->
-                <div class="job-list" style="display: <%= "active".equals(selectedTab) ? "block" : "none" %>;">
+                <div class="job-list" <% if (!"active".equals(selectedTab)) { %>style="display: none;"<% } %>>
                     <div class="column-header">Đang hiển thị</div>
                     <%
                         List jobs = (List) request.getAttribute("jobs");
@@ -756,7 +752,16 @@
                         </div>
                         <div class="applications-section">
                             <div class="column-header">Hồ sơ ứng tuyển</div>
-                            <div class="application-count"><span>-</span></div>
+                            <div class="application-count">
+                                <%
+                                    Map<Integer, Integer> applicationCounts1 = (Map<Integer, Integer>) request.getAttribute("applicationCounts");
+                                    int appCount1 = 0;
+                                    if (applicationCounts1 != null && applicationCounts1.containsKey(j.getJobID())) {
+                                        appCount1 = applicationCounts1.get(j.getJobID());
+                                    }
+                                %>
+                                <span><%= appCount1 %></span>
+                            </div>
                         </div>
                         
                     </div>
@@ -773,7 +778,7 @@
                 </div>
 
                 <!-- Job List - Đã Hết Hạn -->
-                <div class="job-list" style="display: <%= "expired".equals(selectedTab) ? "block" : "none" %>;">
+                <div class="job-list" <% if (!"expired".equals(selectedTab)) { %>style="display: none;"<% } %>>
                     <div class="column-header">Đã hết hạn</div>
                     <%
                         List jobs2 = (List) request.getAttribute("jobs");
@@ -809,7 +814,16 @@
                         </div>
                         <div class="applications-section">
                             <div class="column-header">Hồ sơ ứng tuyển</div>
-                            <div class="application-count"><span>-</span></div>
+                            <div class="application-count">
+                                <%
+                                    Map<Integer, Integer> applicationCounts2 = (Map<Integer, Integer>) request.getAttribute("applicationCounts");
+                                    int appCount2 = 0;
+                                    if (applicationCounts2 != null && applicationCounts2.containsKey(j.getJobID())) {
+                                        appCount2 = applicationCounts2.get(j.getJobID());
+                                    }
+                                %>
+                                <span><%= appCount2 %></span>
+                            </div>
                         </div>
                         
                     </div>
@@ -826,7 +840,7 @@
                 </div>
 
                 <!-- Job List - Nháp -->
-                <div class="job-list" style="display: <%= "draft".equals(selectedTab) ? "block" : "none" %>;">
+                <div class="job-list" <% if (!"draft".equals(selectedTab)) { %>style="display: none;"<% } %>>
                     <div class="column-header">Nháp</div>
                     <%
                         List jobs3 = (List) request.getAttribute("jobs");
@@ -859,6 +873,19 @@
                         <div class="expiration-section">
                             <div class="column-header">Hết hạn</div>
                             <div class="expiration-status"><span>Hết hạn: <%= j.getExpirationDate() != null ? j.getExpirationDate() : "-" %></span></div>
+                        </div>
+                        <div class="applications-section">
+                            <div class="column-header">Hồ sơ ứng tuyển</div>
+                            <div class="application-count">
+                                <%
+                                    Map<Integer, Integer> applicationCounts3 = (Map<Integer, Integer>) request.getAttribute("applicationCounts");
+                                    int appCount3 = 0;
+                                    if (applicationCounts3 != null && applicationCounts3.containsKey(j.getJobID())) {
+                                        appCount3 = applicationCounts3.get(j.getJobID());
+                                    }
+                                %>
+                                <span><%= appCount3 %></span>
+                            </div>
                         </div>
                     </div>
                     <%
