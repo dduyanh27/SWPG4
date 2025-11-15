@@ -2,7 +2,11 @@ package controller.recuiter;
 
 import dal.RecruiterDAO;
 import dal.CategoryDAO;
+import dal.LocationDAO;
+import dal.TypeDAO;
 import model.Category;
+import model.Location;
+import model.Type;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -60,6 +64,26 @@ public class RecruiterRegistrationServlet extends HttpServlet {
             
             request.setAttribute("parentCategories", parentCategories);
             System.out.println("parentCategories set as request attribute");
+            
+            // Load locations for the form
+            LocationDAO locationDAO = new LocationDAO();
+            System.out.println("LocationDAO created successfully");
+            
+            List<Location> locations = locationDAO.getAllLocations();
+            System.out.println("getAllLocations() returned: " + (locations != null ? locations.size() : "null") + " locations");
+            
+            request.setAttribute("locations", locations);
+            System.out.println("locations set as request attribute");
+            
+            // Load job levels for the form (TypeCategory = 'Level')
+            TypeDAO typeDAO = new TypeDAO();
+            System.out.println("TypeDAO created successfully");
+            
+            List<Type> jobLevels = typeDAO.getJobLevels();
+            System.out.println("getJobLevels() returned: " + (jobLevels != null ? jobLevels.size() : "null") + " job levels");
+            
+            request.setAttribute("jobLevels", jobLevels);
+            System.out.println("jobLevels set as request attribute");
             
             request.getRequestDispatcher("/Recruiter/registration.jsp").forward(request, response);
             System.out.println("Forwarded to registration.jsp");
@@ -139,6 +163,15 @@ public class RecruiterRegistrationServlet extends HttpServlet {
             
             // Use the selected category ID directly
             int finalCategoryId = Integer.parseInt(categoryId.trim());
+            
+            // Convert location ID to location name
+            LocationDAO locationDAO = new LocationDAO();
+            int locationId = Integer.parseInt(address.trim());
+            Location location = locationDAO.getLocationById(locationId);
+            String locationName = address; // Default to original value if location not found
+            if (location != null) {
+                locationName = location.getLocationName();
+            }
 
             // Kiểm tra phone đã tồn tại trong tất cả các bảng chưa
             RecruiterDAO recruiterDAO = new RecruiterDAO();
@@ -193,7 +226,7 @@ public class RecruiterRegistrationServlet extends HttpServlet {
                 phone, // Already trimmed phone
                 companyName, 
                 industry, 
-                address, 
+                locationName, // Use location name instead of location ID
                 "Active",
                 taxCode,
                 registrationCertPath,

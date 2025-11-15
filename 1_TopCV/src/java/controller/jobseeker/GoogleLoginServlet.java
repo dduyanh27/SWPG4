@@ -39,7 +39,6 @@ public class GoogleLoginServlet extends HttpServlet {
             
             if (user == null) {
                 // Email doesn't exist, create new account
-                // 创建新 JobSeeker，确保 FullName 非空
                 user = dao.insertJobSeeker(account.getEmail(), "GOOGLE_LOGIN", "Active", account.getName());
                 
                 if (user == null) {

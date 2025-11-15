@@ -955,13 +955,17 @@
                             Địa chỉ <span class="required">*</span>
                         </label>
                         <select id="address" name="address" class="form-select" required>
-                            <option value="">Chọn</option>
-                            <option value="hanoi">Hà Nội</option>
-                            <option value="hcm">TP. Hồ Chí Minh</option>
-                            <option value="danang">Đà Nẵng</option>
-                            <option value="haiphong">Hải Phòng</option>
-                            <option value="cantho">Cần Thơ</option>
-                            <option value="other">Tỉnh/Thành phố khác</option>
+                            <option value="">Chọn địa chỉ</option>
+                            <c:choose>
+                                <c:when test="${locations != null && !locations.isEmpty()}">
+                                    <c:forEach var="location" items="${locations}">
+                                        <option value="${location.locationID}">${location.locationName}</option>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="1">Không có dữ liệu</option>
+                                </c:otherwise>
+                            </c:choose>
                         </select>
                         <div class="error-message" id="addressError">Vui lòng chọn địa chỉ</div>
                     </div>
@@ -1051,12 +1055,16 @@
                         </label>
                         <select id="jobLevel" name="jobLevel" class="form-select">
                             <option value="">Chọn cấp bậc</option>
-                            <option value="intern">Thực tập sinh</option>
-                            <option value="junior">Nhân viên</option>
-                            <option value="senior">Chuyên viên</option>
-                            <option value="manager">Quản lý</option>
-                            <option value="director">Giám đốc</option>
-                            <option value="executive">Điều hành</option>
+                            <c:choose>
+                                <c:when test="${jobLevels != null && !jobLevels.isEmpty()}">
+                                    <c:forEach var="jobLevel" items="${jobLevels}">
+                                        <option value="${jobLevel.typeID}">${jobLevel.typeName}</option>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="1">Không có dữ liệu</option>
+                                </c:otherwise>
+                            </c:choose>
                         </select>
                     </div>
 

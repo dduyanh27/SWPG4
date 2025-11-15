@@ -110,9 +110,6 @@
                         <button class="ph-btn" onclick="location.href = '<%= request.getContextPath() %>/Recruiter/job-package.jsp'">
                             <i class="fas fa-plus"></i> Mua gói
                         </button>
-                        <button class="ph-btn primary">
-                            <i class="fas fa-file-export"></i> Xuất Excel
-                        </button>
                     </div>
                 </div>
 

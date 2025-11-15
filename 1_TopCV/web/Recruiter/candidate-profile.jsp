@@ -2,9 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="model.JobSeeker" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Tìm kiếm ứng viên - RecruitPro</title>
@@ -21,9 +24,7 @@
                 max-width: 1400px;
                 margin: 0 auto;
                 padding: 20px;
-                display: grid;
-                grid-template-columns: 1fr 350px;
-                gap: 20px;
+                display: block;
             }
 
             /* Main Profile Section */
@@ -32,6 +33,9 @@
                 border-radius: 12px;
                 padding: 30px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto;
             }
 
             .profile-header {
@@ -248,29 +252,43 @@
 
             .details-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 20px;
             }
 
             .detail-item {
                 display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 0;
-                border-bottom: 1px solid #f0f0f0;
+                flex-direction: column;
+                padding: 15px;
+                border: 1px solid #f0f0f0;
+                border-radius: 8px;
+                background: #fafafa;
+                gap: 8px;
+                transition: all 0.2s ease;
+            }
+
+            .detail-item:hover {
+                background: #f5f5f5;
+                border-color: #e0e0e0;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             }
 
             .detail-label {
                 color: #666;
                 font-weight: 500;
-                min-width: 150px;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
             .detail-value {
                 color: #333;
                 font-weight: 400;
-                text-align: right;
-                flex: 1;
+                font-size: 15px;
+                word-wrap: break-word;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.5;
             }
 
             /* Matching Candidates Sidebar */
@@ -594,12 +612,8 @@
             /* Responsive Design */
             @media (max-width: 1024px) {
                 .candidate-search-container {
-                    grid-template-columns: 1fr;
-                    gap: 15px;
-                }
-
-                .matching-candidates {
-                    order: -1;
+                    max-width: 100%;
+                    padding: 15px;
                 }
             }
 
@@ -631,12 +645,12 @@
                     </div>
                     <ul class="nav-menu">
                         <li><a href="${pageContext.request.contextPath}/Recruiter/index.jsp">Dashboard</a></li>
-                        <li><a href="#">Việc Làm</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Việc Làm</a></li>
                         <li class="dropdown">
                             <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                             <div class="dropdown-content">
-                                <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
-                                <a href="candidate-folder.html">Quản lý theo thư mục và thẻ</a>
+                                <a href="${pageContext.request.contextPath}/candidate-management">Quản lý theo việc đăng tuyển</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                             </div>
                         </li>
                         <li class="dropdown">
@@ -646,9 +660,14 @@
                                 <a href="#">Tài liệu hướng dẫn</a>
                             </div>
                         </li>
-                        <li><a href="#">Đơn hàng</a></li>
+                        <li class="dropdown">
+                            <a href="#">Đơn hàng <i class="fas fa-chevron-down"></i></a>
+                            <div class="dropdown-content">
+                                <a href="${pageContext.request.contextPath}/recruiter/purchase-history">Lịch sử mua</a>
+                            </div>
+                        </li>
                         <li><a href="#">Báo cáo</a></li>
-                        <li><a href="#">Công ty</a></li>
+                        <li><a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp">Công ty</a></li>
                     </ul>
                 </div>
                 <div class="nav-right">
@@ -658,12 +677,12 @@
                                 Đăng Tuyển Dụng <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="dropdown-content">
-                                <a href="candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
-                                <a href="candidate-folder.html" class="highlighted">Quản lý theo thư mục và thẻ</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/job-posting.jsp">Tạo tin tuyển dụng mới</a>
+                                <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                             </div>
                         </div>
-                        <button class="btn btn-blue">Tìm Ứng Viên</button>
-                        <button class="btn btn-white">Mua</button>
+                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/candidate-search'">Tìm Ứng Viên</button>
+                        <button class="btn btn-white" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-package.jsp'">Mua</button>
                     </div>
                     <div class="nav-icons">
                         <i class="fas fa-bell" style="position: relative;">
@@ -696,7 +715,7 @@
                                         <i class="fas fa-cog"></i>
                                         <span>Quản lý tài khoản</span>
                                     </a>
-                                    <a href="#" class="menu-item highlighted">
+                                    <a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="menu-item highlighted">
                                         <i class="fas fa-building"></i>
                                         <span>Thông tin công ty</span>
                                     </a>
@@ -731,7 +750,7 @@
                                 </div>
 
                                 <div class="menu-footer">
-                                    <a href="#" class="logout-item">
+                                    <a href="${pageContext.request.contextPath}/LogoutServlet" class="logout-item">
                                         <i class="fas fa-sign-out-alt"></i>
                                         <span>Thoát</span>
                                     </a>
@@ -773,7 +792,22 @@
                         <div class="profile-location">
                             <i class="fas fa-map-marker-alt"></i>
                             <c:choose>
-                                <c:when test="${not empty candidate.address}">${candidate.address}</c:when>
+                                <c:when test="${not empty candidate.address}">
+                                    <%
+                                        model.JobSeeker candidateObj = (model.JobSeeker) request.getAttribute("candidate");
+                                        String address = candidateObj != null ? candidateObj.getAddress() : null;
+                                        if (address != null) {
+                                            try {
+                                                // Fix encoding: if string contains ? characters, try to fix
+                                                if (address.contains("?")) {
+                                                    byte[] bytes = address.getBytes("ISO-8859-1");
+                                                    address = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                                                }
+                                            } catch (Exception e) {}
+                                        }
+                                        out.print(address != null ? address : "Đà Nẵng");
+                                    %>
+                                </c:when>
                                 <c:otherwise>Đà Nẵng</c:otherwise>
                             </c:choose>
                         </div>
@@ -914,7 +948,22 @@
                             <span class="detail-label">Địa chỉ</span>
                             <span class="detail-value">
                                 <c:choose>
-                                    <c:when test="${not empty candidate.address}">${candidate.address}</c:when>
+                                    <c:when test="${not empty candidate.address}">
+                                        <%
+                                            model.JobSeeker candidateObj = (model.JobSeeker) request.getAttribute("candidate");
+                                            String address = candidateObj != null ? candidateObj.getAddress() : null;
+                                            if (address != null) {
+                                                try {
+                                                    // Fix encoding: if string contains ? characters, try to fix
+                                                    if (address.contains("?")) {
+                                                        byte[] bytes = address.getBytes("ISO-8859-1");
+                                                        address = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                                                    }
+                                                } catch (Exception e) {}
+                                            }
+                                            out.print(address != null ? address : "Quận Hải Châu, Đà Nẵng");
+                                        %>
+                                    </c:when>
                                     <c:otherwise>Quận Hải Châu, Đà Nẵng</c:otherwise>
                                 </c:choose>
                             </span>
@@ -973,19 +1022,40 @@
                                 <!-- Hiển thị CV file (PDF, DOC, etc.) -->
                                 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                                     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                                        <c:choose>
-                                            <c:when test="${fn:startsWith(selectedCV.cvURL, 'http://') || fn:startsWith(selectedCV.cvURL, 'https://')}">
-                                                <c:set var="downloadUrl" value="${selectedCV.cvURL}" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:set var="downloadUrl" value="${pageContext.request.contextPath}${fn:startsWith(selectedCV.cvURL, '/') ? '' : '/'}${selectedCV.cvURL}" />
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <a href="${downloadUrl}" target="_blank" 
-                                           style="background: #ff6b35; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                                            <i class="fas fa-download"></i>
-                                            Tải xuống CV
-                                        </a>
+                                        <%
+                                            // Get CV URL and construct full path
+                                            model.CV cv = (model.CV) request.getAttribute("selectedCV");
+                                            String cvUrl = cv != null ? cv.getCvURL() : null;
+                                            String downloadUrl = null;
+                                            String fullCvUrl = null;
+                                            
+                                            if (cvUrl != null && !cvUrl.isEmpty()) {
+                                                if (cvUrl.startsWith("http://") || cvUrl.startsWith("https://")) {
+                                                    // Absolute URL
+                                                    downloadUrl = cvUrl;
+                                                    fullCvUrl = cvUrl;
+                                                } else {
+                                                    // Relative URL - ensure it starts with /uploads/cvs/
+                                                    String normalizedUrl = cvUrl.startsWith("/") ? cvUrl : "/" + cvUrl;
+                                                    // If it doesn't start with /uploads/cvs/, add it
+                                                    if (!normalizedUrl.startsWith("/uploads/cvs/")) {
+                                                        // Extract filename from path
+                                                        String fileName = normalizedUrl.substring(normalizedUrl.lastIndexOf("/") + 1);
+                                                        normalizedUrl = "/uploads/cvs/" + fileName;
+                                                    }
+                                                    String contextPath = request.getContextPath();
+                                                    downloadUrl = contextPath + normalizedUrl;
+                                                    fullCvUrl = contextPath + normalizedUrl;
+                                                }
+                                            }
+                                        %>
+                                        <c:if test="<%= downloadUrl != null %>">
+                                            <a href="<%= downloadUrl %>" target="_blank" 
+                                               style="background: #ff6b35; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                                                <i class="fas fa-download"></i>
+                                                Tải xuống CV
+                                            </a>
+                                        </c:if>
                                         <span style="color: #666; font-size: 14px;">
                                             <c:if test="${not empty selectedCV.cvTitle}">
                                                 Tiêu đề: ${selectedCV.cvTitle}
@@ -994,60 +1064,60 @@
                                     </div>
                                     <!-- CV Viewer -->
                                     <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; position: relative;">
-                                        <c:set var="cvUrl" value="${selectedCV.cvURL}" />
-                                        <c:choose>
-                                            <c:when test="${fn:startsWith(cvUrl, 'http://') || fn:startsWith(cvUrl, 'https://')}">
-                                                <!-- Absolute URL -->
-                                                <c:set var="fullCvUrl" value="${cvUrl}" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <!-- Relative URL - add context path -->
-                                                <c:set var="fullCvUrl" value="${pageContext.request.contextPath}${fn:startsWith(cvUrl, '/') ? '' : '/'}${cvUrl}" />
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <c:choose>
-                                            <c:when test="${fn:endsWith(fn:toLowerCase(cvUrl), '.pdf')}">
-                                                <!-- PDF Viewer -->
-                                                <iframe src="${fullCvUrl}#toolbar=0&navpanes=0&scrollbar=1" 
-                                                        style="width: 100%; height: 800px; border: none;"
-                                                        title="CV Viewer (PDF)">
-                                                    <p>Trình duyệt của bạn không hỗ trợ iframe. 
-                                                        <a href="${fullCvUrl}" target="_blank">Nhấp vào đây để xem CV</a>
-                                                    </p>
-                                                </iframe>
-                                            </c:when>
-                                            <c:when test="${fn:endsWith(fn:toLowerCase(cvUrl), '.doc') || fn:endsWith(fn:toLowerCase(cvUrl), '.docx')}">
-                                                <!-- DOC/DOCX - Use Google Docs Viewer -->
-                                                <c:choose>
-                                                    <c:when test="${fn:startsWith(cvUrl, 'http://') || fn:startsWith(cvUrl, 'https://')}">
-                                                        <c:set var="docViewerUrl" value="https://docs.google.com/gview?url=${fn:escapeXml(cvUrl)}&embedded=true" />
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <!-- For relative URLs, need to construct full URL -->
-                                                        <c:set var="docViewerUrl" value="https://docs.google.com/gview?url=${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}${fn:startsWith(cvUrl, '/') ? '' : '/'}${fn:escapeXml(cvUrl)}&embedded=true" />
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <iframe src="${docViewerUrl}" 
-                                                        style="width: 100%; height: 800px; border: none;"
-                                                        title="CV Viewer (DOC/DOCX)">
-                                                    <p>Trình duyệt của bạn không hỗ trợ iframe. 
-                                                        <a href="${fullCvUrl}" target="_blank">Nhấp vào đây để tải xuống CV</a>
-                                                    </p>
-                                                </iframe>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <!-- Other file types - direct link -->
-                                                <div style="padding: 40px; text-align: center;">
-                                                    <i class="fas fa-file" style="font-size: 48px; color: #999; margin-bottom: 20px;"></i>
-                                                    <p style="color: #666; margin-bottom: 20px;">Không thể xem trước file này trong trình duyệt.</p>
-                                                    <a href="${fullCvUrl}" target="_blank" 
-                                                       style="background: #ff6b35; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                                                        <i class="fas fa-download"></i>
-                                                        Tải xuống để xem
-                                                    </a>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <c:if test="<%= fullCvUrl != null %>">
+                                            <%
+                                                String fileExtension = "";
+                                                if (cvUrl != null) {
+                                                    int lastDot = cvUrl.lastIndexOf(".");
+                                                    if (lastDot > 0) {
+                                                        fileExtension = cvUrl.substring(lastDot).toLowerCase();
+                                                    }
+                                                }
+                                            %>
+                                            <c:choose>
+                                                <c:when test="<%= \".pdf\".equals(fileExtension) %>">
+                                                    <!-- PDF Viewer -->
+                                                    <iframe src="<%= fullCvUrl %>#toolbar=0&navpanes=0&scrollbar=1" 
+                                                            style="width: 100%; height: 800px; border: none;"
+                                                            title="CV Viewer (PDF)">
+                                                        <p>Trình duyệt của bạn không hỗ trợ iframe. 
+                                                            <a href="<%= fullCvUrl %>" target="_blank">Nhấp vào đây để xem CV</a>
+                                                        </p>
+                                                    </iframe>
+                                                </c:when>
+                                                <c:when test="<%= \".doc\".equals(fileExtension) || \".docx\".equals(fileExtension) %>">
+                                                    <!-- DOC/DOCX - Use Google Docs Viewer -->
+                                                    <%
+                                                        String docViewerUrl;
+                                                        if (cvUrl != null && (cvUrl.startsWith("http://") || cvUrl.startsWith("https://"))) {
+                                                            docViewerUrl = "https://docs.google.com/gview?url=" + java.net.URLEncoder.encode(cvUrl, "UTF-8") + "&embedded=true";
+                                                        } else {
+                                                            String fullUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + fullCvUrl;
+                                                            docViewerUrl = "https://docs.google.com/gview?url=" + java.net.URLEncoder.encode(fullUrl, "UTF-8") + "&embedded=true";
+                                                        }
+                                                    %>
+                                                    <iframe src="<%= docViewerUrl %>" 
+                                                            style="width: 100%; height: 800px; border: none;"
+                                                            title="CV Viewer (DOC/DOCX)">
+                                                        <p>Trình duyệt của bạn không hỗ trợ iframe. 
+                                                            <a href="<%= fullCvUrl %>" target="_blank">Nhấp vào đây để tải xuống CV</a>
+                                                        </p>
+                                                    </iframe>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <!-- Other file types - direct link -->
+                                                    <div style="padding: 40px; text-align: center;">
+                                                        <i class="fas fa-file" style="font-size: 48px; color: #999; margin-bottom: 20px;"></i>
+                                                        <p style="color: #666; margin-bottom: 20px;">Không thể xem trước file này trong trình duyệt.</p>
+                                                        <a href="<%= fullCvUrl %>" target="_blank" 
+                                                           style="background: #ff6b35; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                                                            <i class="fas fa-download"></i>
+                                                            Tải xuống để xem
+                                                        </a>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:if>
                                     </div>
                                 </div>
                             </c:when>
@@ -1077,51 +1147,6 @@
                         </div>
                     </div>
                 </c:if>
-            </div>
-
-            <!-- Matching Candidates Sidebar -->
-            <div class="matching-candidates">
-                <h3>ỨNG VIÊN PHÙ HỢP</h3>
-
-                <div class="candidate-card">
-                    <div class="candidate-avatar">QA</div>
-                    <div class="candidate-info">
-                        <h4>Nguyễn Văn A</h4>
-                        <p>Junior Quality Assurance</p>
-                    </div>
-                </div>
-
-                <div class="candidate-card">
-                    <div class="candidate-avatar">TL</div>
-                    <div class="candidate-info">
-                        <h4>Trần Thị B</h4>
-                        <p>Technical Lead</p>
-                    </div>
-                </div>
-
-                <div class="candidate-card">
-                    <div class="candidate-avatar">GD</div>
-                    <div class="candidate-info">
-                        <h4>Lê Văn C</h4>
-                        <p>Game Developer</p>
-                    </div>
-                </div>
-
-                <div class="candidate-card">
-                    <div class="candidate-avatar">RD</div>
-                    <div class="candidate-info">
-                        <h4>Phạm Thị D</h4>
-                        <p>Ruby Developer</p>
-                    </div>
-                </div>
-
-                <div class="candidate-card">
-                    <div class="candidate-avatar">FS</div>
-                    <div class="candidate-info">
-                        <h4>Hoàng Văn E</h4>
-                        <p>Full Stack Developer</p>
-                    </div>
-                </div>
             </div>
         </div>
 

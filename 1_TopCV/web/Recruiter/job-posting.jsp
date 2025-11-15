@@ -93,7 +93,7 @@
                     <li class="dropdown">
                         <a href="#">Ứng viên <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-content">
-                            <a href="${pageContext.request.contextPath}/Recruiter/candidate-management.jsp">Quản lý theo việc đăng tuyển</a>
+                            <a href="${pageContext.request.contextPath}/candidate-management">Quản lý theo việc đăng tuyển</a>
                             <a href="${pageContext.request.contextPath}/Recruiter/candidate-folder.html">Quản lý theo thư mục và thẻ</a>
                         </div>
                     </li>
@@ -104,9 +104,15 @@
                             <a href="#">Tài liệu hướng dẫn</a>
                         </div>
                     </li>
-                    <li><a href="${pageContext.request.contextPath}/recruiter/purchase-history">Đơn hàng</a></li>
-                <li><a href="#">Báo cáo</a></li>
-                <li><a href="#" class="company-link">Công ty</a></li>
+                    <li class="dropdown">
+                        <a href="#">Đơn hàng <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#">Quản lý đơn hàng</a>
+                            <a href="${pageContext.request.contextPath}/recruiter/purchase-history">Lịch sử mua</a>
+                        </div>
+                    </li>
+                    <li><a href="#">Báo cáo</a></li>
+                    <li><a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="company-link">Công ty</a></li>
                 </ul>
             </div>
             <div class="nav-right">
@@ -120,8 +126,8 @@
                             <a href="${pageContext.request.contextPath}/Recruiter/job-management.jsp">Quản lý tin đã đăng</a>
                         </div>
                     </div>
-                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/candidate-profile.html'">TÌM ỨNG VIÊN</button>
-                    <button class="btn btn-white">Mua</button>
+                        <button class="btn btn-blue" onclick="window.location.href='${pageContext.request.contextPath}/candidate-search'">TÌM ỨNG VIÊN</button>
+                    <button class="btn btn-white" onclick="window.location.href='${pageContext.request.contextPath}/Recruiter/job-package.jsp'">Mua</button>
                 </div>
                 <div class="nav-icons">
                     <i class="fas fa-shopping-cart"></i>
@@ -152,7 +158,7 @@
                                     <i class="fas fa-cog"></i>
                                     <span>Quản lý tài khoản</span>
                                 </a>
-                                <a href="#" class="menu-item">
+                                <a href="${pageContext.request.contextPath}/Recruiter/company-info.jsp" class="menu-item">
                                     <i class="fas fa-building"></i>
                                     <span>Thông tin công ty</span>
                                 </a>
@@ -198,21 +204,6 @@
             </div>
         </div>
     </nav>
-
-    <!-- Progress Indicator -->
-    <div class="progress-container">
-        <div class="progress-steps">
-            <div class="step active">
-                <div class="step-number">1</div>
-                <div class="step-title">Chỉnh sửa việc làm</div>
-            </div>
-            <div class="step-line"></div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <div class="step-title">Đăng tuyển dụng</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <main class="job-posting-main">
